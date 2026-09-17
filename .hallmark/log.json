@@ -1,0 +1,33 @@
+[
+  {
+    "date": "2026-09-17",
+    "macrostructure": "Index-First",
+    "theme": "custom",
+    "theme_axes": "dark / mono / cool",
+    "vibe": "kelex FUI — grey-800, cyan-300, IBM Plex Mono, chamfered bevels",
+    "enrichment": "none",
+    "nav": "N8",
+    "footer": "Ft2",
+    "brief": "NEL desk restyled on trentlutmer/kelex-design-system tokens"
+  },
+  {
+    "date": "2026-09-17",
+    "macrostructure": "Index-First",
+    "theme": "custom",
+    "theme_axes": "dark / grotesk-sans / warm",
+    "vibe": "bloomberg amber-black terminal",
+    "enrichment": "none",
+    "nav": "N8",
+    "footer": "Ft2",
+    "brief": "NEL desk restyled as a Bloomberg-like amber terminal"
+  },
+  {
+    "date": "2026-09-17",
+    "macrostructure": "Index-First",
+    "theme": "Cobalt",
+    "enrichment": "none",
+    "nav": "N9",
+    "footer": "Ft2",
+    "brief": "NEL post-close trader desk — Focus names and TradingView charts"
+  }
+]
