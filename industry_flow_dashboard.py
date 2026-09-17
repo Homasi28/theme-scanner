@@ -143,7 +143,7 @@ def write_dashboard(output_dir: Path) -> Path:
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>LLD &lt;GO&gt; | Liquid Leadership</title>
   <meta name="description" content="Find non-extended leaders from the market’s most liquid momentum stocks.">
   <meta name="robots" content="index, follow">
@@ -230,6 +230,8 @@ a { color: inherit; }
   gap: var(--space-sm);
   min-height: var(--banner-height);
   padding: 0 var(--page-gutter);
+  padding-left: max(var(--page-gutter), env(safe-area-inset-left));
+  padding-right: max(var(--page-gutter), env(safe-area-inset-right));
   background: var(--grey-800);
   color: var(--grey-100);
   border-bottom: var(--rule) solid var(--grey-100);
@@ -263,6 +265,8 @@ a { color: inherit; }
   align-items: center;
   gap: var(--space-8);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 .bbg-keys a {
   display: flex;
@@ -567,7 +571,8 @@ svg {
 .desk-block--graphite .theme-line { color: var(--color-graphite-muted); }
 .theme-line strong { font-size: var(--text-sm); color: var(--color-accent); font-family: var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
 .desk-block--graphite .theme-line strong { color: var(--color-accent); }
-.table-wrap { overflow-x: auto; max-width: 100%; }
+.rs-lede { margin: 0 0 var(--space-xs); }
+.table-wrap { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
 .scrollable-table { max-height: 16rem; overflow-y: auto; }
 table {
   width: 100%;
@@ -684,13 +689,111 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   .bbg-clock { display: none; }
 }
 @media (max-width: 47.99rem) {
-  .col-industry, .col-vol, .col-ext, .col-rules { display: none; }
-  .bbg-keys { display: none; }
-  .nav-edge { flex-wrap: wrap; }
+  :root {
+    --page-gutter: var(--space-8);
+    --chart-height: 11rem;
+    --banner-height: 3.25rem;
+    --control-height: 2.75rem;
+  }
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+    font-size: var(--text-sm);
+  }
+  .nav-edge {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand controls"
+      "keys keys";
+    align-items: center;
+    gap: 0;
+    min-height: 0;
+    padding: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+  .bbg-brand {
+    grid-area: brand;
+    min-height: var(--banner-height);
+    padding-left: max(var(--page-gutter), env(safe-area-inset-left));
+  }
+  .nav-edge__controls {
+    grid-area: controls;
+    gap: var(--space-4);
+    flex-shrink: 0;
+    padding-right: max(var(--page-gutter), env(safe-area-inset-right));
+  }
+  .bbg-keys {
+    grid-area: keys;
+    flex: 0 0 auto;
+    width: 100%;
+    gap: 0;
+    border-top: var(--rule) solid var(--grey-700);
+    padding: 0 max(var(--page-gutter), env(safe-area-inset-left)) 0 max(var(--page-gutter), env(safe-area-inset-right));
+    scrollbar-width: none;
+  }
+  .bbg-keys::-webkit-scrollbar { display: none; }
+  .bbg-keys a {
+    min-height: 2.5rem;
+    padding: 0 var(--space-12);
+    border-top: 0;
+    border-bottom: 0;
+    font-size: 0.625rem;
+  }
+  .bbg-keys kbd { display: none; }
+  select,
+  .btn {
+    min-height: var(--control-height);
+    padding: 0 var(--space-8);
+    font-size: 0.625rem;
+  }
+  select { width: auto; min-width: 6.5rem; }
+  .lede {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: max(var(--page-gutter), env(safe-area-inset-left));
+    padding-right: max(var(--page-gutter), env(safe-area-inset-right));
+  }
+  .desk-block,
+  .rules,
+  .foot-line {
+    padding-left: max(var(--page-gutter), env(safe-area-inset-left));
+    padding-right: max(var(--page-gutter), env(safe-area-inset-right));
+  }
+  .section-heading { gap: var(--space-8); }
+  .section-heading .btn { width: 100%; justify-self: stretch; }
+  .col-industry,
+  .col-vol,
+  .col-ext,
+  .col-rules,
+  .col-score,
+  .col-rs-d,
+  .col-rs-w,
+  .col-below { display: none; }
+  .bar-row {
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    gap: var(--space-4) var(--space-8);
+  }
+  .bar-row .industry { grid-column: 1 / -1; }
+  .bar-row .track { grid-column: 1; }
+  .bar-row .value { grid-column: 2; grid-row: 2; }
+  .trend-legend {
+    gap: var(--space-4) var(--space-8);
+    padding-inline: var(--space-2xs);
+  }
+  .scrollable-table { max-height: 22rem; }
+  th, td { padding: var(--space-2xs) var(--space-3xs); }
+  .note-input { min-height: var(--control-height); font-size: var(--text-sm); }
+  .rs-lede { margin: 0 0 var(--space-xs); }
   .foot-line p { white-space: normal; }
+}
+@media (max-width: 22.5rem) {
+  .bbg-keys a { padding: 0 var(--space-8); }
+  select { min-width: 5.5rem; }
+  .btn--primary { padding: 0 var(--space-8); }
 }
 @media (pointer: coarse) {
   .note-input { min-height: var(--control-height); }
+  .ticker-link { padding: var(--space-2xs) 0; display: inline-block; }
 }
 @media (prefers-reduced-motion: reduce) {
   select, .btn, .note-input, .ticker-link, .skip-link {
@@ -783,7 +886,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
       <h2 id="rs-title">RS Leads</h2>
       <button id="download-rs" class="btn btn--ghost" type="button">Export RS</button>
     </div>
-    <p class="lede" style="margin:0 0 var(--space-xs)">1ChartMaster tell: RS new high vs SPY while price is still below its lookback high. D/W = daily/weekly.</p>
+    <p class="lede rs-lede">1ChartMaster tell: RS new high vs SPY while price is still below its lookback high. D/W = daily/weekly.</p>
     <div id="rs-sections" class="window-sections"></div>
   </section>
 </main>
@@ -839,7 +942,7 @@ function tickerMarkup(row) {
   const name = String(row.name || '').trim();
   const highLiquidity = Number(averageDollarVolume(row)) > 450_000_000;
   const earn = isTrue(row.earnings_soon);
-  const title = earn && row.earnings_date ? `Earnings ${String(row.earnings_date)}` : 'Open TradingView chart';
+  const title = earn && row.earnings_date ? `Earnings ${String(row.earnings_date)}` : 'Open TradingView chart in a new tab';
   const classes = `ticker-link${highLiquidity ? ' high-liquidity' : ''}${earn ? ' ticker-link--earn' : ''}`;
   return `<td class="col-ticker"><a class="${classes}" href="${escapeHTML(chartUrl(row))}" target="_blank" rel="noopener noreferrer" title="${escapeHTML(title)}">${escapeHTML(name)}</a></td>`;
 }
@@ -958,7 +1061,7 @@ function renderRS(snapshot) {
     if (leadDelta) return leadDelta;
     return Number(b.pct_below_price_high || 0) - Number(a.pct_below_price_high || 0);
   });
-  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th>RS D</th><th>RS W</th><th>Lead</th><th>% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => `<tr>${tickerMarkup(row)}<td class="col-industry">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td>${rsFlag(row.rs_new_high_d)}</td><td>${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td>${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
+  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => `<tr>${tickerMarkup(row)}<td class="col-industry">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
 }
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
@@ -991,6 +1094,14 @@ async function downloadPageImage() {
     const link = document.createElement('a'); link.download = `industry-leadership-${currentSnapshot().date}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   } finally { downloadButton.disabled = false; downloadButton.dataset.state = ''; downloadButton.textContent = 'Snap <GO>'; }
 }
+document.addEventListener('click', event => {
+  const link = event.target.closest('a.ticker-link');
+  if (!link) return;
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#')) return;
+  event.preventDefault();
+  window.open(href, '_blank', 'noopener,noreferrer');
+});
 document.addEventListener('input', event => {
   const field = event.target.closest('.note-input');
   if (!field || !field.dataset.symbol) return;
