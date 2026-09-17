@@ -346,6 +346,28 @@ main {
   background: var(--color-paper-3);
 }
 .trend-label { margin-top: 0; border-top: var(--rule) solid var(--color-rule); }
+.trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-16);
+  padding: var(--space-8) var(--space-xs) var(--space-xs);
+  border-top: var(--rule) solid var(--color-rule);
+}
+.trend-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+  min-width: 0;
+}
+.trend-legend__swatch {
+  width: 0.75rem;
+  height: 0.125rem;
+  flex-shrink: 0;
+  background: currentColor;
+}
 .panel[data-frame="1m"] h2, .nel-window[data-frame="1m"] h3 { color: var(--color-frame-1m); }
 .panel[data-frame="3m"] h2, .nel-window[data-frame="3m"] h3 { color: var(--color-frame-3m); }
 .panel[data-frame="6m"] h2, .nel-window[data-frame="6m"] h3 { color: var(--color-frame-6m); }
@@ -709,6 +731,10 @@ function renderBars(current, previous, frame, container) {
   return names;
 }
 function renderTrend(frame, svg, names) {
+  const legend = document.getElementById(`trend-legend-${frame}`);
+  if (legend) {
+    legend.innerHTML = (names || []).map((name, index) => `<span class="trend-legend__item"><span class="trend-legend__swatch" style="background:${rankColors[index]}"></span>${escapeHTML(name)}</span>`).join('');
+  }
   const active = history.filter(d => d.groups?.[frame]);
   if (active.length < 2) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">Add future daily snapshots to see industry leadership trends.</text>'; return; }
   const width = Math.max(620, svg.clientWidth || 900), height = 300, left = 42, right = 28, top = 18, bottom = 34;
@@ -731,7 +757,10 @@ function fillTheme(id, snapshot, frame) {
   const themeCard = document.getElementById(id);
   if (!themeCard) return null;
   const top = Object.entries(counts(snapshot, frame)).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0];
-  themeCard.innerHTML = `<span class="theme-line"><strong>${top ? escapeHTML(top[0]) : '—'}</strong>${top ? ` (${top[1]} Liquid Leader${top[1] === 1 ? '' : 's'})` : ''}</span>`;
+  const label = flowMeta[frame]?.label || frame;
+  themeCard.innerHTML = top
+    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only.</span>`
+    : `<span class="theme-line">No industry count for this window.</span>`;
   return top;
 }
 function renderTableRows(records, frame, performance, flag, tableId, extraCell, emptyLabel, colspan) {
@@ -771,7 +800,7 @@ function render() {
   liquidTitle.textContent = `Liquid Leaders (LL) - ${(current.liquid || []).length} Tickers`;
   nelTitle.textContent = `Non-Extended Leaders (NEL) - ${(current.nel || []).length} Tickers`;
   if (focusTitle) focusTitle.textContent = `Focus Candidates - ${(current.focus || []).length} Tickers`;
-  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg></section>`).join('');
+  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL', '', null, 'No liquid leaders.');
   if (focusSections) focusSections.innerHTML = windowTables('focus', 'Focus', '<th class="col-score">Score</th><th class="col-rules">Rules</th>', focusExtras, 'No Focus Candidates.');
   nelSections.innerHTML = windowTables('nel', 'NEL', '', null, 'No NEL leaders.');
