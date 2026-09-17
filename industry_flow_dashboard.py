@@ -50,6 +50,29 @@ RECORD_COLUMNS = [
     "rvol_expand",
 ]
 
+RS_RECORD_COLUMNS = [
+    "name",
+    "description",
+    "exchange",
+    "industry",
+    "close",
+    "rs",
+    "signal",
+    "is_rs_lead",
+    "rs_new_high_d",
+    "rs_new_high_w",
+    "rs_lead_d",
+    "rs_lead_w",
+    "price_new_high_d",
+    "price_new_high_w",
+    "pct_below_price_high",
+    "lookback_price_high",
+    "Perf.1M",
+    "Perf.3M",
+    "Perf.6M",
+    "tradingview_url",
+]
+
 
 def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
     columns = [column for column in RECORD_COLUMNS if column in frame.columns]
@@ -62,6 +85,16 @@ def _records(path: Path) -> list[dict]:
     if not path.exists():
         return []
     return _records_from_frame(pd.read_csv(path))
+
+
+def _rs_records(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    frame = pd.read_csv(path)
+    columns = [column for column in RS_RECORD_COLUMNS if column in frame.columns]
+    if "name" not in columns:
+        return []
+    return json.loads(frame.loc[:, columns].to_json(orient="records"))
 
 
 def collect_industry_history(output_dir: Path) -> list[dict]:
@@ -94,6 +127,8 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "liquid": _records_from_frame(frame),
             "nel": _records(output_dir / f"non_extended_leaders_{stamp}.csv"),
             "focus": _records(output_dir / f"focus_candidates_{stamp}.csv"),
+            "rs_leads": _rs_records(output_dir / f"rs_leads_{stamp}.csv"),
+            "rs_highs": _rs_records(output_dir / f"rs_new_highs_{stamp}.csv"),
         })
     return snapshots
 
@@ -679,6 +714,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
       <a href="#liquid-title"><kbd>F3</kbd> LL</a>
       <a href="#focus-title"><kbd>F4</kbd> Focus</a>
       <a href="#nel-title"><kbd>F5</kbd> NEL</a>
+      <a href="#rs-title"><kbd>F6</kbd> RS</a>
     </nav>
     <div class="nav-edge__controls">
       <span id="bbg-clock" class="bbg-clock" aria-live="off"></span>
@@ -742,6 +778,14 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     </div>
     <div id="nel-sections" class="window-sections"></div>
   </section>
+  <section class="desk-block desk-block--graphite" aria-labelledby="rs-title">
+    <div class="section-heading">
+      <h2 id="rs-title">RS Leads</h2>
+      <button id="download-rs" class="btn btn--ghost" type="button">Export RS</button>
+    </div>
+    <p class="lede" style="margin:0 0 var(--space-xs)">1ChartMaster tell: RS new high vs SPY while price is still below its lookback high. D/W = daily/weekly.</p>
+    <div id="rs-sections" class="window-sections"></div>
+  </section>
 </main>
 <footer class="foot-line">
   <p>LLD · Liquid Leadership · not financial advice · kelex</p>
@@ -754,14 +798,17 @@ const thematicTitle = document.getElementById('thematic-title');
 const liquidTitle = document.getElementById('liquid-title');
 const nelTitle = document.getElementById('nel-title');
 const focusTitle = document.getElementById('focus-title');
+const rsTitle = document.getElementById('rs-title');
 const leadershipSections = document.getElementById('leadership-sections');
 const liquidSections = document.getElementById('liquid-sections');
 const nelSections = document.getElementById('nel-sections');
 const focusSections = document.getElementById('focus-sections');
+const rsSections = document.getElementById('rs-sections');
 const downloadButton = document.getElementById('download-image');
 const downloadLiquidButton = document.getElementById('download-ll');
 const downloadNelButton = document.getElementById('download-nel');
 const downloadFocusButton = document.getElementById('download-focus');
+const downloadRsButton = document.getElementById('download-rs');
 const flowMeta = { '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
 const NOTE_KEY = 'nel-note:';
@@ -901,11 +948,24 @@ function renderFocus(snapshot) {
     renderTableRows(records, frame, performance, flag, `focus-table-${frame}`, focusExtras, 'No Focus Candidates.', 8);
   });
 }
+function rsFlag(value) { return isTrue(value) ? 'Y' : '—'; }
+function renderRS(snapshot) {
+  if (!rsSections) return;
+  const leads = snapshot?.rs_leads || [];
+  const highs = snapshot?.rs_highs || [];
+  const rows = (leads.length ? leads : highs).slice().sort((a, b) => {
+    const leadDelta = Number(isTrue(b.is_rs_lead)) - Number(isTrue(a.is_rs_lead));
+    if (leadDelta) return leadDelta;
+    return Number(b.pct_below_price_high || 0) - Number(a.pct_below_price_high || 0);
+  });
+  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th>RS D</th><th>RS W</th><th>Lead</th><th>% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => `<tr>${tickerMarkup(row)}<td class="col-industry">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td>${rsFlag(row.rs_new_high_d)}</td><td>${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td>${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
+}
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
   liquidTitle.textContent = `Liquid Leaders (LL) - ${(current.liquid || []).length} Tickers`;
   nelTitle.textContent = `Non-Extended Leaders (NEL) - ${(current.nel || []).length} Tickers`;
   if (focusTitle) focusTitle.textContent = `Focus Candidates - ${(current.focus || []).length} Tickers`;
+  if (rsTitle) rsTitle.textContent = `RS Leads - ${(current.rs_leads || []).length} Tickers`;
   leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL', '', null, 'No liquid leaders.');
   if (focusSections) focusSections.innerHTML = windowTables('focus', 'Focus', '<th class="col-score">Score</th><th class="col-rules">Rules</th>', focusExtras, 'No Focus Candidates.');
@@ -914,6 +974,7 @@ function render() {
   renderLiquid(current);
   renderFocus(current);
   renderNEL(current);
+  renderRS(current);
 }
 function downloadSymbols(key, filePrefix) {
   const snapshot = currentSnapshot();
@@ -936,13 +997,13 @@ document.addEventListener('input', event => {
   saveNote(field.dataset.symbol, field.value);
 });
 document.addEventListener('keydown', event => {
-  const map = { F1: '#hard-rules', F2: '#thematic-title', F3: '#liquid-title', F4: '#focus-title', F5: '#nel-title' };
+  const map = { F1: '#hard-rules', F2: '#thematic-title', F3: '#liquid-title', F4: '#focus-title', F5: '#nel-title', F6: '#rs-title' };
   const href = map[event.key];
   if (!href) return;
   event.preventDefault();
   document.querySelector(href)?.scrollIntoView({ behavior: 'instant', block: 'start' });
 });
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); downloadNelButton.addEventListener('click', () => downloadSymbols('nel', 'nel')); if (downloadFocusButton) downloadFocusButton.addEventListener('click', () => downloadSymbols('focus', 'focus')); window.addEventListener('resize', render); render(); }
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); downloadNelButton.addEventListener('click', () => downloadSymbols('nel', 'nel')); if (downloadFocusButton) downloadFocusButton.addEventListener('click', () => downloadSymbols('focus', 'focus')); if (downloadRsButton) downloadRsButton.addEventListener('click', () => downloadSymbols('rs_leads', 'rs_leads')); window.addEventListener('resize', render); render(); }
 </script>
 </body>
 </html>'''

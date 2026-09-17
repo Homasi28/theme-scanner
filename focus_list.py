@@ -486,10 +486,22 @@ def main() -> None:
     nel = annotate_structure(nel, focus_settings, snapshot)
     focus = calculate_focus(nel, focus_settings)
     paths = write_outputs(universe, leaders, nel, settings, args.output_dir, snapshot, focus, focus_settings)
+    try:
+        from rs_lead_scan import RSLeadSettings, scan_rs_leads, write_rs_outputs
+
+        rs_settings = RSLeadSettings()
+        rs_frame = scan_rs_leads(universe, rs_settings)
+        paths.extend(write_rs_outputs(rs_frame, rs_settings, args.output_dir, snapshot))
+        rs_leads = int(rs_frame["is_rs_lead"].sum()) if not rs_frame.empty else 0
+        rs_summary = f" | RS highs: {len(rs_frame):,} | RS leads: {rs_leads:,}"
+    except SystemExit as error:
+        rs_summary = f" | RS scan skipped ({error})"
+    except Exception as error:  # noqa: BLE001 — daily desk should still publish NEL/Focus
+        rs_summary = f" | RS scan failed ({error})"
     paths.append(write_dashboard(args.output_dir))
     print(
         f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | "
-        f"NEL: {len(nel):,} | focus: {len(focus):,}"
+        f"NEL: {len(nel):,} | focus: {len(focus):,}{rs_summary}"
     )
     print("Saved:\n" + "\n".join(str(path) for path in paths))
 

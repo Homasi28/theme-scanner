@@ -59,6 +59,28 @@ Consecutive tight closes are not in this pass; that needs daily history, which T
 
 Every run also refreshes `industry_flow_dashboard.html`. Open it in a browser to compare industry leadership across the saved daily snapshots. It shows the 1-month, 3-month, and 6-month views together, plus Focus Candidates, Jeff’s 14 hard rules, and per-symbol notes stored in the browser. Theme cards always derive from the full momentum-leader file, not NEL or Focus, so extended names do not distort the strongest-industry signal. Keep prior daily CSV files in `outputs/`; the dashboard reads all of them when it is regenerated.
 
+## RS leads (1ChartMaster)
+
+After the universe is built, the desk also scans StockCharts-style relative strength vs SPY:
+
+- `RS = close / SPY close`
+- **RS new high** = RS at a 252-day (daily) or 52-week (weekly) high
+- **RS lead** = RS new high while price is still at least `0.5%` below its own lookback high
+
+That is the “clue before the gap”: RS prints first, price highs often follow. Outputs:
+
+- `outputs/rs_new_highs_YYYY-MM-DD.csv` — every RS new high (D/W)
+- `outputs/rs_leads_YYYY-MM-DD.csv` — only the lead setups
+- `outputs/EXPORT/rs_lead_symbols_YYYY-MM-DD.csv`
+
+Standalone:
+
+```bash
+python rs_lead_scan.py
+```
+
+NEL membership rules are unchanged; RS is an extra watchlist layer. Dashboard panel: **F6 RS**.
+
 ## GitHub Pages and cloud automation
 
 `index.html` is refreshed with the dashboard for GitHub Pages. The GitHub Actions workflow in `.github/workflows/daily-scan.yml` schedules the scanner after the US close, commits the refreshed CSVs and dashboard, and works without your Mac being awake. GitHub Pages must be enabled for the repository with the `main` branch and `/ (root)` folder selected as its source.
