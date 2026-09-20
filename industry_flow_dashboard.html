@@ -391,6 +391,26 @@ main {
   overflow-wrap: anywhere;
 }
 .industry--lead { font-weight: 600; color: var(--color-accent); }
+tbody tr.row--theme-lead {
+  outline: 1px solid var(--green-300);
+  outline-offset: -1px;
+  background: color-mix(in oklch, var(--green-300) 12%, var(--color-paper));
+}
+tbody tr.row--theme-lead td {
+  border-bottom-color: color-mix(in oklch, var(--green-300) 45%, var(--color-rule));
+}
+tbody tr.row--theme-lead .ticker-link {
+  color: var(--green-300);
+}
+tbody tr.row--theme-lead .col-ticker {
+  box-shadow: inset 2px 0 0 var(--green-300);
+}
+.desk-block--graphite tbody tr.row--theme-lead {
+  background: color-mix(in oklch, var(--green-300) 14%, var(--color-paper));
+}
+.desk-block--graphite tbody tr.row--theme-lead .ticker-link {
+  color: var(--green-300);
+}
 .track {
   height: 0.75rem;
   position: relative;
@@ -868,26 +888,35 @@ function windowTables(prefix, heading, extraHead, extraCell, emptyLabel) {
     return `<section class="nel-window" data-frame="${frame}"><h3>${meta.label} ${heading}</h3><div id="${prefix}-theme-${frame}" class="theme-card frame-${frame}"></div><div class="table-wrap${prefix === 'liquid' ? ' scrollable-table' : ''}"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Performance</th><th class="col-vol">Avg $ Vol</th><th class="col-ext">Extension</th>${extras}<th>Notes</th></tr></thead><tbody id="${prefix}-table-${frame}"></tbody></table></div></section>`;
   }).join('');
 }
+function leadingTheme(snapshot, frame) {
+  return Object.entries(counts(snapshot, frame)).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0] || null;
+}
+function isLeadingThemeRow(row, top) {
+  return Boolean(top && row.industry && row.industry === top[0]);
+}
 function fillTheme(id, snapshot, frame) {
   const themeCard = document.getElementById(id);
   if (!themeCard) return null;
-  const top = Object.entries(counts(snapshot, frame)).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0];
+  const top = leadingTheme(snapshot, frame);
   const label = flowMeta[frame]?.label || frame;
   themeCard.innerHTML = top
-    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only.</span>`
+    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only. Leading-theme names are boxed in green.</span>`
     : `<span class="theme-line">No industry count for this window.</span>`;
   return top;
 }
 function renderTableRows(records, frame, performance, flag, tableId, extraCell, emptyLabel, colspan) {
   const table = document.getElementById(tableId);
   if (!table) return;
-  const top = Object.entries(counts(currentSnapshot(), frame)).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0];
+  const top = leadingTheme(currentSnapshot(), frame);
   const rows = records.filter(row => isTrue(row[flag])).sort((a, b) => {
     const scoreDelta = Number(b.focus_score) - Number(a.focus_score);
     if (extraCell && Number.isFinite(scoreDelta) && scoreDelta) return scoreDelta;
     return Number(b[performance]) - Number(a[performance]);
   });
-  table.innerHTML = rows.length ? rows.map(row => `<tr>${metricCells(row, performance, top)}${extraCell ? extraCell(row) : ''}${noteMarkup(row)}</tr>`).join('') : `<tr><td colspan="${colspan}" class="empty">${emptyLabel}</td></tr>`;
+  table.innerHTML = rows.length ? rows.map(row => {
+    const inTheme = isLeadingThemeRow(row, top);
+    return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${metricCells(row, performance, top)}${extraCell ? extraCell(row) : ''}${noteMarkup(row)}</tr>`;
+  }).join('') : `<tr><td colspan="${colspan}" class="empty">${emptyLabel}</td></tr>`;
 }
 function renderLiquid(snapshot) {
   const records = snapshot?.liquid || [];
@@ -915,12 +944,13 @@ function renderRS(snapshot) {
   if (!rsSections) return;
   const leads = snapshot?.rs_leads || [];
   const highs = snapshot?.rs_highs || [];
+  const top = leadingTheme(snapshot, '1m');
   const rows = (leads.length ? leads : highs).slice().sort((a, b) => {
     const leadDelta = Number(isTrue(b.is_rs_lead)) - Number(isTrue(a.is_rs_lead));
     if (leadDelta) return leadDelta;
     return Number(b.pct_below_price_high || 0) - Number(a.pct_below_price_high || 0);
   });
-  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => `<tr>${tickerMarkup(row)}<td class="col-industry">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
+  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}${top ? ` · 1m theme <strong>${escapeHTML(top[0])}</strong> boxed in green` : ''}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
 }
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
