@@ -1,0 +1,7 @@
+name,close,ema8w,dist_to_ema8w_pct,ema8w_slope_pct,off_8w_high_pct,tagged_ema8w,ema8w_rising,signal,tradingview_url,description,exchange,industry,Perf.1M,Perf.3M,Perf.6M
+AEHR,93.49,93.236,0.27,0.078,36.57,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NASDAQ:AEHR&interval=D,Aehr Test Systems,NASDAQ,Electronic Production Equipment,-24.39,-21.73,147.85
+CHYM,30.33,30.1749,0.51,0.147,14.68,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NASDAQ:CHYM&interval=D,"Chime Financial, Inc.",NASDAQ,Packaged Software,-5.22,81.62,58.63
+ORKA,94.96,94.4659,0.52,0.15,17.8,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NASDAQ:ORKA&interval=D,"Oruka Therapeutics, Inc.",NASDAQ,Pharmaceuticals: Major,-17.79,29.73,144.05
+CORT,110.29,109.3116,0.9,0.256,12.73,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NASDAQ:CORT&interval=D,Corcept Therapeutics Incorporated,NASDAQ,Pharmaceuticals: Major,-7.61,33.17,210.68
+AMBQ,65.46,63.9585,2.35,0.675,8.63,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NYSE:AMBQ&interval=D,"Ambiq Micro, Inc.",NYSE,Semiconductors,1.66,-22.46,151.77
+ETON,55.5,54.123,2.54,0.732,16.38,True,True,EMA8W_PB,https://www.tradingview.com/chart/?symbol=NASDAQ:ETON&interval=D,"Eton Pharmaceuticals, Inc.",NASDAQ,Pharmaceuticals: Major,-12.67,66.62,159.35

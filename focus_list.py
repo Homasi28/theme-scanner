@@ -498,10 +498,32 @@ def main() -> None:
         rs_summary = f" | RS scan skipped ({error})"
     except Exception as error:  # noqa: BLE001 — daily desk should still publish NEL/Focus
         rs_summary = f" | RS scan failed ({error})"
+    try:
+        from ema8_pullback_scan import Ema8PullbackSettings, scan_ema8_pullbacks, write_ema8_outputs
+
+        ema_settings = Ema8PullbackSettings()
+        ema_frame = scan_ema8_pullbacks(leaders, ema_settings)
+        paths.extend(write_ema8_outputs(ema_frame, ema_settings, args.output_dir, snapshot))
+        ema_summary = f" | EMA8 PB: {len(ema_frame):,}"
+    except SystemExit as error:
+        ema_summary = f" | EMA8 scan skipped ({error})"
+    except Exception as error:  # noqa: BLE001
+        ema_summary = f" | EMA8 scan failed ({error})"
+    try:
+        from ma_stack_scan import MaStackSettings, scan_ma_stack, write_ma_stack_outputs
+
+        ma_settings = MaStackSettings()
+        ma_frame = scan_ma_stack(leaders, ma_settings)
+        paths.extend(write_ma_stack_outputs(ma_frame, ma_settings, args.output_dir, snapshot))
+        ma_summary = f" | MA stack: {len(ma_frame):,}"
+    except SystemExit as error:
+        ma_summary = f" | MA stack skipped ({error})"
+    except Exception as error:  # noqa: BLE001
+        ma_summary = f" | MA stack failed ({error})"
     paths.append(write_dashboard(args.output_dir))
     print(
         f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | "
-        f"NEL: {len(nel):,} | focus: {len(focus):,}{rs_summary}"
+        f"NEL: {len(nel):,} | focus: {len(focus):,}{rs_summary}{ema_summary}{ma_summary}"
     )
     print("Saved:\n" + "\n".join(str(path) for path in paths))
 

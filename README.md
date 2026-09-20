@@ -81,6 +81,40 @@ python rs_lead_scan.py
 
 NEL membership rules are unchanged; RS is an extra watchlist layer. Dashboard panel: **F6 RS**.
 
+## 8-week EMA pullbacks (Liquid Leaders)
+
+From the Liquid Leaders list only, scan for names tagging a **rising 8-week EMA**:
+
+- Weekly `EMA(8)` sloping up
+- Daily close within `3%` above / `1.5%` undercut
+- At least `1%` off the recent 8-week high (actual pullback, not a fresh high)
+
+Outputs:
+
+- `outputs/ema8_pullbacks_YYYY-MM-DD.csv`
+- `outputs/EXPORT/ema8_pullback_symbols_YYYY-MM-DD.csv`
+
+```bash
+python ema8_pullback_scan.py
+```
+
+Runs automatically with the daily `focus_list.py` job. Dashboard panel: **F7 8W**.
+
+## MA stack (5>10 · 20×30)
+
+From Liquid Leaders only: **SMA5 already above SMA10**, and **SMA20 just crossed / is crossing above SMA30** (actual cross within 3 sessions, or gap ≤ 0.75%).
+
+Outputs:
+
+- `outputs/ma_stack_YYYY-MM-DD.csv`
+- `outputs/EXPORT/ma_stack_symbols_YYYY-MM-DD.csv`
+
+```bash
+python ma_stack_scan.py
+```
+
+Runs automatically with the daily `focus_list.py` job. Dashboard panel: **F8 MA**.
+
 ## GitHub Pages and cloud automation
 
 `index.html` is refreshed with the dashboard for GitHub Pages. The GitHub Actions workflow in `.github/workflows/daily-scan.yml` schedules the scanner after the US close, commits the refreshed CSVs and dashboard, and works without your Mac being awake. GitHub Pages must be enabled for the repository with the `main` branch and `/ (root)` folder selected as its source.

@@ -73,6 +73,46 @@ RS_RECORD_COLUMNS = [
     "tradingview_url",
 ]
 
+EMA8_RECORD_COLUMNS = [
+    "name",
+    "description",
+    "exchange",
+    "industry",
+    "close",
+    "ema8w",
+    "dist_to_ema8w_pct",
+    "ema8w_slope_pct",
+    "off_8w_high_pct",
+    "tagged_ema8w",
+    "ema8w_rising",
+    "signal",
+    "Perf.1M",
+    "Perf.3M",
+    "Perf.6M",
+    "tradingview_url",
+]
+
+MA_STACK_RECORD_COLUMNS = [
+    "name",
+    "description",
+    "exchange",
+    "industry",
+    "close",
+    "SMA5",
+    "SMA10",
+    "SMA20",
+    "SMA30",
+    "sma5_gt_sma10",
+    "sma20_gt_sma30",
+    "sma20_30_gap_pct",
+    "cross_days_ago",
+    "signal",
+    "Perf.1M",
+    "Perf.3M",
+    "Perf.6M",
+    "tradingview_url",
+]
+
 
 def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
     columns = [column for column in RECORD_COLUMNS if column in frame.columns]
@@ -92,6 +132,26 @@ def _rs_records(path: Path) -> list[dict]:
         return []
     frame = pd.read_csv(path)
     columns = [column for column in RS_RECORD_COLUMNS if column in frame.columns]
+    if "name" not in columns:
+        return []
+    return json.loads(frame.loc[:, columns].to_json(orient="records"))
+
+
+def _ema8_records(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    frame = pd.read_csv(path)
+    columns = [column for column in EMA8_RECORD_COLUMNS if column in frame.columns]
+    if "name" not in columns:
+        return []
+    return json.loads(frame.loc[:, columns].to_json(orient="records"))
+
+
+def _ma_stack_records(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    frame = pd.read_csv(path)
+    columns = [column for column in MA_STACK_RECORD_COLUMNS if column in frame.columns]
     if "name" not in columns:
         return []
     return json.loads(frame.loc[:, columns].to_json(orient="records"))
@@ -129,6 +189,8 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "focus": _records(output_dir / f"focus_candidates_{stamp}.csv"),
             "rs_leads": _rs_records(output_dir / f"rs_leads_{stamp}.csv"),
             "rs_highs": _rs_records(output_dir / f"rs_new_highs_{stamp}.csv"),
+            "ema8_pullbacks": _ema8_records(output_dir / f"ema8_pullbacks_{stamp}.csv"),
+            "ma_stack": _ma_stack_records(output_dir / f"ma_stack_{stamp}.csv"),
         })
     return snapshots
 
@@ -166,7 +228,7 @@ def write_dashboard(output_dir: Path) -> Path:
   <link rel="stylesheet" href="tokens.css">
   <style>
 html { color-scheme: dark; }
-html, body { overflow-x: clip; }
+html, body { overflow-x: clip; overflow-anchor: none; }
 * { box-sizing: border-box; }
 html { background: var(--color-paper); }
 body {
@@ -177,7 +239,11 @@ body {
   font-weight: 400;
   font-size: var(--text-base);
   line-height: 1.35;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
 }
+main { min-height: 100dvh; }
 img, svg, table { max-width: 100%; }
 h1, h2, h3 {
   font-family: var(--font-display);
@@ -189,9 +255,9 @@ h1, h2, h3 {
   overflow-wrap: anywhere;
   min-width: 0;
   line-height: 1;
-  scroll-margin-top: calc(var(--banner-height) + var(--space-xs));
+  scroll-margin-top: calc(var(--banner-height) + var(--mobile-nav-keys, 0px) + var(--space-xs));
 }
-#hard-rules { scroll-margin-top: var(--banner-height); }
+#hard-rules { scroll-margin-top: calc(var(--banner-height) + var(--mobile-nav-keys, 0px)); }
 a { color: inherit; }
 .visually-hidden {
   position: absolute;
@@ -714,6 +780,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     --chart-height: 11rem;
     --banner-height: 3.25rem;
     --control-height: 2.75rem;
+    --mobile-nav-keys: 2.5rem;
   }
   body {
     padding-bottom: env(safe-area-inset-bottom);
@@ -746,18 +813,22 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     grid-area: keys;
     flex: 0 0 auto;
     width: 100%;
+    height: var(--mobile-nav-keys);
     gap: 0;
     border-top: var(--rule) solid var(--grey-700);
     padding: 0 max(var(--page-gutter), env(safe-area-inset-left)) 0 max(var(--page-gutter), env(safe-area-inset-right));
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
   }
   .bbg-keys::-webkit-scrollbar { display: none; }
   .bbg-keys a {
-    min-height: 2.5rem;
+    min-height: var(--mobile-nav-keys);
+    height: var(--mobile-nav-keys);
     padding: 0 var(--space-12);
     border-top: 0;
     border-bottom: 0;
     font-size: 0.625rem;
+    touch-action: manipulation;
   }
   .bbg-keys kbd { display: none; }
   select,
@@ -765,6 +836,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     min-height: var(--control-height);
     padding: 0 var(--space-8);
     font-size: 0.625rem;
+    touch-action: manipulation;
   }
   select { width: auto; min-width: 6.5rem; }
   .lede {
@@ -800,11 +872,16 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     gap: var(--space-4) var(--space-8);
     padding-inline: var(--space-2xs);
   }
-  .scrollable-table { max-height: 22rem; }
+  .scrollable-table { max-height: 22rem; overscroll-behavior: contain; }
   th, td { padding: var(--space-2xs) var(--space-3xs); }
-  .note-input { min-height: var(--control-height); font-size: var(--text-sm); }
+  .note-input {
+    min-height: var(--control-height);
+    font-size: 16px;
+    touch-action: manipulation;
+  }
   .rs-lede { margin: 0 0 var(--space-xs); }
   .foot-line p { white-space: normal; }
+  .ticker-link { touch-action: manipulation; }
 }
 @media (max-width: 22.5rem) {
   .bbg-keys a { padding: 0 var(--space-8); }
@@ -838,6 +915,8 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
       <a href="#focus-title"><kbd>F4</kbd> Focus</a>
       <a href="#nel-title"><kbd>F5</kbd> NEL</a>
       <a href="#rs-title"><kbd>F6</kbd> RS</a>
+      <a href="#ema8-title"><kbd>F7</kbd> 8W</a>
+      <a href="#ma-stack-title"><kbd>F8</kbd> MA</a>
     </nav>
     <div class="nav-edge__controls">
       <span id="bbg-clock" class="bbg-clock" aria-live="off"></span>
@@ -909,6 +988,22 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     <p class="lede rs-lede">1ChartMaster tell: RS new high vs SPY while price is still below its lookback high. D/W = daily/weekly.</p>
     <div id="rs-sections" class="window-sections"></div>
   </section>
+  <section class="desk-block" aria-labelledby="ema8-title">
+    <div class="section-heading">
+      <h2 id="ema8-title">8W EMA Pullbacks</h2>
+      <button id="download-ema8" class="btn btn--ghost" type="button">Export 8W</button>
+    </div>
+    <p class="lede rs-lede">Liquid Leaders tagging a rising 8-week EMA (within 3%, shallow undercut OK). Buy weakness, not chase.</p>
+    <div id="ema8-sections" class="window-sections"></div>
+  </section>
+  <section class="desk-block desk-block--graphite" aria-labelledby="ma-stack-title">
+    <div class="section-heading">
+      <h2 id="ma-stack-title">MA Stack</h2>
+      <button id="download-ma-stack" class="btn btn--ghost" type="button">Export MA</button>
+    </div>
+    <p class="lede rs-lede">SMA5 already above SMA10, with SMA20 just crossing / crossing above SMA30.</p>
+    <div id="ma-stack-sections" class="window-sections"></div>
+  </section>
 </main>
 <footer class="foot-line">
   <p>LLD · Liquid Leadership · not financial advice · kelex</p>
@@ -922,16 +1017,22 @@ const liquidTitle = document.getElementById('liquid-title');
 const nelTitle = document.getElementById('nel-title');
 const focusTitle = document.getElementById('focus-title');
 const rsTitle = document.getElementById('rs-title');
+const ema8Title = document.getElementById('ema8-title');
+const maStackTitle = document.getElementById('ma-stack-title');
 const leadershipSections = document.getElementById('leadership-sections');
 const liquidSections = document.getElementById('liquid-sections');
 const nelSections = document.getElementById('nel-sections');
 const focusSections = document.getElementById('focus-sections');
 const rsSections = document.getElementById('rs-sections');
+const ema8Sections = document.getElementById('ema8-sections');
+const maStackSections = document.getElementById('ma-stack-sections');
 const downloadButton = document.getElementById('download-image');
 const downloadLiquidButton = document.getElementById('download-ll');
 const downloadNelButton = document.getElementById('download-nel');
 const downloadFocusButton = document.getElementById('download-focus');
 const downloadRsButton = document.getElementById('download-rs');
+const downloadEma8Button = document.getElementById('download-ema8');
+const downloadMaStackButton = document.getElementById('download-ma-stack');
 const flowMeta = { '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
 const NOTE_KEY = 'nel-note:';
@@ -1093,12 +1194,31 @@ function renderRS(snapshot) {
   });
   rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}${top ? ` · 1m theme <strong>${escapeHTML(top[0])}</strong> boxed in green` : ''}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
 }
+function renderEMA8(snapshot) {
+  if (!ema8Sections) return;
+  const rows = (snapshot?.ema8_pullbacks || []).slice().sort((a, b) => Math.abs(Number(a.dist_to_ema8w_pct || 99)) - Math.abs(Number(b.dist_to_ema8w_pct || 99)));
+  const top = leadingTheme(snapshot, '1m');
+  ema8Sections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>Rising 8-week EMA tags</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders within 3% of a rising 8W EMA` : 'No 8W EMA pullbacks for this snapshot. Run <code>python ema8_pullback_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Dist EMA8W</th><th class="col-ext">Slope</th><th class="col-vol">Off 8W High</th><th>Notes</th></tr></thead><tbody id="ema8-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${formatNumber(row.dist_to_ema8w_pct)}%</td><td class="col-ext">${formatNumber(row.ema8w_slope_pct)}%</td><td class="col-vol">${formatNumber(row.off_8w_high_pct)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No 8W EMA pullbacks.</td></tr>`}</tbody></table></div></section>`;
+}
+function renderMaStack(snapshot) {
+  if (!maStackSections) return;
+  const signalRank = { '20x30_TODAY': 0, '20x30_1D': 1, '20x30_2D': 2, '20x30_NEAR': 3 };
+  const rows = (snapshot?.ma_stack || []).slice().sort((a, b) => {
+    const rankDelta = (signalRank[a.signal] ?? 9) - (signalRank[b.signal] ?? 9);
+    if (rankDelta) return rankDelta;
+    return Number(a.sma20_30_gap_pct || 99) - Number(b.sma20_30_gap_pct || 99);
+  });
+  const top = leadingTheme(snapshot, '1m');
+  maStackSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>5&gt;10 · 20×30 cross</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders with SMA5&gt;SMA10 and SMA20 crossing SMA30` : 'No MA stack crosses for this snapshot. Run <code>python ma_stack_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-ext">20/30 Gap</th><th class="col-vol">Cross D</th><th>Notes</th></tr></thead><tbody id="ma-stack-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-ext">${formatNumber(row.sma20_30_gap_pct)}%</td><td class="col-vol">${row.cross_days_ago === '' || row.cross_days_ago == null ? '—' : escapeHTML(row.cross_days_ago)}</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No MA stack crosses.</td></tr>`}</tbody></table></div></section>`;
+}
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
   liquidTitle.textContent = `Liquid Leaders (LL) - ${(current.liquid || []).length} Tickers`;
   nelTitle.textContent = `Non-Extended Leaders (NEL) - ${(current.nel || []).length} Tickers`;
   if (focusTitle) focusTitle.textContent = `Focus Candidates - ${(current.focus || []).length} Tickers`;
   if (rsTitle) rsTitle.textContent = `RS Leads - ${(current.rs_leads || []).length} Tickers`;
+  if (ema8Title) ema8Title.textContent = `8W EMA Pullbacks - ${(current.ema8_pullbacks || []).length} Tickers`;
+  if (maStackTitle) maStackTitle.textContent = `MA Stack - ${(current.ma_stack || []).length} Tickers`;
   leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL', '', null, 'No liquid leaders.');
   if (focusSections) focusSections.innerHTML = windowTables('focus', 'Focus', '<th class="col-score">Score</th><th class="col-rules">Rules</th>', focusExtras, 'No Focus Candidates.');
@@ -1108,6 +1228,19 @@ function render() {
   renderFocus(current);
   renderNEL(current);
   renderRS(current);
+  renderEMA8(current);
+  renderMaStack(current);
+}
+function redrawChartsOnly() {
+  const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
+  if (!current) return;
+  Object.keys(flowMeta).forEach(frame => {
+    const bars = document.getElementById(`bars-${frame}`);
+    const svg = document.getElementById(`trend-${frame}`);
+    if (!bars || !svg) return;
+    const rankedNames = renderBars(current, previous, frame, bars);
+    renderTrend(frame, svg, rankedNames);
+  });
 }
 function downloadSymbols(key, filePrefix) {
   const snapshot = currentSnapshot();
@@ -1125,6 +1258,17 @@ async function downloadPageImage() {
   } finally { downloadButton.disabled = false; downloadButton.dataset.state = ''; downloadButton.textContent = 'Snap <GO>'; }
 }
 document.addEventListener('click', event => {
+  const nav = event.target.closest('.bbg-keys a[href^="#"], a.wordmark[href^="#"]');
+  if (nav) {
+    const href = nav.getAttribute('href');
+    const target = href ? document.querySelector(href) : null;
+    if (target) {
+      event.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (history.replaceState) history.replaceState(null, '', href);
+    }
+    return;
+  }
   const link = event.target.closest('a.ticker-link');
   if (!link) return;
   const href = link.getAttribute('href');
@@ -1138,13 +1282,23 @@ document.addEventListener('input', event => {
   saveNote(field.dataset.symbol, field.value);
 });
 document.addEventListener('keydown', event => {
-  const map = { F1: '#hard-rules', F2: '#thematic-title', F3: '#liquid-title', F4: '#focus-title', F5: '#nel-title', F6: '#rs-title' };
+  const map = { F1: '#hard-rules', F2: '#thematic-title', F3: '#liquid-title', F4: '#focus-title', F5: '#nel-title', F6: '#rs-title', F7: '#ema8-title', F8: '#ma-stack-title' };
   const href = map[event.key];
   if (!href) return;
   event.preventDefault();
-  document.querySelector(href)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); downloadNelButton.addEventListener('click', () => downloadSymbols('nel', 'nel')); if (downloadFocusButton) downloadFocusButton.addEventListener('click', () => downloadSymbols('focus', 'focus')); if (downloadRsButton) downloadRsButton.addEventListener('click', () => downloadSymbols('rs_leads', 'rs_leads')); window.addEventListener('resize', render); render(); }
+let resizeTimer = 0;
+let lastLayoutWidth = window.innerWidth;
+function onViewportChange() {
+  const width = window.innerWidth;
+  // Mobile URL-bar show/hide changes height only — skip full re-renders.
+  if (Math.abs(width - lastLayoutWidth) < 12) return;
+  lastLayoutWidth = width;
+  clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(redrawChartsOnly, 180);
+}
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); downloadNelButton.addEventListener('click', () => downloadSymbols('nel', 'nel')); if (downloadFocusButton) downloadFocusButton.addEventListener('click', () => downloadSymbols('focus', 'focus')); if (downloadRsButton) downloadRsButton.addEventListener('click', () => downloadSymbols('rs_leads', 'rs_leads')); if (downloadEma8Button) downloadEma8Button.addEventListener('click', () => downloadSymbols('ema8_pullbacks', 'ema8_pullbacks')); if (downloadMaStackButton) downloadMaStackButton.addEventListener('click', () => downloadSymbols('ma_stack', 'ma_stack')); window.addEventListener('resize', onViewportChange, { passive: true }); render(); }
 </script>
 </body>
 </html>'''

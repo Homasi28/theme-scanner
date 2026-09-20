@@ -1,0 +1,2 @@
+name,close,SMA5,SMA10,SMA20,SMA30,sma5_gt_sma10,sma20_gt_sma30,sma20_30_gap_pct,cross_days_ago,signal,tradingview_url,description,exchange,industry,Perf.1M,Perf.3M,Perf.6M
+MRVL,244.25,231.048,230.227,227.476,226.3,True,True,0.52,,20x30_NEAR,https://www.tradingview.com/chart/?symbol=NASDAQ:MRVL&interval=D,"Marvell Technology, Inc.",NASDAQ,Semiconductors,1.72,-20.04,174.75
