@@ -520,10 +520,22 @@ def main() -> None:
         ma_summary = f" | MA stack skipped ({error})"
     except Exception as error:  # noqa: BLE001
         ma_summary = f" | MA stack failed ({error})"
+    try:
+        from a_plus_flag_scan import APlusFlagSettings, scan_a_plus_flags, write_a_plus_flag_outputs
+
+        ap_settings = APlusFlagSettings()
+        ap_frame = scan_a_plus_flags(leaders, ap_settings)
+        paths.extend(write_a_plus_flag_outputs(ap_frame, ap_settings, args.output_dir, snapshot))
+        n_bo = int((ap_frame["signal"] == "APLUS_BREAKOUT").sum()) if not ap_frame.empty else 0
+        ap_summary = f" | A++ flags: {len(ap_frame):,} ({n_bo} BO)"
+    except SystemExit as error:
+        ap_summary = f" | A++ flag scan skipped ({error})"
+    except Exception as error:  # noqa: BLE001
+        ap_summary = f" | A++ flag scan failed ({error})"
     paths.append(write_dashboard(args.output_dir))
     print(
         f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | "
-        f"NEL: {len(nel):,} | focus: {len(focus):,}{rs_summary}{ema_summary}{ma_summary}"
+        f"NEL: {len(nel):,} | focus: {len(focus):,}{rs_summary}{ema_summary}{ma_summary}{ap_summary}"
     )
     print("Saved:\n" + "\n".join(str(path) for path in paths))
 

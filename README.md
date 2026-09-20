@@ -115,6 +115,32 @@ python ma_stack_scan.py
 
 Runs automatically with the daily `focus_list.py` job. Dashboard panel: **F8 MA**.
 
+## A++ Flag Breakouts (20MA / 50MA)
+
+Distilled from NVDA / MU / SNDK / INTC / TSLA — **find the coil before the break**, not late continuation (ASST after Aug 19 is rejected).
+
+1. **Thrust (flagpole)** — ≥18% advance into the base
+2. **Flag coil** — ≥20 sessions after the thrust peak, depth ≤35%, range contracts
+3. **MA stack** — rising/flat 50MA holds; 20/50 pinch; close not >10% above 20MA
+4. **Pivot stalk** — primary signal `APLUS_COIL` = within 6% under flag/peak high, volume dry vs thrust
+5. **Day-0 break only** — `APLUS_BREAKOUT` = first close through pivot today (RVOL + anti-chase)
+6. **MACD** — soft confirm
+
+Rejects late runners (e.g. ASST weeks after the Aug-19 base break).
+
+Outputs:
+
+- `outputs/a_plus_flags_YYYY-MM-DD.csv`
+- `outputs/EXPORT/a_plus_flag_coil_symbols_YYYY-MM-DD.csv` (stalk list)
+- `outputs/EXPORT/a_plus_flag_breakout_symbols_YYYY-MM-DD.csv` (day-0 only)
+- `outputs/EXPORT/a_plus_flag_symbols_YYYY-MM-DD.csv`
+
+```bash
+python a_plus_flag_scan.py
+```
+
+Runs automatically with the daily `focus_list.py` job. Dashboard panel: **F9 A++** (coils first).
+
 ## GitHub Pages and cloud automation
 
 `index.html` is refreshed with the dashboard for GitHub Pages. The GitHub Actions workflow in `.github/workflows/daily-scan.yml` schedules the scanner after the US close, commits the refreshed CSVs and dashboard, and works without your Mac being awake. GitHub Pages must be enabled for the repository with the `main` branch and `/ (root)` folder selected as its source.
