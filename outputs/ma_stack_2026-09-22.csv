@@ -1,0 +1,6 @@
+name,close,SMA5,SMA10,SMA20,SMA30,sma5_gt_sma10,sma20_gt_sma30,sma20_30_gap_pct,cross_days_ago,signal,tradingview_url,description,exchange,industry,Perf.1M,Perf.3M,Perf.6M
+NTSK,18.4,17.572,16.347,15.3265,15.293,True,True,0.219,0,20x30_TODAY,https://www.tradingview.com/chart/?symbol=NASDAQ:NTSK&interval=D,"Netskope, Inc.",NASDAQ,Packaged Software,27.3356401384083,107.20720720720718,106.04703247480403
+FIVN,37.01,34.216,32.534,33.0283,32.9255,True,True,0.312,0,20x30_TODAY,https://www.tradingview.com/chart/?symbol=NASDAQ:FIVN&interval=D,"Five9, Inc.",NASDAQ,Packaged Software,14.866542520173802,97.5974372664175,139.54692556634305
+FTFT,4.51,5.802,4.538,3.333,3.2847,True,True,1.471,0,20x30_TODAY,https://www.tradingview.com/chart/?symbol=NASDAQ:FTFT&interval=D,Future FinTech Group Inc.,NASDAQ,Finance/Rental/Leasing,64.59854014598538,-59.67453505007153,-76.54364650079054
+CRWD,249.35,243.31,228.535,218.7255,216.5523,True,True,1.004,1,20x30_1D,https://www.tradingview.com/chart/?symbol=NASDAQ:CRWD&interval=D,"CrowdStrike Holdings, Inc.",NASDAQ,Packaged Software,30.59076149575783,49.08596284061524,149.98746804351092
+MRVL,257.38,238.76,233.61,228.493,227.5887,True,True,0.397,,20x30_NEAR,https://www.tradingview.com/chart/?symbol=NASDAQ:MRVL&interval=D,"Marvell Technology, Inc.",NASDAQ,Semiconductors,1.9770989341891554,-7.689548812854171,173.59022056869517

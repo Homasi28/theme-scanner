@@ -3,4 +3,5 @@ __pycache__/
 *.py[cod]
 logs/
 .daily_scan.lock/
+outputs/.last_scheduled_run.txt
 .DS_Store

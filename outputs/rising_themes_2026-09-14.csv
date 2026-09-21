@@ -1,0 +1,17 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-09-14,1m,industry,Packaged Software,KICKOFF,0,4,4,
+2026-09-14,1m,industry,Pharmaceuticals: Major,KICKOFF,0,4,4,
+2026-09-14,1m,industry,Financial Conglomerates,KICKOFF,0,3,3,
+2026-09-14,1m,cluster,Semis complex,KICKOFF,0,2,2,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-09-14,6m,cluster,Semis complex,KICKOFF,0,9,9,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-09-14,3m,industry,Packaged Software,KICKOFF,0,6,6,
+2026-09-14,6m,industry,Packaged Software,KICKOFF,0,4,4,
+2026-09-14,6m,industry,Computer Peripherals,KICKOFF,0,3,3,
+2026-09-14,3m,industry,Oil Refining/Marketing,KICKOFF,0,3,3,
+2026-09-14,3m,industry,Pharmaceuticals: Major,KICKOFF,0,3,3,
+2026-09-14,6m,industry,Pharmaceuticals: Major,KICKOFF,0,3,3,
+2026-09-14,6m,industry,Semiconductors,KICKOFF,0,3,3,
+2026-09-14,6m,industry,Computer Processing Hardware,KICKOFF,0,2,2,
+2026-09-14,3m,industry,Medical Specialties,KICKOFF,0,2,2,
+2026-09-14,3m,industry,Miscellaneous Commercial Services,KICKOFF,0,2,2,
+2026-09-14,3m,cluster,Semis complex,KICKOFF,0,2,2,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors

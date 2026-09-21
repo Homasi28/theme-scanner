@@ -15,6 +15,23 @@ TIMEFRAMES = {
     "6m": "is_top_6m",
 }
 
+# Related industries roll up so a Semis kickoff is not missed when
+# leadership spreads across peripherals / equipment names.
+THEME_CLUSTERS = {
+    "Semis complex": frozenset({
+        "Semiconductors",
+        "Computer Peripherals",
+        "Computer Processing Hardware",
+        "Electronic Production Equipment",
+        "Electronic Equipment/Instruments",
+        "Electronics/Appliances",
+    }),
+}
+
+RISING_MIN_COUNT = 2
+RISING_MIN_DELTA = 1
+
+
 RECORD_COLUMNS = [
     "name",
     "industry",
@@ -197,6 +214,155 @@ def _a_plus_flag_records(path: Path) -> list[dict]:
     return json.loads(frame.loc[:, columns].to_json(orient="records"))
 
 
+def _cluster_counts(groups: dict[str, int], members: frozenset[str]) -> int:
+    return sum(int(groups.get(name, 0) or 0) for name in members)
+
+
+def _signal_for_rise(prior: int, current: int) -> str | None:
+    delta = current - prior
+    if delta < RISING_MIN_DELTA or current < RISING_MIN_COUNT:
+        return None
+    # Fresh breadth: new or thin theme expanding into real participation.
+    if prior == 0 or (prior <= 1 and current >= 3):
+        return "KICKOFF"
+    return "RISING"
+
+
+def detect_rising_themes(
+    current_groups: dict[str, dict[str, int]] | None,
+    prior_groups: dict[str, dict[str, int]] | None,
+    *,
+    primary_frame: str = "1m",
+) -> list[dict]:
+    """Flag industries (and clusters) whose LL window count is expanding."""
+    current_groups = current_groups or {}
+    prior_groups = prior_groups or {}
+    frames = [primary_frame] + [frame for frame in TIMEFRAMES if frame != primary_frame]
+    rising: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+
+    for frame in frames:
+        now = current_groups.get(frame) or {}
+        then = prior_groups.get(frame) or {}
+        industries = set(now) | set(then)
+        for industry in industries:
+            current = int(now.get(industry, 0) or 0)
+            prior = int(then.get(industry, 0) or 0)
+            signal = _signal_for_rise(prior, current)
+            if not signal:
+                continue
+            key = (frame, industry)
+            if key in seen:
+                continue
+            seen.add(key)
+            rising.append({
+                "frame": frame,
+                "industry": industry,
+                "kind": "industry",
+                "prior_count": prior,
+                "current_count": current,
+                "delta": current - prior,
+                "signal": signal,
+            })
+        for cluster_name, members in THEME_CLUSTERS.items():
+            current = _cluster_counts(now, members)
+            prior = _cluster_counts(then, members)
+            signal = _signal_for_rise(prior, current)
+            if not signal:
+                continue
+            key = (frame, cluster_name)
+            if key in seen:
+                continue
+            seen.add(key)
+            rising.append({
+                "frame": frame,
+                "industry": cluster_name,
+                "kind": "cluster",
+                "prior_count": prior,
+                "current_count": current,
+                "delta": current - prior,
+                "signal": signal,
+                "members": sorted(members),
+            })
+
+    rising.sort(
+        key=lambda row: (
+            0 if row["frame"] == primary_frame else 1,
+            0 if row["signal"] == "KICKOFF" else 1,
+            -int(row["delta"]),
+            -int(row["current_count"]),
+            str(row["industry"]),
+        )
+    )
+    return rising
+
+
+def rising_industry_names(rising: list[dict], *, frame: str | None = "1m") -> set[str]:
+    """Industries to highlight on desk lists for a rising / kickoff theme."""
+    names: set[str] = set()
+    for row in rising:
+        if frame is not None and row.get("frame") != frame:
+            continue
+        if row.get("kind") == "cluster":
+            names.update(row.get("members") or [])
+        else:
+            names.add(str(row["industry"]))
+    return names
+
+
+def annotate_rising_themes(snapshots: list[dict]) -> list[dict]:
+    for index, snapshot in enumerate(snapshots):
+        prior = snapshots[index - 1] if index else None
+        rising = detect_rising_themes(
+            snapshot.get("groups"),
+            prior.get("groups") if prior else None,
+        )
+        snapshot["rising_themes"] = rising
+        snapshot["rising_industries"] = sorted(rising_industry_names(rising, frame="1m"))
+    return snapshots
+
+
+def write_rising_theme_csvs(output_dir: Path, snapshots: list[dict]) -> list[Path]:
+    """Persist rising-theme flags beside the daily scan outputs."""
+    written: list[Path] = []
+    export_dir = output_dir / "EXPORT"
+    export_dir.mkdir(parents=True, exist_ok=True)
+    for snapshot in snapshots:
+        rising = snapshot.get("rising_themes") or []
+        stamp = snapshot["date"]
+        path = output_dir / f"rising_themes_{stamp}.csv"
+        rows = []
+        for item in rising:
+            rows.append({
+                "date": stamp,
+                "frame": item.get("frame"),
+                "kind": item.get("kind"),
+                "industry": item.get("industry"),
+                "signal": item.get("signal"),
+                "prior_count": item.get("prior_count"),
+                "current_count": item.get("current_count"),
+                "delta": item.get("delta"),
+                "members": "|".join(item.get("members") or []),
+            })
+        frame = pd.DataFrame(rows, columns=[
+            "date", "frame", "kind", "industry", "signal",
+            "prior_count", "current_count", "delta", "members",
+        ])
+        frame.to_csv(path, index=False)
+        written.append(path)
+
+        rising_set = set(snapshot.get("rising_industries") or [])
+        symbols = sorted({
+            str(row.get("name") or "").strip()
+            for row in (snapshot.get("liquid") or [])
+            if str(row.get("industry") or "").strip() in rising_set and str(row.get("name") or "").strip()
+        })
+        symbol_path = export_dir / f"rising_theme_symbols_{stamp}.csv"
+        pd.DataFrame({"symbol": symbols}).to_csv(symbol_path, index=False)
+        written.append(symbol_path)
+    return written
+
+
 def collect_industry_history(output_dir: Path) -> list[dict]:
     """Summarise every dated momentum-leader snapshot by industry and timeframe."""
     snapshots = []
@@ -233,12 +399,13 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "ma_stack": _ma_stack_records(output_dir / f"ma_stack_{stamp}.csv"),
             "a_plus_flags": _a_plus_flag_records(output_dir / f"a_plus_flags_{stamp}.csv"),
         })
-    return snapshots
+    return annotate_rising_themes(snapshots)
 
 
 def write_dashboard(output_dir: Path) -> Path:
     """Write an offline-friendly interactive dashboard with embedded history."""
     history = collect_industry_history(output_dir)
+    write_rising_theme_csvs(output_dir, history)
     dashboard = Path("industry_flow_dashboard.html")
     pages_entrypoint = Path("index.html")
     payload = json.dumps(history, separators=(",", ":"))
@@ -659,6 +826,57 @@ tbody tr.row--theme-lead .col-ticker {
 .desk-block--graphite tbody tr.row--theme-lead .ticker-link {
   color: var(--green-300);
 }
+tbody tr.row--theme-rising {
+  outline: 1px dashed var(--color-frame-1m);
+  outline-offset: -1px;
+  background: color-mix(in oklch, var(--color-frame-1m) 10%, var(--color-paper));
+}
+tbody tr.row--theme-rising td {
+  border-bottom-color: color-mix(in oklch, var(--color-frame-1m) 40%, var(--color-rule));
+}
+tbody tr.row--theme-rising .ticker-link {
+  color: var(--color-frame-1m);
+}
+tbody tr.row--theme-rising .col-ticker {
+  box-shadow: inset 2px 0 0 var(--color-frame-1m);
+}
+tbody tr.row--theme-lead.row--theme-rising {
+  outline: 1px solid var(--green-300);
+  background: color-mix(in oklch, var(--green-300) 10%, color-mix(in oklch, var(--color-frame-1m) 8%, var(--color-paper)));
+}
+.rising-alert {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-frame-1m);
+  background: color-mix(in oklch, var(--color-frame-1m) 12%, var(--color-paper));
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--color-ink-2);
+}
+.rising-alert[hidden] { display: none; }
+.rising-alert__label {
+  display: inline-block;
+  margin-right: 0.55rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--color-frame-1m);
+  color: var(--color-frame-1m);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.rising-alert strong {
+  color: var(--color-frame-1m);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.industry--rising::after {
+  content: " ▲";
+  color: var(--color-frame-1m);
+  font-size: 0.85em;
+}
 .track {
   height: 0.75rem;
   position: relative;
@@ -999,6 +1217,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   </section>
   <section class="desk-block" aria-labelledby="thematic-title">
     <div class="section-heading"><h1 id="thematic-title" class="dashboard-title">Thematic Leadership</h1></div>
+    <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="leadership-sections" class="window-sections"></div>
   </section>
   <section class="desk-block" aria-labelledby="liquid-title">
@@ -1071,6 +1290,7 @@ const ema8Title = document.getElementById('ema8-title');
 const maStackTitle = document.getElementById('ma-stack-title');
 const aplusTitle = document.getElementById('aplus-title');
 const leadershipSections = document.getElementById('leadership-sections');
+const risingThemeAlert = document.getElementById('rising-theme-alert');
 const liquidSections = document.getElementById('liquid-sections');
 const nelSections = document.getElementById('nel-sections');
 const focusSections = document.getElementById('focus-sections');
@@ -1090,6 +1310,27 @@ const flowMeta = { '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
 const NOTE_KEY = 'nel-note:';
 
+function risingThemes(snapshot) { return snapshot?.rising_themes || []; }
+function risingIndustrySet(snapshot) { return new Set(snapshot?.rising_industries || []); }
+function isRisingThemeRow(row, snapshot) {
+  const industry = String(row?.industry || '').trim();
+  return Boolean(industry && risingIndustrySet(snapshot).has(industry));
+}
+function renderRisingAlert(snapshot) {
+  if (!risingThemeAlert) return;
+  const primary = risingThemes(snapshot).filter(row => row.frame === '1m');
+  if (!primary.length) {
+    risingThemeAlert.hidden = true;
+    risingThemeAlert.innerHTML = '';
+    return;
+  }
+  const parts = primary.slice(0, 6).map(row => {
+    const arrow = `${row.prior_count}→${row.current_count}`;
+    return `<strong>${escapeHTML(row.signal)}</strong> ${escapeHTML(row.industry)} (${arrow}, +${row.delta})`;
+  });
+  risingThemeAlert.hidden = false;
+  risingThemeAlert.innerHTML = `<span class="rising-alert__label">Do not miss</span>${parts.join(' · ')}. Rising-theme names are dashed in the desk lists.`;
+}
 function counts(snapshot, frame) { return snapshot?.groups?.[frame] || {}; }
 function total(map) { return Object.values(map).reduce((a,b) => a + b, 0); }
 function escapeHTML(value) { return String(value ?? '—').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -1154,10 +1395,21 @@ function tickClock() {
 function currentSnapshot() { return history[Number(dateSelect.value)] || null; }
 function renderBars(current, previous, frame, container) {
   const now = counts(current, frame), then = counts(previous, frame);
+  const rising = new Set((risingThemes(current) || []).filter(row => row.frame === frame).map(row => row.industry));
+  // Cluster members still mark individual bars when the cluster itself is rising.
+  (risingThemes(current) || []).filter(row => row.frame === frame && row.kind === 'cluster').forEach(row => {
+    (row.members || []).forEach(name => rising.add(name));
+  });
   const names = [...new Set([...Object.keys(now), ...Object.keys(then)])].sort((a,b) => (now[b]||0) - (now[a]||0) || (then[b]||0) - (then[a]||0)).slice(0, 5);
   if (!names.length) { container.innerHTML = '<p class="empty">No leader data is available for this snapshot.</p>'; return []; }
   const max = Math.max(1, ...names.flatMap(n => [now[n]||0, then[n]||0]));
-  container.innerHTML = names.map((name, index) => { const color = rankColors[index]; return `<div class="bar-row"><div class="industry" style="color:${color}" title="${name}">${name}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`; }).join('');
+  container.innerHTML = names.map((name, index) => {
+    const color = rankColors[index];
+    const risingClass = rising.has(name) ? ' industry--rising' : '';
+    const delta = (now[name]||0) - (then[name]||0);
+    const title = rising.has(name) ? `${name} · rising ${delta >= 0 ? '+' : ''}${delta}` : name;
+    return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
+  }).join('');
   return names;
 }
 function renderTrend(frame, svg, names) {
@@ -1189,28 +1441,45 @@ function leadingTheme(snapshot, frame) {
 function isLeadingThemeRow(row, top) {
   return Boolean(top && row.industry && row.industry === top[0]);
 }
+function rowThemeClasses(row, top, snapshot) {
+  const lead = isLeadingThemeRow(row, top);
+  const rising = isRisingThemeRow(row, snapshot);
+  return [lead ? 'row--theme-lead' : '', rising ? 'row--theme-rising' : ''].filter(Boolean).join(' ');
+}
+function rowThemeTitle(row, top, snapshot) {
+  const bits = [];
+  if (isLeadingThemeRow(row, top)) bits.push(`Leading theme: ${top[0]}`);
+  if (isRisingThemeRow(row, snapshot)) bits.push('Rising theme — do not miss');
+  return bits.join(' · ');
+}
 function fillTheme(id, snapshot, frame) {
   const themeCard = document.getElementById(id);
   if (!themeCard) return null;
   const top = leadingTheme(snapshot, frame);
   const label = flowMeta[frame]?.label || frame;
+  const rising = risingThemes(snapshot).filter(row => row.frame === frame);
+  const risingNote = rising.length
+    ? ` Rising: ${rising.slice(0, 3).map(row => `${row.signal} ${row.industry} (${row.prior_count}→${row.current_count})`).join('; ')}.`
+    : '';
   themeCard.innerHTML = top
-    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only. Leading-theme names are boxed in green.</span>`
-    : `<span class="theme-line">No industry count for this window.</span>`;
+    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only. Leading-theme names are boxed in green.${escapeHTML(risingNote)}</span>`
+    : `<span class="theme-line">No industry count for this window.${escapeHTML(risingNote)}</span>`;
   return top;
 }
 function renderTableRows(records, frame, performance, flag, tableId, extraCell, emptyLabel, colspan) {
   const table = document.getElementById(tableId);
   if (!table) return;
-  const top = leadingTheme(currentSnapshot(), frame);
+  const snapshot = currentSnapshot();
+  const top = leadingTheme(snapshot, frame);
   const rows = records.filter(row => isTrue(row[flag])).sort((a, b) => {
     const scoreDelta = Number(b.focus_score) - Number(a.focus_score);
     if (extraCell && Number.isFinite(scoreDelta) && scoreDelta) return scoreDelta;
     return Number(b[performance]) - Number(a[performance]);
   });
   table.innerHTML = rows.length ? rows.map(row => {
-    const inTheme = isLeadingThemeRow(row, top);
-    return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${metricCells(row, performance, top)}${extraCell ? extraCell(row) : ''}${noteMarkup(row)}</tr>`;
+    const classes = rowThemeClasses(row, top, snapshot);
+    const title = rowThemeTitle(row, top, snapshot);
+    return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${metricCells(row, performance, top)}${extraCell ? extraCell(row) : ''}${noteMarkup(row)}</tr>`;
   }).join('') : `<tr><td colspan="${colspan}" class="empty">${emptyLabel}</td></tr>`;
 }
 function renderLiquid(snapshot) {
@@ -1245,13 +1514,13 @@ function renderRS(snapshot) {
     if (leadDelta) return leadDelta;
     return Number(b.pct_below_price_high || 0) - Number(a.pct_below_price_high || 0);
   });
-  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}${top ? ` · 1m theme <strong>${escapeHTML(top[0])}</strong> boxed in green` : ''}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
+  rsSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>RS new high vs SPY</h3><div class="theme-card frame-1m"><span class="theme-line">${leads.length ? `<strong>${leads.length}</strong> leads (RS high before price high) · ${highs.length} total RS highs` : highs.length ? `${highs.length} RS highs · no pure leads today` : 'No RS scan for this snapshot yet. Run <code>python rs_lead_scan.py</code>.'}${top ? ` · 1m theme <strong>${escapeHTML(top[0])}</strong> boxed in green` : ''}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-rs-d">RS D</th><th class="col-rs-w">RS W</th><th>Lead</th><th class="col-below">% Below Px High</th><th>Notes</th></tr></thead><tbody id="rs-table">${rows.length ? rows.map(row => { const classes = rowThemeClasses(row, top, snapshot); const title = rowThemeTitle(row, top, snapshot); return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${tickerMarkup(row)}<td class="col-industry${isLeadingThemeRow(row, top) ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-rs-d">${rsFlag(row.rs_new_high_d)}</td><td class="col-rs-w">${rsFlag(row.rs_new_high_w)}</td><td>${isTrue(row.is_rs_lead) ? 'LEAD' : '—'}</td><td class="col-below">${formatNumber(row.pct_below_price_high)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="8" class="empty">No RS leads.</td></tr>`}</tbody></table></div></section>`;
 }
 function renderEMA8(snapshot) {
   if (!ema8Sections) return;
   const rows = (snapshot?.ema8_pullbacks || []).slice().sort((a, b) => Math.abs(Number(a.dist_to_ema8w_pct || 99)) - Math.abs(Number(b.dist_to_ema8w_pct || 99)));
   const top = leadingTheme(snapshot, '1m');
-  ema8Sections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>Rising 8-week EMA tags</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders within 3% of a rising 8W EMA` : 'No 8W EMA pullbacks for this snapshot. Run <code>python ema8_pullback_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Dist EMA8W</th><th class="col-ext">Slope</th><th class="col-vol">Off 8W High</th><th>Notes</th></tr></thead><tbody id="ema8-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${formatNumber(row.dist_to_ema8w_pct)}%</td><td class="col-ext">${formatNumber(row.ema8w_slope_pct)}%</td><td class="col-vol">${formatNumber(row.off_8w_high_pct)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No 8W EMA pullbacks.</td></tr>`}</tbody></table></div></section>`;
+  ema8Sections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>Rising 8-week EMA tags</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders within 3% of a rising 8W EMA` : 'No 8W EMA pullbacks for this snapshot. Run <code>python ema8_pullback_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Dist EMA8W</th><th class="col-ext">Slope</th><th class="col-vol">Off 8W High</th><th>Notes</th></tr></thead><tbody id="ema8-table">${rows.length ? rows.map(row => { const classes = rowThemeClasses(row, top, snapshot); const title = rowThemeTitle(row, top, snapshot); return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${tickerMarkup(row)}<td class="col-industry${isLeadingThemeRow(row, top) ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${formatNumber(row.dist_to_ema8w_pct)}%</td><td class="col-ext">${formatNumber(row.ema8w_slope_pct)}%</td><td class="col-vol">${formatNumber(row.off_8w_high_pct)}%</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No 8W EMA pullbacks.</td></tr>`}</tbody></table></div></section>`;
 }
 function renderMaStack(snapshot) {
   if (!maStackSections) return;
@@ -1262,7 +1531,7 @@ function renderMaStack(snapshot) {
     return Number(a.sma20_30_gap_pct || 99) - Number(b.sma20_30_gap_pct || 99);
   });
   const top = leadingTheme(snapshot, '1m');
-  maStackSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>5&gt;10 · 20×30 cross</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders with SMA5&gt;SMA10 and SMA20 crossing SMA30` : 'No MA stack crosses for this snapshot. Run <code>python ma_stack_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-ext">20/30 Gap</th><th class="col-vol">Cross D</th><th>Notes</th></tr></thead><tbody id="ma-stack-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-ext">${formatNumber(row.sma20_30_gap_pct)}%</td><td class="col-vol">${row.cross_days_ago === '' || row.cross_days_ago == null ? '—' : escapeHTML(row.cross_days_ago)}</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No MA stack crosses.</td></tr>`}</tbody></table></div></section>`;
+  maStackSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>5&gt;10 · 20×30 cross</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${rows.length}</strong> Liquid Leaders with SMA5&gt;SMA10 and SMA20 crossing SMA30` : 'No MA stack crosses for this snapshot. Run <code>python ma_stack_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th class="col-ext">20/30 Gap</th><th class="col-vol">Cross D</th><th>Notes</th></tr></thead><tbody id="ma-stack-table">${rows.length ? rows.map(row => { const classes = rowThemeClasses(row, top, snapshot); const title = rowThemeTitle(row, top, snapshot); return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${tickerMarkup(row)}<td class="col-industry${isLeadingThemeRow(row, top) ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${escapeHTML(row.signal || '—')}</td><td class="col-ext">${formatNumber(row.sma20_30_gap_pct)}%</td><td class="col-vol">${row.cross_days_ago === '' || row.cross_days_ago == null ? '—' : escapeHTML(row.cross_days_ago)}</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="6" class="empty">No MA stack crosses.</td></tr>`}</tbody></table></div></section>`;
 }
 function renderAPlusFlags(snapshot) {
   if (!aplusSections) return;
@@ -1278,7 +1547,7 @@ function renderAPlusFlags(snapshot) {
   const bos = rows.filter(r => r.signal === 'APLUS_BREAKOUT').length;
   const coils = rows.length - bos;
   const top = leadingTheme(snapshot, '1m');
-  aplusSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>Stalk coil · day-0 break</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${coils}</strong> coils under pivot · <strong>${bos}</strong> day-0 breaks` : 'No A++ flags for this snapshot. Run <code>python a_plus_flag_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th>Grade</th><th class="col-ext">Thrust</th><th class="col-vol">Depth</th><th>Pivot</th><th>RVOL</th><th>Notes</th></tr></thead><tbody id="aplus-table">${rows.length ? rows.map(row => { const inTheme = isLeadingThemeRow(row, top); const sig = row.signal === 'APLUS_BREAKOUT' ? 'BREAKOUT' : 'COIL'; return `<tr class="${inTheme ? 'row--theme-lead' : ''}"${inTheme ? ` title="Leading theme: ${escapeHTML(top[0])}"` : ''}>${tickerMarkup(row)}<td class="col-industry${inTheme ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${sig}</td><td>${escapeHTML(row.grade || '—')}</td><td class="col-ext">${formatNumber(row.thrust_pct)}%</td><td class="col-vol">${formatNumber(row.flag_depth_pct)}%</td><td>${formatNumber(row.dist_to_pivot_pct)}%</td><td>${formatNumber(row.rvol)}</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="9" class="empty">No A++ flag setups.</td></tr>`}</tbody></table></div></section>`;
+  aplusSections.innerHTML = `<section class="nel-window" data-frame="1m"><h3>Stalk coil · day-0 break</h3><div class="theme-card frame-1m"><span class="theme-line">${rows.length ? `<strong>${coils}</strong> coils under pivot · <strong>${bos}</strong> day-0 breaks` : 'No A++ flags for this snapshot. Run <code>python a_plus_flag_scan.py</code>.'}</span></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Signal</th><th>Grade</th><th class="col-ext">Thrust</th><th class="col-vol">Depth</th><th>Pivot</th><th>RVOL</th><th>Notes</th></tr></thead><tbody id="aplus-table">${rows.length ? rows.map(row => { const classes = rowThemeClasses(row, top, snapshot); const title = rowThemeTitle(row, top, snapshot); const sig = row.signal === 'APLUS_BREAKOUT' ? 'BREAKOUT' : 'COIL'; return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${tickerMarkup(row)}<td class="col-industry${isLeadingThemeRow(row, top) ? ' industry--lead' : ''}">${escapeHTML(row.industry || '—')}</td><td>${sig}</td><td>${escapeHTML(row.grade || '—')}</td><td class="col-ext">${formatNumber(row.thrust_pct)}%</td><td class="col-vol">${formatNumber(row.flag_depth_pct)}%</td><td>${formatNumber(row.dist_to_pivot_pct)}%</td><td>${formatNumber(row.rvol)}</td>${noteMarkup(row)}</tr>`; }).join('') : `<tr><td colspan="9" class="empty">No A++ flag setups.</td></tr>`}</tbody></table></div></section>`;
 }
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
@@ -1289,6 +1558,7 @@ function render() {
   if (ema8Title) ema8Title.textContent = `8W EMA Pullbacks - ${(current.ema8_pullbacks || []).length} Tickers`;
   if (maStackTitle) maStackTitle.textContent = `MA Stack - ${(current.ma_stack || []).length} Tickers`;
   if (aplusTitle) aplusTitle.textContent = `A++ Flag Breakouts - ${(current.a_plus_flags || []).length} Tickers`;
+  renderRisingAlert(current);
   leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL', '', null, 'No liquid leaders.');
   if (focusSections) focusSections.innerHTML = windowTables('focus', 'Focus', '<th class="col-score">Score</th><th class="col-rules">Rules</th>', focusExtras, 'No Focus Candidates.');

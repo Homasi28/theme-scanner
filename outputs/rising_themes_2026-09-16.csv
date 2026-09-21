@@ -1,0 +1,6 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-09-16,1m,industry,Oil Refining/Marketing,RISING,1,2,1,
+2026-09-16,1m,industry,Pharmaceuticals: Major,RISING,1,2,1,
+2026-09-16,1m,cluster,Semis complex,RISING,1,2,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-09-16,3m,industry,Packaged Software,RISING,6,9,3,
+2026-09-16,3m,industry,Oil Refining/Marketing,RISING,4,5,1,

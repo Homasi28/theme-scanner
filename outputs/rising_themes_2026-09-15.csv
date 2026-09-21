@@ -1,0 +1,7 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-09-15,1m,industry,Packaged Software,RISING,4,5,1,
+2026-09-15,1m,industry,Data Processing Services,RISING,1,2,1,
+2026-09-15,6m,industry,Packaged Software,RISING,4,7,3,
+2026-09-15,3m,industry,Oil Refining/Marketing,RISING,3,4,1,
+2026-09-15,3m,industry,Pharmaceuticals: Major,RISING,3,4,1,
+2026-09-15,6m,industry,Pharmaceuticals: Major,RISING,3,4,1,

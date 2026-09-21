@@ -59,6 +59,13 @@ Consecutive tight closes are not in this pass; that needs daily history, which T
 
 Every run also refreshes `industry_flow_dashboard.html`. Open it in a browser to compare industry leadership across the saved daily snapshots. It shows the 1-month, 3-month, and 6-month views together, plus Focus Candidates, Jeff’s 14 hard rules, and per-symbol notes stored in the browser. Theme cards always derive from the full momentum-leader file, not NEL or Focus, so extended names do not distort the strongest-industry signal. Keep prior daily CSV files in `outputs/`; the dashboard reads all of them when it is regenerated.
 
+**Rising themes:** each snapshot is compared to the prior day. If an industry’s 1-month LL count expands (or the Semis complex cluster expands), the desk shows a **Do not miss** alert on F2 Themes, dashes those names in the lists, and writes:
+
+- `outputs/rising_themes_YYYY-MM-DD.csv`
+- `outputs/EXPORT/rising_theme_symbols_YYYY-MM-DD.csv`
+
+`KICKOFF` = new/thin theme reaching real breadth; `RISING` = already-present theme adding names.
+
 ## RS leads (1ChartMaster)
 
 After the universe is built, the desk also scans StockCharts-style relative strength vs SPY:

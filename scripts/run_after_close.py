@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import argparse
+import os
 import subprocess
 import sys
 from datetime import date, datetime, timedelta
@@ -88,38 +90,67 @@ def next_session_date(now: datetime) -> date:
     return candidate
 
 
-def main() -> int:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Run even outside the post-close window (also set FORCE_RUN=1).",
+    )
+    parser.add_argument(
+        "--snapshot-date",
+        type=date.fromisoformat,
+        help="Override output stamp (YYYY-MM-DD). Default: next NYSE session.",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    force = args.force or os.environ.get("FORCE_RUN", "").strip() in {"1", "true", "TRUE", "yes", "YES"}
     now = datetime.now(NY_TZ)
-    if not should_run(now):
+    if not force and not should_run(now):
+        print(f"Skip: not after US close yet ({now.isoformat()})", flush=True)
         return 0
     LOG_DIR.mkdir(exist_ok=True)
     MARKER.parent.mkdir(exist_ok=True)
-    if MARKER.exists() and MARKER.read_text(encoding="utf-8").strip() == now.date().isoformat():
+    if not force and MARKER.exists() and MARKER.read_text(encoding="utf-8").strip() == now.date().isoformat():
+        print(f"Skip: already ran for {now.date().isoformat()}", flush=True)
         return 0
     try:
         LOCK_DIR.mkdir()
     except FileExistsError:
+        print("Skip: lock held by another run", flush=True)
         return 0
     try:
+        snapshot = args.snapshot_date or next_session_date(now)
         log_path = LOG_DIR / f"daily_scan_{now.date().isoformat()}.log"
         local_python = PROJECT_DIR / ".venv" / "bin" / "python"
         scanner_python = local_python if local_python.exists() else Path(sys.executable)
+        cmd = [str(scanner_python), "focus_list.py", "--snapshot-date", snapshot.isoformat()]
+        print(f"Running {' '.join(cmd)} (force={force})", flush=True)
         with log_path.open("a", encoding="utf-8") as log:
-            log.write(f"\n--- Scheduled run started {now.isoformat()} ---\n")
+            log.write(f"\n--- Scheduled run started {now.isoformat()} force={force} ---\n")
             result = subprocess.run(
-                [str(scanner_python), "focus_list.py", "--snapshot-date", next_session_date(now).isoformat()],
+                cmd,
                 cwd=PROJECT_DIR,
-                stdout=log,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
                 check=False,
             )
+            log.write(result.stdout or "")
             log.write(f"--- Scheduled run finished with exit code {result.returncode} ---\n")
+        if result.stdout:
+            print(result.stdout, end="" if result.stdout.endswith("\n") else "\n", flush=True)
         if result.returncode == 0:
             MARKER.write_text(now.date().isoformat() + "\n", encoding="utf-8")
+        else:
+            print(f"Scan failed with exit code {result.returncode}", flush=True)
         return result.returncode
     finally:
-        LOCK_DIR.rmdir()
+        if LOCK_DIR.exists():
+            LOCK_DIR.rmdir()
 
 
 if __name__ == "__main__":
