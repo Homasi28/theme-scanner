@@ -31,6 +31,95 @@ THEME_CLUSTERS = {
 RISING_MIN_COUNT = 2
 RISING_MIN_DELTA = 1
 
+# Livingston's voice in Edwin Lefèvre, Reminiscences of a Stock Operator (1923).
+# Public domain in the USA. Short lines only — not passages from later books.
+LIVERMORE_QUOTES = [
+    "There is nothing new in Wall Street. There can't be because speculation is as old as the hills. Whatever happens in the stock market today has happened before and will happen again.",
+    "A battle goes on in the stock market and the tape is your telescope. You can depend upon it seven out of ten cases.",
+    "I didn't ask the tape why when I was fourteen, and I don't ask it today, at forty. Your business with the tape is now — not tomorrow. The reason can wait.",
+    "I kept my business to myself. It was a one-man business. That is why I have always played a lone hand.",
+    "I was playing a system and not a favorite stock or backing opinions.",
+    "There is the plain fool, who does the wrong thing at all times everywhere, but there is the Wall Street fool, who thinks he must trade all the time.",
+    "No man can always have adequate reasons for buying or selling stocks daily — or sufficient knowledge to make his play an intelligent play.",
+    "Whenever I read the tape by the light of experience I made money, but when I made a plain fool play I had to lose.",
+    "The desire for constant action irrespective of underlying conditions is responsible for many losses in Wall Street even among the professionals, who feel that they must take home some money every day, as though they were working for regular wages.",
+    "I always made money when I was sure I was right before I began. What beat me was not having brains enough to stick to my own game — to play the market only when I was satisfied that precedents favored my play.",
+    "There is a time for all things, but I didn't know it. And that is precisely what beats so many men in Wall Street.",
+    "I never lose my temper over the stock market. I never argue with the tape. Getting sore at the market doesn't get you anywhere.",
+    "There wasn't anything wrong with me; only with my play.",
+    "It takes a man a long time to learn all the lessons of all his mistakes.",
+    "There is only one side to the stock market; and it is not the bull side or the bear side, but the right side.",
+    "A man must believe in himself and his judgment if he expects to make a living at this game. That is why I don't believe in tips.",
+    "Nobody can make big money on what someone else tells him to do.",
+    "If I buy stocks on Smith's tip I must sell those same stocks on Smith's tip. I am depending on him.",
+    "The game taught me the game. And it didn't spare the rod while teaching.",
+    "Reading the tape like an expert did not save me.",
+    "In A. R. Fullerton's office the tape always talked ancient history to me, as far as my system of trading went, and I didn't realise it.",
+    "It was not that I was playing it legitimately that made me lose, but that I was playing it ignorantly.",
+    "Of course I let the craving for excitement get the better of my judgment.",
+    "I was accustomed to regarding the tape as the best little friend I had, because I bet according to what it told me. But this time the tape double-crossed me.",
+    "It took me five years to learn to play the game intelligently enough to make big money when I was right.",
+    "I thought I was beating the game when in reality I was only beating the shop.",
+    "The market does not beat them. They beat themselves, because though they have brains they cannot sit tight.",
+    "Old Turkey was dead right in doing and saving what he did. He had not only the courage of his convictions but the intelligent patience to sit tight.",
+    "Disregarding the big swing and trying to jump in and out was fatal to me. Nobody can catch all the fluctuations.",
+    "In a bull market your game is to buy and hold until you believe that the bull market is near its end.",
+    "To do this you must study the general conditions and not tips or special factors affecting individual stocks. Then get out of all your stocks; get out for keeps!",
+    "The big money was not in the individual fluctuations but in the main movements — not in reading the tape but in sizing up the entire market and its trend.",
+    "When old Mr. Partridge kept on telling the other customers, \"Well, you know this is a bull market!\" he really meant to tell them that the big money was not in the individual fluctuations but in the main movements.",
+    "It never was my thinking that made the big money for me. It always was my sitting. My sitting tight!",
+    "It is no trick at all to be right on the market. You always find lots of early bulls in bull markets and early bears in bear markets.",
+    "Men who can both be right and sit tight are uncommon. I found it one of the hardest things to learn.",
+    "It is literally true that millions come easier to a trader after he knows how to trade than hundreds did in the days of his ignorance.",
+    "A man may see straight and clearly and yet become impatient or doubtful when the market takes its time about doing as he figured it must do.",
+    "They say you never grow poor taking profits. No, you don't. But neither do you grow rich taking a four-point profit in a bull market.",
+    "Of all speculative blunders there are few greater than trying to average a losing game.",
+    "Always sell what shows you a loss and keep what shows you a profit.",
+    "The cotton showed me a loss and I kept it. The wheat showed me a profit and I sold it out.",
+    "The speculator's chief enemies are always boring from within.",
+    "It is inseparable from human nature to hope and to fear.",
+    "When the market goes against you, you hope that every day will be the last day — and you lose more than you should had you not listened to hope.",
+    "When the market goes your way you become fearful that the next day will take away your profit, and you get out — too soon.",
+    "Fear keeps you from making as much money as you ought to. The successful trader has to fight these two deep-seated instincts.",
+    "Instead of hoping he must fear; instead of fearing he must hope. He must fear that his loss may develop into a much bigger loss, and hope that his profit may become a big profit.",
+    "The speculator's deadly enemies are ignorance, greed, fear and hope. All the statute books in the world and all the rules of all the Exchanges on earth cannot eliminate these from the human animal.",
+    "If a stock doesn't act right don't touch it; because, being unable to tell precisely what is wrong, you cannot tell which way it is going. No diagnosis, no prognosis. No prognosis, no profit.",
+    "It is enough for the experienced trader to perceive that something is wrong. He must not expect the tape to become a lecturer. His job is to listen for it to say \"Get out!\"",
+    "Prices, like everything else, move along the line of least resistance. They will go up if there is less resistance to an advance than to a decline; and vice versa.",
+    "The trend is evident to a man who has an open mind and reasonably clear sight, for it is never wise for a speculator to fit his facts to his theories.",
+    "The speculator is not an investor. His object is not to secure a steady return on his money at a good rate of interest, but to profit by either a rise or a fall in the price of whatever he may be speculating in.",
+    "A man cannot be convinced against his own convictions, but he can be talked into a state of uncertainty and indecision, which is even worse, for that means that he cannot trade with confidence and comfort.",
+    "The professional concerns himself with doing the right thing rather than with making money, knowing that the profit takes care of itself if the other things are attended to.",
+    "A trader gets to play the game as the professional billiard player does — he looks far ahead instead of considering the particular shot before him.",
+    "I have always found it profitable to study my mistakes.",
+    "It was all very well not to lose your bear position in a bear market, but at all times the tape should be read to determine the propitiousness of the time for operating.",
+    "Observation, experience, memory and mathematics — these are what the successful trader must depend on.",
+    "He must not only observe accurately but remember at all times what he has observed.",
+    "He cannot bet on the unreasonable or on the unexpected, however strong his personal convictions may be.",
+    "The principles of successful stock speculation are based on the supposition that people will continue in the future to make the mistakes that they have made in the past.",
+    "The public is so often whipsawed that one marvels at their persistence in not learning their lesson.",
+    "The average man doesn't wish to be told that it is a bull or a bear market. What he desires is to be told specifically which particular stock to buy or sell.",
+    "He wants to get something for nothing. He does not wish to work. He doesn't even wish to have to think.",
+    "I never hesitate to tell a man that I am bullish or bearish. But I do not tell people to buy or sell any particular stock.",
+    "In a bear market all stocks go down and in a bull market they go up.",
+    "To buy on a rising market is the most comfortable way of buying stocks. The point is not to buy as cheap as possible or go short at top prices, but to buy or sell at the right time.",
+    "When I am bearish and I sell a stock, each sale must be at a lower level than the previous sale. When I am buying, the reverse is true. I must buy on a rising scale.",
+    "I don't buy long stock on a scale down. I buy on a scale up.",
+    "Remember that stocks are never too high for you to begin buying or too low to begin selling.",
+    "After the initial transaction, don't make a second unless the first shows you a profit. Wait and watch.",
+    "Never try to sell at the top. It isn't wise. Sell after a reaction if there is no rally.",
+    "Give up trying to catch the last eighth — or the first. These two are the most expensive eighths in the world.",
+    "The man who is right always has two forces working in his favor — basic conditions and the men who are wrong.",
+    "In a bull market bear factors are ignored. That is human nature.",
+    "A man may possess an original mind and a lifelong habit of independent thinking and withal be vulnerable to attacks by a persuasive personality.",
+    "The training of a stock trader is like a medical education. He learns the theory and then proceeds to devote his life to the practice.",
+    "He must not permit himself set opinions. He must have an open mind and flexibility.",
+    "It is not wise to disregard the message of the tape, no matter what your opinion of crop conditions or of the probable demand may be.",
+    "The weaknesses to which a speculator is prone are almost numberless.",
+    "I have been in the speculative game ever since I was fourteen. It is all I have ever done.",
+    "A man may beat a stock or a group at a certain time, but no man living can beat the stock market!",
+]
+
 
 RECORD_COLUMNS = [
     "name",
@@ -409,6 +498,7 @@ def write_dashboard(output_dir: Path) -> Path:
     dashboard = Path("industry_flow_dashboard.html")
     pages_entrypoint = Path("index.html")
     payload = json.dumps(history, separators=(",", ":"))
+    quotes_payload = json.dumps(LIVERMORE_QUOTES, ensure_ascii=False, separators=(",", ":"))
     template = r'''<!doctype html>
 <html lang="en">
 <head>
@@ -742,6 +832,48 @@ main {
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--color-accent);
+}
+.qotd {
+  margin: 0 0 var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: var(--rule) solid var(--color-rule);
+}
+.qotd__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-xs);
+  padding: var(--space-2xs) var(--space-xs);
+  background: var(--color-paper-3);
+}
+.qotd__head h2 {
+  flex: 1 1 10rem;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-sm);
+  font-style: normal;
+}
+.qotd__quote {
+  margin: 0;
+  padding: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--grey-100);
+  overflow-wrap: anywhere;
+}
+.qotd__meta {
+  margin: var(--space-2xs) 0 0;
+  padding: 0 var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
 .window-sections {
   display: grid;
@@ -1186,7 +1318,15 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     </div>
   </header>
   <p class="lede">Post-close desk · pick Focus · open charts <span id="bbg-session">US equity session</span></p>
-  <section id="hard-rules" class="rules" aria-labelledby="rules-title">
+  <section id="hard-rules" class="rules" aria-label="Quote of the day and Jeff’s hard rules">
+    <div class="qotd">
+      <div class="qotd__head">
+        <h2 id="qotd-title">Quote of the day</h2>
+        <button id="qotd-next" class="btn btn--ghost" type="button">Next quote</button>
+      </div>
+      <blockquote id="qotd-text" class="qotd__quote" aria-live="polite"></blockquote>
+      <p id="qotd-meta" class="qotd__meta">Jesse Livermore</p>
+    </div>
     <h2 id="rules-title" class="rules__title">Jeff’s 14 hard rules</h2>
     <div class="rules__groups">
       <div>
@@ -1280,6 +1420,51 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 const history = __DATA__;
+const QUOTES = __QUOTES__;
+(function initQuoteOfDay() {
+  const text = document.getElementById('qotd-text');
+  const meta = document.getElementById('qotd-meta');
+  const button = document.getElementById('qotd-next');
+  if (!text || !Array.isArray(QUOTES) || !QUOTES.length) return;
+  const storageKey = 'lld-qotd';
+  function nyDate() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  }
+  function hash(value) {
+    let h = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      h ^= value.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function readSaved() {
+    try { return JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { return null; }
+  }
+  function save(index) {
+    try { localStorage.setItem(storageKey, JSON.stringify({ date: nyDate(), index })); } catch { /* private mode */ }
+  }
+  function show(index) {
+    text.textContent = QUOTES[index];
+    text.dataset.index = String(index);
+    if (meta) meta.textContent = (index + 1) + ' / ' + QUOTES.length + ' · Jesse Livermore · Reminiscences, 1923';
+  }
+  const today = nyDate();
+  const saved = readSaved();
+  let index = hash('lld|' + today) % QUOTES.length;
+  if (saved && saved.date === today && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < QUOTES.length) index = saved.index;
+  show(index);
+  if (!button) return;
+  button.addEventListener('click', () => {
+    const current = Number(text.dataset.index);
+    let next = current;
+    if (QUOTES.length > 1) {
+      while (next === current) next = Math.floor(Math.random() * QUOTES.length);
+    }
+    show(next);
+    save(next);
+  });
+})();
 const dateSelect = document.getElementById('date');
 const thematicTitle = document.getElementById('thematic-title');
 const liquidTitle = document.getElementById('liquid-title');
@@ -1643,7 +1828,7 @@ if (!history.length) { document.querySelector('main').innerHTML = '<p class="emp
 </script>
 </body>
 </html>'''
-    rendered = template.replace("__DATA__", payload)
+    rendered = template.replace("__DATA__", payload).replace("__QUOTES__", quotes_payload)
     dashboard.write_text(rendered, encoding="utf-8")
     pages_entrypoint.write_text(rendered, encoding="utf-8")
     return dashboard
