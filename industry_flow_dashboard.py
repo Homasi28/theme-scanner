@@ -207,6 +207,28 @@ def _performance_records(*paths: Path) -> dict[str, dict[str, list[dict]]]:
     return out
 
 
+def _finviz_member_records(path: Path) -> dict[str, list[dict]]:
+    """finviz_group_members CSV -> {industry: [names ranked by the week]}."""
+    if not path.exists():
+        return {}
+    frame = pd.read_csv(path)
+    if frame.empty or "industry" not in frame.columns:
+        return {}
+    windows = [column for column in ("1w", "1m", "3m", "6m") if column in frame.columns]
+    slim = frame.loc[:, ["industry", "rank", "ticker", *windows]].sort_values(["industry", "rank"])
+    out: dict[str, list[dict]] = {}
+    for industry, group in slim.groupby("industry"):
+        records = []
+        for row in group.to_dict(orient="records"):
+            record = {"t": str(row["ticker"])}
+            for window in windows:
+                value = row[window]
+                record[window] = None if pd.isna(value) else float(value)
+            records.append(record)
+        out[str(industry)] = records
+    return out
+
+
 def _member_records(path: Path) -> list[dict]:
     """Eligible-universe rows, slimmed down, for the industry drill-down."""
     if not path.exists():
@@ -463,6 +485,7 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
                 output_dir / f"finviz_groups_{stamp}.csv",
             ),
             "members": _member_records(output_dir / f"filtered_universe_{stamp}.csv"),
+            "finviz_members": _finviz_member_records(output_dir / f"finviz_group_members_{stamp}.csv"),
         })
     return annotate_rising_themes(snapshots)
 
@@ -1292,14 +1315,15 @@ function renderIndustryDetail() {
   const snapshot = currentSnapshot();
   const { industry, frame } = openIndustry;
   if (perfScope === 'finviz') {
-    // Finviz groups use their own taxonomy, so our TradingView-tagged universe
-    // cannot be filtered by them; send the user to the real constituent list.
+    // Finviz groups carry their own membership and their own numbers, already
+    // ranked by the week when scraped.
     const row = perfRows(snapshot, frame).find(r => r.industry === industry);
-    const url = row?.slug
-      ? `https://finviz.com/screener.ashx?v=141&f=ind_${encodeURIComponent(row.slug)}&o=-perf1w`
-      : 'https://finviz.com/groups.ashx?g=industry&v=140&o=-perf1w';
+    const names = (snapshot?.finviz_members || {})[industry] || [];
+    const body = names.length
+      ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${names.map(m => `<tr><td class="col-ticker"><a class="ticker-link" href="https://finviz.com/quote.ashx?t=${encodeURIComponent(m.t)}" target="_blank" rel="noopener noreferrer">${escapeHTML(m.t)}</a></td><td class="${Number(m['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1w'])}</td><td class="${Number(m['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1m'])}</td><td class="${Number(m['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['3m'])}</td><td class="${Number(m['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['6m'])}</td></tr>`).join('')}</tbody></table></div>`
+      : '<p class="empty">No member list for this group in this snapshot. Run fetch_finviz_groups.py.</p>';
     panel.hidden = false;
-    panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${formatSigned(row?.median)} over ${escapeHTML(flowMeta[frame]?.label || frame)}</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div><p class="lede">This is a Finviz group, so its members come from their classification rather than ours. <a class="ticker-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Open the ${escapeHTML(industry)} constituents on Finviz →</a></p>`;
+    panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${formatSigned(row?.median)} over ${escapeHTML(flowMeta[frame]?.label || frame)} · ${names.length} name${names.length === 1 ? '' : 's'}, best week first</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div>${body}`;
     return;
   }
   const members = (snapshot?.members || [])
