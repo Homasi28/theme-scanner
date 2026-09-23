@@ -459,7 +459,13 @@ def write_dashboard(output_dir: Path) -> Path:
     write_rising_theme_csvs(output_dir, history)
     dashboard = Path("industry_flow_dashboard.html")
     pages_entrypoint = Path("index.html")
-    payload = json.dumps(history, separators=(",", ":"))
+    # `liquid` is the full leader list. The CSV exports above need it, the page
+    # does not, and it is the single largest thing in the payload.
+    browser_history = [
+        {key: value for key, value in snapshot.items() if key != "liquid"}
+        for snapshot in history
+    ]
+    payload = json.dumps(browser_history, separators=(",", ":"))
     quotes_payload = json.dumps(LIVERMORE_QUOTES, ensure_ascii=False, separators=(",", ":"))
     template = r'''<!doctype html>
 <html lang="en">
@@ -629,20 +635,6 @@ a { color: inherit; }
 }
 select,
 .btn,
-.note-input {
-  border: var(--rule) solid var(--grey-100);
-  border-radius: 0;
-  background: transparent;
-  color: var(--grey-100);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1;
-  outline: 2px solid transparent;
-  outline-offset: 1px;
-}
 select,
 .btn {
   min-height: 45px;
@@ -662,14 +654,13 @@ select { width: 9.5rem; max-width: 100%; min-width: 0; background: var(--grey-80
   border-color: var(--grey-100);
 }
 @media (hover: hover) and (pointer: fine) {
-  select:hover, .btn:hover, .note-input:hover { border-color: var(--cyan-300); color: var(--cyan-300); }
+  select:hover, .btn:hover { border-color: var(--cyan-300); color: var(--cyan-300); }
   .btn--primary:hover { background: var(--grey-200); color: var(--grey-800); border-color: var(--grey-200); }
   .ticker-link:hover { color: var(--cyan-300); text-decoration: underline; text-underline-offset: var(--space-3xs); }
   .bbg-keys a:hover { color: var(--cyan-300); border-color: var(--cyan-300); }
 }
 select:focus-visible,
 .btn:focus-visible,
-.note-input:focus-visible,
 .ticker-link:focus-visible,
 .wordmark:focus-visible,
 .bbg-keys a:focus-visible {
@@ -677,12 +668,12 @@ select:focus-visible,
   outline-offset: 1px;
 }
 select:active, .btn:active { transform: translateY(1px); }
-.btn:disabled, select:disabled, .note-input:disabled {
+.btn:disabled, select:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 .btn[data-state="loading"] { cursor: wait; opacity: 0.7; }
-.btn[data-state="error"], .note-input[aria-invalid="true"] { border-color: var(--color-danger); color: var(--color-danger); }
+.btn[data-state="error"] { border-color: var(--color-danger); color: var(--color-danger); }
 .btn[data-state="success"] { border-color: var(--color-up); }
 
 main {
@@ -822,49 +813,12 @@ main {
   align-items: start;
 }
 .panel,
-.nel-window {
-  min-width: 0;
-  padding: 0;
-  border: var(--rule) solid var(--grey-100);
-  background: var(--grey-800);
-}
 .panel h2,
-.nel-window h3 {
-  margin: 0;
-  padding: var(--space-2xs) var(--space-xs);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  background: var(--color-paper-3);
-}
-.trend-label { margin-top: 0; border-top: var(--rule) solid var(--color-rule); }
-.trend-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-8) var(--space-16);
-  padding: var(--space-8) var(--space-xs) var(--space-xs);
-  border-top: var(--rule) solid var(--color-rule);
-}
-.trend-legend__item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-8);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--color-ink-2);
-  min-width: 0;
-}
-.trend-legend__swatch {
-  width: 0.75rem;
-  height: 0.125rem;
-  flex-shrink: 0;
-  background: currentColor;
-}
-.panel[data-frame="1w"] h2, .nel-window[data-frame="1w"] h3 { color: var(--color-frame-1w); }
-.panel[data-frame="1m"] h2, .nel-window[data-frame="1m"] h3 { color: var(--color-frame-1m); }
-.panel[data-frame="3m"] h2, .nel-window[data-frame="3m"] h3 { color: var(--color-frame-3m); }
-.panel[data-frame="6m"] h2, .nel-window[data-frame="6m"] h3 { color: var(--color-frame-6m); }
+.panel[data-frame="1w"] h2 { color: var(--color-frame-1w); }
+.panel[data-frame="1m"] h2 { color: var(--color-frame-1m); }
+.panel[data-frame="3m"] h2 { color: var(--color-frame-3m); }
+.panel[data-frame="6m"] h2 { color: var(--color-frame-6m); }
 .desk-block--graphite .panel,
-.desk-block--graphite .nel-window { border-color: var(--color-graphite-rule); }
 .bars { display: grid; gap: var(--space-2xs); padding: var(--space-xs); }
 .bar-row {
   display: grid;
@@ -877,45 +831,6 @@ main {
   font-size: var(--text-xs);
   line-height: 1.3;
   overflow-wrap: anywhere;
-}
-.industry--lead { font-weight: 600; color: var(--color-accent); }
-tbody tr.row--theme-lead {
-  outline: 1px solid var(--green-300);
-  outline-offset: -1px;
-  background: color-mix(in oklch, var(--green-300) 12%, var(--color-paper));
-}
-tbody tr.row--theme-lead td {
-  border-bottom-color: color-mix(in oklch, var(--green-300) 45%, var(--color-rule));
-}
-tbody tr.row--theme-lead .ticker-link {
-  color: var(--green-300);
-}
-tbody tr.row--theme-lead .col-ticker {
-  box-shadow: inset 2px 0 0 var(--green-300);
-}
-.desk-block--graphite tbody tr.row--theme-lead {
-  background: color-mix(in oklch, var(--green-300) 14%, var(--color-paper));
-}
-.desk-block--graphite tbody tr.row--theme-lead .ticker-link {
-  color: var(--green-300);
-}
-tbody tr.row--theme-rising {
-  outline: 1px dashed var(--color-frame-1m);
-  outline-offset: -1px;
-  background: color-mix(in oklch, var(--color-frame-1m) 10%, var(--color-paper));
-}
-tbody tr.row--theme-rising td {
-  border-bottom-color: color-mix(in oklch, var(--color-frame-1m) 40%, var(--color-rule));
-}
-tbody tr.row--theme-rising .ticker-link {
-  color: var(--color-frame-1m);
-}
-tbody tr.row--theme-rising .col-ticker {
-  box-shadow: inset 2px 0 0 var(--color-frame-1m);
-}
-tbody tr.row--theme-lead.row--theme-rising {
-  outline: 1px solid var(--green-300);
-  background: color-mix(in oklch, var(--green-300) 10%, color-mix(in oklch, var(--color-frame-1m) 8%, var(--color-paper)));
 }
 .rising-alert {
   margin: 0 0 var(--space-md);
@@ -978,17 +893,6 @@ svg {
   overflow: visible;
   padding: 0 var(--space-xs) var(--space-xs);
 }
-.theme-card {
-  padding: var(--space-2xs) var(--space-xs);
-  margin: 0;
-  border-bottom: var(--rule) solid var(--color-rule);
-  background: var(--color-paper-2);
-}
-.desk-block--graphite .theme-card { border-bottom-color: var(--color-graphite-rule); }
-.theme-line { display: block; color: var(--color-ink-2); font-family: var(--font-mono); font-size: var(--text-xs); }
-.desk-block--graphite .theme-line { color: var(--color-graphite-muted); }
-.theme-line strong { font-size: var(--text-sm); color: var(--color-accent); font-family: var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
-.desk-block--graphite .theme-line strong { color: var(--color-accent); }
 .table-wrap { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
 .scrollable-table { max-height: 16rem; overflow-y: auto; }
 table {
@@ -1024,7 +928,6 @@ th {
   background: var(--color-paper-3);
 }
 .desk-block--graphite th { color: var(--color-accent); }
-td.col-industry { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-muted); }
 .ticker-link {
   font-family: var(--font-outlier);
   font-weight: 600;
@@ -1032,27 +935,9 @@ td.col-industry { white-space: nowrap; overflow: hidden; text-overflow: ellipsis
   text-decoration: none;
 }
 .desk-block--graphite .ticker-link { color: var(--color-graphite-ink); }
-.high-liquidity { color: var(--color-liquidity); }
 tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 70%, transparent); }
 .tick-up { color: var(--color-up); }
 .tick-down { color: var(--color-down); }
-.ticker-link--earn { box-shadow: inset 0 -2px 0 var(--color-warn); }
-.note-input {
-  width: 100%;
-  min-height: 1.5rem;
-  padding: var(--space-3xs) var(--space-2xs);
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-  border-color: var(--color-rule-2);
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-}
-.desk-block--graphite .note-input {
-  background: var(--color-paper);
-  color: var(--color-graphite-ink);
-  border-color: var(--color-graphite-rule);
-}
 .empty {
   color: var(--color-muted);
   padding: var(--space-sm) var(--space-xs);
@@ -1182,9 +1067,6 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   }
   .section-heading { gap: var(--space-8); }
   .section-heading .btn { width: 100%; justify-self: stretch; }
-  .col-industry,
-  .col-vol,
-  .col-ext { display: none; }
   .bar-row {
     grid-template-columns: minmax(0, 1fr) 2rem;
     gap: var(--space-4) var(--space-8);
@@ -1192,17 +1074,8 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   .bar-row .industry { grid-column: 1 / -1; }
   .bar-row .track { grid-column: 1; }
   .bar-row .value { grid-column: 2; grid-row: 2; }
-  .trend-legend {
-    gap: var(--space-4) var(--space-8);
-    padding-inline: var(--space-2xs);
-  }
   .scrollable-table { max-height: 22rem; overscroll-behavior: contain; }
   th, td { padding: var(--space-2xs) var(--space-3xs); }
-  .note-input {
-    min-height: var(--control-height);
-    font-size: 16px;
-    touch-action: manipulation;
-  }
   .foot-line p { white-space: normal; }
   .ticker-link { touch-action: manipulation; }
 }
@@ -1212,11 +1085,10 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   .btn--primary { padding: 0 var(--space-8); }
 }
 @media (pointer: coarse) {
-  .note-input { min-height: var(--control-height); }
   .ticker-link { padding: var(--space-2xs) 0; display: inline-block; }
 }
 @media (prefers-reduced-motion: reduce) {
-  select, .btn, .note-input, .ticker-link, .skip-link {
+  select, .btn, .ticker-link, .skip-link {
     transition: none;
   }
   select:active, .btn:active { transform: none; }
@@ -1233,7 +1105,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     </div>
     <nav class="bbg-keys" aria-label="Terminal panels">
       <a href="#thematic-title"><kbd>F1</kbd> Themes</a>
-      <a href="#liquid-title"><kbd>F2</kbd> LL</a>
+      <a href="#baskets-title"><kbd>F2</kbd> Baskets</a>
       <a href="#qotd"><kbd>F3</kbd> Quote</a>
     </nav>
     <div class="nav-edge__controls">
@@ -1264,13 +1136,6 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     </div>
     <p class="lede">Named themes defined by a curated ticker list, counted the same way as industries. Edit <code>theme_baskets.json</code> to change one.</p>
     <div id="basket-sections" class="window-sections"></div>
-  </section>
-  <section class="desk-block" aria-labelledby="liquid-title">
-    <div class="section-heading">
-      <h2 id="liquid-title">Liquid Leaders (LL)</h2>
-      <button id="download-ll" class="btn btn--ghost" type="button">Export LL</button>
-    </div>
-    <div id="liquid-sections" class="window-sections"></div>
   </section>
   <section id="qotd" class="rules" aria-label="Quote of the day">
     <div class="qotd">
@@ -1335,27 +1200,16 @@ const QUOTES = __QUOTES__;
   });
 })();
 const dateSelect = document.getElementById('date');
-const liquidTitle = document.getElementById('liquid-title');
 const leadershipSections = document.getElementById('leadership-sections');
 const risingThemeAlert = document.getElementById('rising-theme-alert');
-const liquidSections = document.getElementById('liquid-sections');
 const basketSections = document.getElementById('basket-sections');
 const downloadButton = document.getElementById('download-image');
-const downloadLiquidButton = document.getElementById('download-ll');
 const downloadBasketsButton = document.getElementById('download-baskets');
 const flowMeta = { '1w': { label:'1 week', color:'var(--color-frame-1w)' }, '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
 const NOTE_KEY = 'thm-note:';
 
 function risingThemes(snapshot) { return snapshot?.rising_themes || []; }
-function risingIndustrySet(snapshot) { return new Set(snapshot?.rising_industries || []); }
-function risingBasketSet(snapshot) { return new Set(snapshot?.rising_basket_symbols || []); }
-function isRisingThemeRow(row, snapshot) {
-  const industry = String(row?.industry || '').trim();
-  if (industry && risingIndustrySet(snapshot).has(industry)) return true;
-  const symbol = String(row?.name || '').trim().toUpperCase();
-  return Boolean(symbol && risingBasketSet(snapshot).has(symbol));
-}
 function basketCounts(snapshot, frame) { return snapshot?.baskets?.[frame] || {}; }
 function renderRisingAlert(snapshot) {
   if (!risingThemeAlert) return;
@@ -1370,50 +1224,9 @@ function renderRisingAlert(snapshot) {
     return `<strong>${escapeHTML(row.signal)}</strong> ${escapeHTML(row.industry)} (${arrow}, +${row.delta})`;
   });
   risingThemeAlert.hidden = false;
-  risingThemeAlert.innerHTML = `<span class="rising-alert__label">Do not miss</span>${parts.join(' · ')}. Rising-theme names are dashed in the desk lists.`;
+  risingThemeAlert.innerHTML = `<span class="rising-alert__label">Do not miss</span>${parts.join(' · ')}.`;
 }
-function counts(snapshot, frame) { return snapshot?.groups?.[frame] || {}; }
-function total(map) { return Object.values(map).reduce((a,b) => a + b, 0); }
 function escapeHTML(value) { return String(value ?? '—').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
-function formatPct(value) { return Number.isFinite(Number(value)) ? `${Number(value).toFixed(1)}%` : '—'; }
-function formatNumber(value) { return Number.isFinite(Number(value)) ? Number(value).toFixed(2) : '—'; }
-function formatDollarVolume(value) { const amount = Number(value); if (!Number.isFinite(amount) || amount <= 0) return '—'; if (amount >= 1_000_000_000) return `$${Math.ceil(amount / 1_000_000_000)}B`; return `$${Math.ceil(amount / 10_000_000) * 10}M`; }
-function averageDollarVolume(row) { return row.average_dollar_volume_30d ?? row.dollar_volume_30d; }
-function isTrue(value) { return value === true || String(value).toLowerCase() === 'true'; }
-function noteValue(symbol) { try { return localStorage.getItem(NOTE_KEY + symbol) || ''; } catch { return ''; } }
-function saveNote(symbol, value) {
-  try {
-    const key = NOTE_KEY + symbol;
-    if (value) localStorage.setItem(key, value);
-    else localStorage.removeItem(key);
-  } catch { /* private mode */ }
-}
-function chartUrl(row) {
-  const url = String(row.tradingview_url || '').trim();
-  if (url) return url;
-  const name = String(row.name || '').trim();
-  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(name)}&interval=D`;
-}
-function tickerMarkup(row) {
-  const name = String(row.name || '').trim();
-  const highLiquidity = Number(averageDollarVolume(row)) > 450_000_000;
-  const earn = isTrue(row.earnings_soon);
-  const title = earn && row.earnings_date ? `Earnings ${String(row.earnings_date)}` : 'Open TradingView chart in a new tab';
-  const classes = `ticker-link${highLiquidity ? ' high-liquidity' : ''}${earn ? ' ticker-link--earn' : ''}`;
-  return `<td class="col-ticker"><a class="${classes}" href="${escapeHTML(chartUrl(row))}" target="_blank" rel="noopener noreferrer" title="${escapeHTML(title)}">${escapeHTML(name)}</a></td>`;
-}
-function noteMarkup(row) {
-  const name = String(row.name || '').trim();
-  return `<td class="col-note"><label><span class="visually-hidden">Note for ${escapeHTML(name)}</span><input class="note-input" type="text" data-symbol="${escapeHTML(name)}" value="${escapeHTML(noteValue(name))}" autocomplete="off" spellcheck="false" maxlength="240"></label></td>`;
-}
-function metricCells(row, performance, top) {
-  const dollarVolume = averageDollarVolume(row);
-  const highLiquidity = Number(dollarVolume) > 450_000_000;
-  const lead = top && row.industry === top[0] ? ' industry--lead' : '';
-  const move = Number(row[performance]);
-  const tick = Number.isFinite(move) && move > 0 ? ' tick-up' : Number.isFinite(move) && move < 0 ? ' tick-down' : '';
-  return `${tickerMarkup(row)}<td class="col-industry${lead}">${escapeHTML(row.industry)}</td><td class="col-perf${tick}">${formatPct(row[performance])}</td><td class="col-vol${highLiquidity ? ' high-liquidity' : ''}">${formatDollarVolume(dollarVolume)}</td><td class="col-ext">${formatNumber(row.atr_extension_from_50d)}×</td>`;
-}
 function updateDates() {
   dateSelect.innerHTML = history.map((d,i) => `<option value="${i}">${d.date}</option>`).join('');
   dateSelect.value = Math.max(0, history.length - 1);
@@ -1494,128 +1307,14 @@ function renderBasketBars(current, previous, frame, container) {
     return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
   }).join('');
 }
-function perfLookup(snapshot, frame) {
-  const map = new Map();
-  (snapshot?.performance?.[perfScope]?.[frame] || []).forEach(row => map.set(row.industry, Number(row.median)));
-  return map;
-}
-function renderPerfTrend(frame, svg, names) {
-  if (!svg) return;
-  const legend = document.getElementById(`trend-legend-${frame}`);
-  if (legend) {
-    legend.innerHTML = (names || []).map((name, index) => `<span class="trend-legend__item"><span class="trend-legend__swatch" style="background:${rankColors[index % rankColors.length]}"></span>${escapeHTML(name)}</span>`).join('');
-  }
-  const active = history.filter(d => d.performance?.[perfScope]?.[frame]);
-  if (active.length < 2) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">Add future daily snapshots to see industry performance trends.</text>'; return; }
-  const series = active.map(d => perfLookup(d, frame));
-  const values = names.flatMap(name => series.map(map => map.get(name)).filter(v => Number.isFinite(v)));
-  if (!values.length) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">No history for these industries yet.</text>'; return; }
-  const width = Math.max(620, svg.clientWidth || 900), height = 300, left = 52, right = 28, top = 18, bottom = 34;
-  const rawMin = Math.min(0, ...values), rawMax = Math.max(0, ...values);
-  const pad = Math.max(1, (rawMax - rawMin) * 0.1);
-  const min = rawMin - pad, max = rawMax + pad;
-  const x = i => left + i * ((width-left-right) / Math.max(1, active.length-1));
-  const y = value => top + (max-value) * ((height-top-bottom)/(max-min));
-  let markup = `<line x1="${left}" y1="${y(0)}" x2="${width-right}" y2="${y(0)}" stroke="var(--color-rule)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--color-rule)"/>`;
-  const ticks = 4;
-  for (let i=0;i<=ticks;i++) { const v = min + (max-min)*i/ticks; markup += `<text x="${left-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--color-ink-2)">${v.toFixed(0)}%</text>`; }
-  active.forEach((d,i) => markup += `<text x="${x(i)}" y="${height-12}" text-anchor="middle" font-size="12" fill="var(--color-ink-2)">${d.date.slice(5)}</text>`);
-  names.forEach((name, index) => {
-    const color = rankColors[index % rankColors.length];
-    const points = active.map((d,i) => { const v = series[i].get(name); return Number.isFinite(v) ? `${x(i)},${y(v)}` : null; }).filter(Boolean).join(' ');
-    if (points) markup += `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
-    active.forEach((d,i) => { const v = series[i].get(name); if (!Number.isFinite(v)) return; markup += `<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${color}"><title>${escapeHTML(name)}: ${v.toFixed(2)}% on ${d.date}</title></circle>`; });
-  });
-  svg.setAttribute('viewBox', `0 0 ${width} ${height}`); svg.innerHTML = markup;
-}
-function windowTables(prefix, heading) {
-  return Object.entries(flowMeta).map(([frame, meta]) => {
-    return `<section class="nel-window" data-frame="${frame}"><h3>${meta.label} ${heading}</h3><div id="${prefix}-theme-${frame}" class="theme-card frame-${frame}"></div><div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th class="col-industry">Industry</th><th>Performance</th><th class="col-vol">Avg $ Vol</th><th class="col-ext">Extension</th><th>Notes</th></tr></thead><tbody id="${prefix}-table-${frame}"></tbody></table></div></section>`;
-  }).join('');
-}
-function leadingTheme(snapshot, frame) {
-  return Object.entries(counts(snapshot, frame)).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0] || null;
-}
-function isLeadingThemeRow(row, top) {
-  return Boolean(top && row.industry && row.industry === top[0]);
-}
-function rowThemeClasses(row, top, snapshot) {
-  const lead = isLeadingThemeRow(row, top);
-  const rising = isRisingThemeRow(row, snapshot);
-  return [lead ? 'row--theme-lead' : '', rising ? 'row--theme-rising' : ''].filter(Boolean).join(' ');
-}
-function rowThemeTitle(row, top, snapshot) {
-  const bits = [];
-  if (isLeadingThemeRow(row, top)) bits.push(`Leading theme: ${top[0]}`);
-  if (isRisingThemeRow(row, snapshot)) bits.push('Rising theme — do not miss');
-  return bits.join(' · ');
-}
-function fillTheme(id, snapshot, frame) {
-  const themeCard = document.getElementById(id);
-  if (!themeCard) return null;
-  const top = leadingTheme(snapshot, frame);
-  const label = flowMeta[frame]?.label || frame;
-  const rising = risingThemes(snapshot).filter(row => row.frame === frame);
-  const risingNote = rising.length
-    ? ` Rising: ${rising.slice(0, 3).map(row => `${row.signal} ${row.industry} (${row.prior_count}→${row.current_count})`).join('; ')}.`
-    : '';
-  themeCard.innerHTML = top
-    ? `<span class="theme-line">Most names in this ${escapeHTML(label)} window sit in <strong>${escapeHTML(top[0])}</strong> (${top[1]} of them). The table below is the full window, not that industry only. Leading-theme names are boxed in green.${escapeHTML(risingNote)}</span>`
-    : `<span class="theme-line">No industry count for this window.${escapeHTML(risingNote)}</span>`;
-  return top;
-}
-function renderTableRows(records, frame, performance, flag, tableId) {
-  const table = document.getElementById(tableId);
-  if (!table) return;
-  const snapshot = currentSnapshot();
-  const top = leadingTheme(snapshot, frame);
-  const rows = records.filter(row => isTrue(row[flag])).sort((a, b) => Number(b[performance]) - Number(a[performance]));
-  table.innerHTML = rows.length ? rows.map(row => {
-    const classes = rowThemeClasses(row, top, snapshot);
-    const title = rowThemeTitle(row, top, snapshot);
-    return `<tr class="${classes}"${title ? ` title="${escapeHTML(title)}"` : ''}>${metricCells(row, performance, top)}${noteMarkup(row)}</tr>`;
-  }).join('') : '<tr><td colspan="6" class="empty">No leaders in this window.</td></tr>';
-}
-function renderLiquid(snapshot) {
-  const records = snapshot?.liquid || [];
-  [['1w', 'Perf.W', 'is_top_1w'], ['1m', 'Perf.1M', 'is_top_1m'], ['3m', 'Perf.3M', 'is_top_3m'], ['6m', 'Perf.6M', 'is_top_6m']].forEach(([frame, performance, flag]) => {
-    fillTheme(`liquid-theme-${frame}`, snapshot, frame);
-    renderTableRows(records, frame, performance, flag, `liquid-table-${frame}`);
-  });
-}
 function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
-  liquidTitle.textContent = `Liquid Leaders (LL) - ${(current.liquid || []).length} Tickers`;
   renderRisingAlert(current);
-  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} performance</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Performance over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry performance across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
-  liquidSections.innerHTML = windowTables('liquid', 'LL');
+  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} performance</h2><div id="bars-${frame}" class="bars"></div></section>`).join('');
   if (basketSections) basketSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} baskets</h2><div id="baskets-${frame}" class="bars"></div></section>`).join('');
-  Object.keys(flowMeta).forEach(frame => {
-    renderPerformanceBars(current, frame, document.getElementById(`bars-${frame}`));
-    const top = perfRows(current, frame).slice(0, 5).map(row => row.industry);
-    renderPerfTrend(frame, document.getElementById(`trend-${frame}`), top);
-  });
+  Object.keys(flowMeta).forEach(frame => renderPerformanceBars(current, frame, document.getElementById(`bars-${frame}`)));
   Object.keys(flowMeta).forEach(frame => renderBasketBars(current, previous, frame, document.getElementById(`baskets-${frame}`)));
-  renderLiquid(current);
   renderIndustryDetail();
-}
-function redrawChartsOnly() {
-  const current = currentSnapshot();
-  if (!current) return;
-  Object.keys(flowMeta).forEach(frame => {
-    const bars = document.getElementById(`bars-${frame}`);
-    const svg = document.getElementById(`trend-${frame}`);
-    if (!bars || !svg) return;
-    renderPerformanceBars(current, frame, bars);
-    renderPerfTrend(frame, svg, perfRows(current, frame).slice(0, 5).map(row => row.industry));
-  });
-}
-function downloadSymbols(key, filePrefix) {
-  const snapshot = currentSnapshot();
-  const symbols = [...new Set((snapshot?.[key] || []).map(row => String(row.name || '').trim()).filter(Boolean))].sort();
-  const csv = ['symbol', ...symbols.map(symbol => `"${symbol.replaceAll('"', '""')}"`)].join('\n') + '\n';
-  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
-  const link = document.createElement('a'); link.download = `${filePrefix}_symbols_${snapshot.date}.csv`; link.href = URL.createObjectURL(blob); link.click(); URL.revokeObjectURL(link.href);
 }
 function downloadBasketCounts() {
   const snapshot = currentSnapshot();
@@ -1677,29 +1376,15 @@ document.addEventListener('click', event => {
   event.preventDefault();
   window.open(href, '_blank', 'noopener,noreferrer');
 });
-document.addEventListener('input', event => {
-  const field = event.target.closest('.note-input');
-  if (!field || !field.dataset.symbol) return;
-  saveNote(field.dataset.symbol, field.value);
-});
 document.addEventListener('keydown', event => {
-  const map = { F1: '#thematic-title', F2: '#liquid-title', F3: '#qotd' };
+  const map = { F1: '#thematic-title', F2: '#baskets-title', F3: '#qotd' };
   const href = map[event.key];
   if (!href) return;
   event.preventDefault();
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-let resizeTimer = 0;
-let lastLayoutWidth = window.innerWidth;
-function onViewportChange() {
-  const width = window.innerWidth;
-  // Mobile URL-bar show/hide changes height only — skip full re-renders.
-  if (Math.abs(width - lastLayoutWidth) < 12) return;
-  lastLayoutWidth = width;
-  clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(redrawChartsOnly, 180);
-}
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); window.addEventListener('resize', onViewportChange, { passive: true }); render(); }
+// The bars size themselves with CSS percentages, so a resize needs no redraw.
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); render(); }
 </script>
 </body>
 </html>'''
