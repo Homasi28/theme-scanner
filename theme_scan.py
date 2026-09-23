@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from math import ceil
@@ -55,6 +56,11 @@ WEEKLY_COLUMN = "Perf.W"
 SCAN_COLUMNS = CORE_COLUMNS + [WEEKLY_COLUMN] + EARNINGS_COLUMNS
 TV_EXCHANGES = {"NASDAQ": "NASDAQ", "NYSE": "NYSE", "AMEX": "AMEX"}
 
+# Headroom over the ~5.7k listed US common stocks. Too low silently drops the
+# tail of the market and skews every industry average, so the fetch checks the
+# count TradingView reports and complains if it is still clipping.
+UNIVERSE_LIMIT = 10_000
+
 # (performance column, rank column, top-group flag). The 1-week window is
 # optional; the other three are required and define a momentum leader.
 PERF_WINDOWS = [
@@ -96,10 +102,16 @@ def fetch_universe() -> pd.DataFrame:
                 col("exchange").isin(["NASDAQ", "NYSE", "AMEX"]),
                 col("average_volume_10d_calc") > 0,
             )
-            .limit(5_000)
+            .limit(UNIVERSE_LIMIT)
         )
         try:
-            _, frame = query.get_scanner_data()
+            total, frame = query.get_scanner_data()
+            if total and len(frame) < total:
+                print(
+                    f"Warning: fetched {len(frame):,} of {total:,} matching stocks. "
+                    f"Raise UNIVERSE_LIMIT; industry averages are missing the tail.",
+                    file=sys.stderr,
+                )
             return frame
         except Exception as error:  # noqa: BLE001 — TradingView field names vary
             last_error = error

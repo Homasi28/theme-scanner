@@ -1,6 +1,6 @@
 date,frame,basket,leaders
-2026-09-23,1w,Semiconductors,3
 2026-09-23,1w,Fintech,2
+2026-09-23,1w,Semiconductors,2
 2026-09-23,1w,Artificial Intelligence,1
 2026-09-23,1w,Big Data,1
 2026-09-23,1w,Cloud Computing,1
@@ -25,15 +25,13 @@ date,frame,basket,leaders
 2026-09-23,1m,Hardware,1
 2026-09-23,1m,Nanotechnology,1
 2026-09-23,1m,Quantum Computing,1
-2026-09-23,3m,Software,4
 2026-09-23,3m,Cloud Computing,3
+2026-09-23,3m,Software,3
 2026-09-23,3m,Telecommunications,2
 2026-09-23,3m,Artificial Intelligence,1
-2026-09-23,3m,Big Data,1
 2026-09-23,3m,Biometrics,1
 2026-09-23,3m,Cybersecurity,1
 2026-09-23,3m,E-Commerce,1
-2026-09-23,3m,Fintech,1
 2026-09-23,3m,Internet of Things,1
 2026-09-23,3m,Virtual & Augmented Reality,1
 2026-09-23,6m,Artificial Intelligence,7
