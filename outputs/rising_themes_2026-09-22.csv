@@ -1,4 +1,6 @@
 date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-09-22,1m,basket,Clawdbot,KICKOFF,0,2,2,
+2026-09-22,1m,basket,Cyber Security,KICKOFF,0,2,2,
 2026-09-22,1m,industry,Packaged Software,RISING,4,6,2,
 2026-09-22,1m,cluster,Semis complex,RISING,3,5,2,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
 2026-09-22,1m,industry,Semiconductors,RISING,2,3,1,
@@ -7,4 +9,6 @@ date,frame,kind,industry,signal,prior_count,current_count,delta,members
 2026-09-22,6m,industry,Packaged Software,RISING,5,7,2,
 2026-09-22,6m,industry,Semiconductors,RISING,4,5,1,
 2026-09-22,6m,industry,Computer Peripherals,RISING,2,3,1,
+2026-09-22,3m,basket,AI Healthcare,RISING,1,2,1,
+2026-09-22,6m,basket,AI Memory,RISING,1,2,1,
 2026-09-22,6m,industry,Financial Conglomerates,RISING,1,2,1,

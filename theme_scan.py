@@ -47,8 +47,23 @@ EARNINGS_COLUMNS = [
     "earnings_release_date",
 ]
 
-SCAN_COLUMNS = CORE_COLUMNS + EARNINGS_COLUMNS
+# TradingView's weekly performance field. `Perf.1W` is accepted by the API but
+# always comes back null, so the name matters. Optional: if the request for it
+# fails the scan still runs, just without the 1-week window.
+WEEKLY_COLUMN = "Perf.W"
+
+SCAN_COLUMNS = CORE_COLUMNS + [WEEKLY_COLUMN] + EARNINGS_COLUMNS
 TV_EXCHANGES = {"NASDAQ": "NASDAQ", "NYSE": "NYSE", "AMEX": "AMEX"}
+
+# (performance column, rank column, top-group flag). The 1-week window is
+# optional; the other three are required and define a momentum leader.
+PERF_WINDOWS = [
+    (WEEKLY_COLUMN, "perf_1w_rank", "is_top_1w"),
+    ("Perf.1M", "perf_1m_rank", "is_top_1m"),
+    ("Perf.3M", "perf_3m_rank", "is_top_3m"),
+    ("Perf.6M", "perf_6m_rank", "is_top_6m"),
+]
+REQUIRED_PERF = ["Perf.1M", "Perf.3M", "Perf.6M"]
 
 
 def fetch_universe() -> pd.DataFrame:
@@ -65,7 +80,7 @@ def fetch_universe() -> pd.DataFrame:
         raise SystemExit("Missing dependency. Run: pip install -r requirements.txt") from error
 
     last_error: Exception | None = None
-    for columns in (SCAN_COLUMNS, CORE_COLUMNS):
+    for columns in (SCAN_COLUMNS, CORE_COLUMNS + [WEEKLY_COLUMN], CORE_COLUMNS):
         query = (
             Query()
             .set_markets("america")
@@ -152,7 +167,7 @@ def calculate_leaders(raw: pd.DataFrame, settings: Settings) -> tuple[pd.DataFra
     _require_columns(raw, ["name", "industry", "close", "SMA30", "SMA50", "ADRP", "ATRP", "Perf.1M", "Perf.3M", "Perf.6M", "average_volume_10d_calc", "average_volume_30d_calc"])
     df = raw.copy()
     numeric = ["close", "SMA30", "SMA50", "ADRP", "ATRP", "Perf.1M", "Perf.3M", "Perf.6M", "average_volume_10d_calc", "average_volume_30d_calc"]
-    _numeric(df, numeric)
+    _numeric(df, numeric + [WEEKLY_COLUMN])
 
     # ADRP and ATRP are TradingView's daily 14-period percentage indicators.
     # ADRP is the activity filter; ATRP feeds the extension column, which is
@@ -165,7 +180,7 @@ def calculate_leaders(raw: pd.DataFrame, settings: Settings) -> tuple[pd.DataFra
 
     valid_industry = ~df["industry"].fillna("").str.contains("biotech", case=False, regex=False)
     valid_metrics = (df[["close", "SMA30", "SMA50", "ADRP", "ATRP"]] > 0).all(axis=1)
-    has_performance = df[["Perf.1M", "Perf.3M", "Perf.6M"]].notna().all(axis=1)
+    has_performance = df[REQUIRED_PERF].notna().all(axis=1)
     universe = df.loc[
         valid_industry
         & valid_metrics
@@ -179,19 +194,17 @@ def calculate_leaders(raw: pd.DataFrame, settings: Settings) -> tuple[pd.DataFra
         return universe, universe.copy()
 
     cutoff = max(1, ceil(len(universe) * settings.top_pct))
-    _assign_exact_top_flags(universe, "Perf.1M", "perf_1m_rank", "is_top_1m", cutoff)
-    _assign_exact_top_flags(universe, "Perf.3M", "perf_3m_rank", "is_top_3m", cutoff)
-    _assign_exact_top_flags(universe, "Perf.6M", "perf_6m_rank", "is_top_6m", cutoff)
-    universe["momentum_score"] = universe[["Perf.1M", "Perf.3M", "Perf.6M"]].mean(axis=1)
+    windows = [window for window in PERF_WINDOWS if window[0] in universe.columns]
+    for metric, rank_column, flag_column in windows:
+        _assign_exact_top_flags(universe, metric, rank_column, flag_column, cutoff)
+    # Kept to the three longer windows so the sort order does not swing on a
+    # single week; the weekly window only adds leaders, it does not re-rank them.
+    universe["momentum_score"] = universe[REQUIRED_PERF].mean(axis=1)
 
-    # Combine the three leader groups. A symbol can lead in more than one
-    # timeframe but appears only once in the final leader list.
+    # Combine the leader groups. A symbol can lead in more than one timeframe
+    # but appears only once in the final leader list.
     leaders = pd.concat(
-        [
-            universe.loc[universe["is_top_1m"]],
-            universe.loc[universe["is_top_3m"]],
-            universe.loc[universe["is_top_6m"]],
-        ],
+        [universe.loc[universe[flag_column]] for _, _, flag_column in windows],
         ignore_index=True,
     ).drop_duplicates(subset="name", keep="first")
     sort_order = ["momentum_score", "Perf.1M", "Perf.3M", "Perf.6M"]
@@ -228,17 +241,17 @@ def prepare_for_export(frame: pd.DataFrame) -> pd.DataFrame:
     preferred = [
         "name", "description", "exchange", "industry", "close", "SMA30", "SMA50", "ADRP", "ATRP",
         "average_volume_10d_calc", "average_volume_30d_calc", "dollar_volume_30d", "average_dollar_volume_30d",
-        "Perf.1M", "perf_1m_rank", "Perf.3M", "perf_3m_rank", "Perf.6M", "perf_6m_rank",
+        "Perf.W", "perf_1w_rank", "Perf.1M", "perf_1m_rank", "Perf.3M", "perf_3m_rank", "Perf.6M", "perf_6m_rank",
         "momentum_score", "atr_extension_from_50d",
         "earnings_date", "earnings_soon", "tradingview_url",
-        "is_top_1m", "is_top_3m", "is_top_6m",
+        "is_top_1w", "is_top_1m", "is_top_3m", "is_top_6m",
     ]
     columns = [column for column in preferred if column in frame.columns]
     result = frame.loc[:, columns].copy()
     return result.round({
         "close": 2, "SMA30": 2, "SMA50": 2, "ADRP": 2, "ATRP": 2,
         "dollar_volume_30d": 0, "average_dollar_volume_30d": 0,
-        "Perf.1M": 2, "Perf.3M": 2, "Perf.6M": 2, "momentum_score": 2,
+        "Perf.W": 2, "Perf.1M": 2, "Perf.3M": 2, "Perf.6M": 2, "momentum_score": 2,
         "atr_extension_from_50d": 2,
     })
 

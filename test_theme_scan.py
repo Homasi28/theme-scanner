@@ -77,6 +77,26 @@ class CalculateLeadersTests(unittest.TestCase):
         _, leaders = calculate_leaders(raw, Settings(top_pct=0.25))
         self.assertEqual(list(leaders.name), ["AAA"])
 
+    def test_weekly_window_adds_leaders_without_reranking_the_others(self):
+        raw = pd.DataFrame([
+            _row(name="LONG", **{"Perf.W": 1, "Perf.1M": 50, "Perf.3M": 50, "Perf.6M": 50}),
+            _row(name="WEEKLY", **{"Perf.W": 90, "Perf.1M": 1, "Perf.3M": 1, "Perf.6M": 1}),
+        ])
+        _, leaders = calculate_leaders(raw, Settings(top_pct=0.5))
+        self.assertEqual(set(leaders.name), {"LONG", "WEEKLY"})
+        by_name = leaders.set_index("name")
+        self.assertTrue(bool(by_name.loc["WEEKLY", "is_top_1w"]))
+        self.assertFalse(bool(by_name.loc["WEEKLY", "is_top_1m"]))
+        # momentum_score ignores the week, so the long-window name still sorts first.
+        self.assertEqual(list(leaders.name)[0], "LONG")
+
+    def test_runs_without_the_weekly_column(self):
+        raw = pd.DataFrame([_row()])
+        self.assertNotIn("Perf.W", raw.columns)
+        _, leaders = calculate_leaders(raw, Settings(top_pct=1))
+        self.assertEqual(list(leaders.name), ["KEEP"])
+        self.assertNotIn("is_top_1w", leaders.columns)
+
     def test_empty_universe_returns_two_empty_frames(self):
         raw = pd.DataFrame([_row(ADRP=1.0)])
         universe, leaders = calculate_leaders(raw, Settings(top_pct=1))

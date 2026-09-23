@@ -10,6 +10,7 @@ import pandas as pd
 
 
 TIMEFRAMES = {
+    "1w": "is_top_1w",
     "1m": "is_top_1m",
     "3m": "is_top_3m",
     "6m": "is_top_6m",
@@ -30,6 +31,25 @@ THEME_CLUSTERS = {
 
 RISING_MIN_COUNT = 2
 RISING_MIN_DELTA = 1
+
+# Named narrative themes defined by an explicit ticker list, e.g. "AI Memory".
+# These are tracked alongside TradingView's industry labels, never merged into
+# them: a basket is a hand-curated view, an industry is exchange taxonomy.
+# Edit theme_baskets.json to add, remove, or re-scope a basket.
+BASKETS_FILE = Path(__file__).with_name("theme_baskets.json")
+
+
+def load_theme_baskets(path: Path = BASKETS_FILE) -> dict[str, frozenset[str]]:
+    if not path.exists():
+        return {}
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        str(name): frozenset(str(ticker).strip().upper() for ticker in tickers if str(ticker).strip())
+        for name, tickers in raw.items()
+    }
+
+
+THEME_BASKETS = load_theme_baskets()
 
 # Livingston's voice in Edwin Lefèvre, Reminiscences of a Stock Operator (1923).
 # Public domain in the USA. Short lines only — not passages from later books.
@@ -128,9 +148,11 @@ RECORD_COLUMNS = [
     "Perf.1M",
     "Perf.3M",
     "Perf.6M",
+    "Perf.W",
     "average_dollar_volume_30d",
     "dollar_volume_30d",
     "atr_extension_from_50d",
+    "is_top_1w",
     "is_top_1m",
     "is_top_3m",
     "is_top_6m",
@@ -166,10 +188,14 @@ def detect_rising_themes(
     prior_groups: dict[str, dict[str, int]] | None,
     *,
     primary_frame: str = "1m",
+    current_baskets: dict[str, dict[str, int]] | None = None,
+    prior_baskets: dict[str, dict[str, int]] | None = None,
 ) -> list[dict]:
-    """Flag industries (and clusters) whose LL window count is expanding."""
+    """Flag industries, clusters, and ticker baskets whose count is expanding."""
     current_groups = current_groups or {}
     prior_groups = prior_groups or {}
+    current_baskets = current_baskets or {}
+    prior_baskets = prior_baskets or {}
     frames = [primary_frame] + [frame for frame in TIMEFRAMES if frame != primary_frame]
     rising: list[dict] = []
     seen: set[tuple[str, str]] = set()
@@ -217,6 +243,27 @@ def detect_rising_themes(
                 "signal": signal,
                 "members": sorted(members),
             })
+        now_baskets = current_baskets.get(frame) or {}
+        then_baskets = prior_baskets.get(frame) or {}
+        for basket in set(now_baskets) | set(then_baskets):
+            current = int(now_baskets.get(basket, 0) or 0)
+            prior = int(then_baskets.get(basket, 0) or 0)
+            signal = _signal_for_rise(prior, current)
+            if not signal:
+                continue
+            key = (frame, basket)
+            if key in seen:
+                continue
+            seen.add(key)
+            rising.append({
+                "frame": frame,
+                "industry": basket,
+                "kind": "basket",
+                "prior_count": prior,
+                "current_count": current,
+                "delta": current - prior,
+                "signal": signal,
+            })
 
     rising.sort(
         key=lambda row: (
@@ -236,11 +283,27 @@ def rising_industry_names(rising: list[dict], *, frame: str | None = "1m") -> se
     for row in rising:
         if frame is not None and row.get("frame") != frame:
             continue
-        if row.get("kind") == "cluster":
+        kind = row.get("kind")
+        if kind == "basket":
+            # Baskets are ticker lists, not industries; matched separately.
+            continue
+        if kind == "cluster":
             names.update(row.get("members") or [])
         else:
             names.add(str(row["industry"]))
     return names
+
+
+def rising_basket_symbols(rising: list[dict], *, frame: str | None = "1m") -> set[str]:
+    """Tickers belonging to a rising basket, for highlighting desk rows."""
+    symbols: set[str] = set()
+    for row in rising:
+        if frame is not None and row.get("frame") != frame:
+            continue
+        if row.get("kind") != "basket":
+            continue
+        symbols.update(THEME_BASKETS.get(str(row["industry"]), frozenset()))
+    return symbols
 
 
 def annotate_rising_themes(snapshots: list[dict]) -> list[dict]:
@@ -249,9 +312,12 @@ def annotate_rising_themes(snapshots: list[dict]) -> list[dict]:
         rising = detect_rising_themes(
             snapshot.get("groups"),
             prior.get("groups") if prior else None,
+            current_baskets=snapshot.get("baskets"),
+            prior_baskets=prior.get("baskets") if prior else None,
         )
         snapshot["rising_themes"] = rising
         snapshot["rising_industries"] = sorted(rising_industry_names(rising, frame="1m"))
+        snapshot["rising_basket_symbols"] = sorted(rising_basket_symbols(rising, frame="1m"))
     return snapshots
 
 
@@ -285,14 +351,28 @@ def write_rising_theme_csvs(output_dir: Path, snapshots: list[dict]) -> list[Pat
         written.append(path)
 
         rising_set = set(snapshot.get("rising_industries") or [])
+        rising_tickers = set(snapshot.get("rising_basket_symbols") or [])
         symbols = sorted({
-            str(row.get("name") or "").strip()
+            name
             for row in (snapshot.get("liquid") or [])
-            if str(row.get("industry") or "").strip() in rising_set and str(row.get("name") or "").strip()
+            for name in [str(row.get("name") or "").strip()]
+            if name and (
+                str(row.get("industry") or "").strip() in rising_set
+                or name.upper() in rising_tickers
+            )
         })
         symbol_path = export_dir / f"rising_theme_symbols_{stamp}.csv"
         pd.DataFrame({"symbol": symbols}).to_csv(symbol_path, index=False)
         written.append(symbol_path)
+
+        basket_rows = [
+            {"date": stamp, "frame": frame, "basket": basket, "leaders": count}
+            for frame, counts in (snapshot.get("baskets") or {}).items()
+            for basket, count in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+        ]
+        basket_path = output_dir / f"theme_baskets_{stamp}.csv"
+        pd.DataFrame(basket_rows, columns=["date", "frame", "basket", "leaders"]).to_csv(basket_path, index=False)
+        written.append(basket_path)
     return written
 
 
@@ -307,22 +387,26 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
         if "industry" not in frame.columns:
             continue
         groups = {}
+        baskets = {}
         for label, flag in TIMEFRAMES.items():
             if flag not in frame.columns:
                 continue
-            counts = (
-                frame.loc[frame[flag].fillna(False).astype(bool), "industry"]
-                .fillna("Unclassified")
-                .value_counts()
-                .to_dict()
-            )
+            window = frame.loc[frame[flag].fillna(False).astype(bool)]
+            counts = window["industry"].fillna("Unclassified").value_counts().to_dict()
             groups[label] = {str(industry): int(count) for industry, count in counts.items()}
+            symbols = {str(name).strip().upper() for name in window["name"].dropna()}
+            baskets[label] = {
+                basket: len(symbols & tickers)
+                for basket, tickers in THEME_BASKETS.items()
+                if symbols & tickers
+            }
         stamp = match.group(1)
-        # `groups` and `liquid` both come from the full momentum-leader file,
-        # so nothing narrower can distort theme leadership.
+        # `groups`, `baskets` and `liquid` all come from the full momentum-leader
+        # file, so nothing narrower can distort theme leadership.
         snapshots.append({
             "date": stamp,
             "groups": groups,
+            "baskets": baskets,
             "liquid": _records_from_frame(frame),
         })
     return annotate_rising_themes(snapshots)
@@ -712,6 +796,7 @@ main {
   flex-shrink: 0;
   background: currentColor;
 }
+.panel[data-frame="1w"] h2, .nel-window[data-frame="1w"] h3 { color: var(--color-frame-1w); }
 .panel[data-frame="1m"] h2, .nel-window[data-frame="1m"] h3 { color: var(--color-frame-1m); }
 .panel[data-frame="3m"] h2, .nel-window[data-frame="3m"] h3 { color: var(--color-frame-3m); }
 .panel[data-frame="6m"] h2, .nel-window[data-frame="6m"] h3 { color: var(--color-frame-6m); }
@@ -947,7 +1032,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   .window-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 90rem) {
-  .window-sections { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .window-sections { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 72rem) {
   .bbg-product { display: none; }
@@ -1101,6 +1186,14 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="leadership-sections" class="window-sections"></div>
   </section>
+  <section class="desk-block desk-block--graphite" aria-labelledby="baskets-title">
+    <div class="section-heading">
+      <h2 id="baskets-title">Theme Baskets</h2>
+      <button id="download-baskets" class="btn btn--ghost" type="button">Export Baskets</button>
+    </div>
+    <p class="lede">Named themes defined by a curated ticker list, counted the same way as industries. Edit <code>theme_baskets.json</code> to change one.</p>
+    <div id="basket-sections" class="window-sections"></div>
+  </section>
   <section class="desk-block" aria-labelledby="liquid-title">
     <div class="section-heading">
       <h2 id="liquid-title">Liquid Leaders (LL)</h2>
@@ -1175,18 +1268,24 @@ const liquidTitle = document.getElementById('liquid-title');
 const leadershipSections = document.getElementById('leadership-sections');
 const risingThemeAlert = document.getElementById('rising-theme-alert');
 const liquidSections = document.getElementById('liquid-sections');
+const basketSections = document.getElementById('basket-sections');
 const downloadButton = document.getElementById('download-image');
 const downloadLiquidButton = document.getElementById('download-ll');
-const flowMeta = { '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
+const downloadBasketsButton = document.getElementById('download-baskets');
+const flowMeta = { '1w': { label:'1 week', color:'var(--color-frame-1w)' }, '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
 const NOTE_KEY = 'thm-note:';
 
 function risingThemes(snapshot) { return snapshot?.rising_themes || []; }
 function risingIndustrySet(snapshot) { return new Set(snapshot?.rising_industries || []); }
+function risingBasketSet(snapshot) { return new Set(snapshot?.rising_basket_symbols || []); }
 function isRisingThemeRow(row, snapshot) {
   const industry = String(row?.industry || '').trim();
-  return Boolean(industry && risingIndustrySet(snapshot).has(industry));
+  if (industry && risingIndustrySet(snapshot).has(industry)) return true;
+  const symbol = String(row?.name || '').trim().toUpperCase();
+  return Boolean(symbol && risingBasketSet(snapshot).has(symbol));
 }
+function basketCounts(snapshot, frame) { return snapshot?.baskets?.[frame] || {}; }
 function renderRisingAlert(snapshot) {
   if (!risingThemeAlert) return;
   const primary = risingThemes(snapshot).filter(row => row.frame === '1m');
@@ -1275,6 +1374,23 @@ function renderBars(current, previous, frame, container) {
   }).join('');
   return names;
 }
+function renderBasketBars(current, previous, frame, container) {
+  if (!container) return;
+  const now = basketCounts(current, frame), then = basketCounts(previous, frame);
+  const rising = new Set(risingThemes(current).filter(row => row.frame === frame && row.kind === 'basket').map(row => row.industry));
+  const names = [...new Set([...Object.keys(now), ...Object.keys(then)])]
+    .sort((a, b) => (now[b]||0) - (now[a]||0) || (then[b]||0) - (then[a]||0) || a.localeCompare(b))
+    .slice(0, 8);
+  if (!names.length) { container.innerHTML = '<p class="empty">No basket members lead this window.</p>'; return; }
+  const max = Math.max(1, ...names.flatMap(n => [now[n]||0, then[n]||0]));
+  container.innerHTML = names.map((name, index) => {
+    const color = rankColors[index % rankColors.length];
+    const risingClass = rising.has(name) ? ' industry--rising' : '';
+    const delta = (now[name]||0) - (then[name]||0);
+    const title = rising.has(name) ? `${name} · rising ${delta >= 0 ? '+' : ''}${delta}` : name;
+    return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
+  }).join('');
+}
 function renderTrend(frame, svg, names) {
   const legend = document.getElementById(`trend-legend-${frame}`);
   if (legend) {
@@ -1342,7 +1458,7 @@ function renderTableRows(records, frame, performance, flag, tableId) {
 }
 function renderLiquid(snapshot) {
   const records = snapshot?.liquid || [];
-  [['1m', 'Perf.1M', 'is_top_1m'], ['3m', 'Perf.3M', 'is_top_3m'], ['6m', 'Perf.6M', 'is_top_6m']].forEach(([frame, performance, flag]) => {
+  [['1w', 'Perf.W', 'is_top_1w'], ['1m', 'Perf.1M', 'is_top_1m'], ['3m', 'Perf.3M', 'is_top_3m'], ['6m', 'Perf.6M', 'is_top_6m']].forEach(([frame, performance, flag]) => {
     fillTheme(`liquid-theme-${frame}`, snapshot, frame);
     renderTableRows(records, frame, performance, flag, `liquid-table-${frame}`);
   });
@@ -1353,7 +1469,9 @@ function render() {
   renderRisingAlert(current);
   leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL');
+  if (basketSections) basketSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} baskets</h2><div id="baskets-${frame}" class="bars"></div></section>`).join('');
   Object.keys(flowMeta).forEach(frame => { const rankedNames = renderBars(current, previous, frame, document.getElementById(`bars-${frame}`)); renderTrend(frame, document.getElementById(`trend-${frame}`), rankedNames); });
+  Object.keys(flowMeta).forEach(frame => renderBasketBars(current, previous, frame, document.getElementById(`baskets-${frame}`)));
   renderLiquid(current);
 }
 function redrawChartsOnly() {
@@ -1373,6 +1491,19 @@ function downloadSymbols(key, filePrefix) {
   const csv = ['symbol', ...symbols.map(symbol => `"${symbol.replaceAll('"', '""')}"`)].join('\n') + '\n';
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
   const link = document.createElement('a'); link.download = `${filePrefix}_symbols_${snapshot.date}.csv`; link.href = URL.createObjectURL(blob); link.click(); URL.revokeObjectURL(link.href);
+}
+function downloadBasketCounts() {
+  const snapshot = currentSnapshot();
+  if (!snapshot) return;
+  const rows = [['frame', 'basket', 'leaders']];
+  Object.keys(flowMeta).forEach(frame => {
+    Object.entries(basketCounts(snapshot, frame))
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .forEach(([basket, count]) => rows.push([frame, basket, String(count)]));
+  });
+  const csv = rows.map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\n') + '\n';
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const link = document.createElement('a'); link.download = `theme_baskets_${snapshot.date}.csv`; link.href = URL.createObjectURL(blob); link.click(); URL.revokeObjectURL(link.href);
 }
 async function downloadPageImage() {
   if (typeof html2canvas !== 'function') { window.alert('The image exporter could not load. Check your connection and try again.'); return; }
@@ -1423,7 +1554,7 @@ function onViewportChange() {
   clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(redrawChartsOnly, 180);
 }
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); window.addEventListener('resize', onViewportChange, { passive: true }); render(); }
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); downloadLiquidButton.addEventListener('click', () => downloadSymbols('liquid', 'liquid_leaders')); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); window.addEventListener('resize', onViewportChange, { passive: true }); render(); }
 </script>
 </body>
 </html>'''

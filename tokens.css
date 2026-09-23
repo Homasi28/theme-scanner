@@ -140,6 +140,7 @@
   --color-graphite-ink: var(--grey-100);
   --color-graphite-muted: var(--grey-400);
   --color-graphite-rule: var(--cyan-600);
+  --color-frame-1w: var(--green-300);
   --color-frame-1m: var(--cyan-300);
   --color-frame-3m: var(--yellow-300);
   --color-frame-6m: var(--orange-300);

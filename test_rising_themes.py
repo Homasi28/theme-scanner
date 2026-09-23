@@ -6,6 +6,33 @@ from industry_flow_dashboard import (
 )
 
 
+class ThemeBasketTests(unittest.TestCase):
+    def test_basket_expansion_is_flagged_separately_from_industries(self):
+        rising = detect_rising_themes(
+            {"1m": {}},
+            {"1m": {}},
+            current_baskets={"1m": {"AI Memory": 3}},
+            prior_baskets={"1m": {"AI Memory": 1}},
+        )
+        row = next(r for r in rising if r["industry"] == "AI Memory")
+        self.assertEqual(row["kind"], "basket")
+        self.assertEqual(row["signal"], "KICKOFF")
+        self.assertEqual(row["delta"], 2)
+
+    def test_baskets_do_not_leak_into_industry_highlighting(self):
+        rising = detect_rising_themes(
+            {"1m": {}},
+            {"1m": {}},
+            current_baskets={"1m": {"AI Memory": 3}},
+            prior_baskets={"1m": {"AI Memory": 1}},
+        )
+        self.assertNotIn("AI Memory", rising_industry_names(rising, frame="1m"))
+
+    def test_baskets_are_optional(self):
+        rising = detect_rising_themes({"1m": {"Semiconductors": 3}}, {"1m": {"Semiconductors": 1}})
+        self.assertTrue(all(row["kind"] != "basket" for row in rising))
+
+
 class RisingThemeTests(unittest.TestCase):
     def test_semis_breadth_expansion_flags_rising(self):
         prior = {"1m": {"Semiconductors": 2, "Packaged Software": 4}}
