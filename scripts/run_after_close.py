@@ -127,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
         log_path = LOG_DIR / f"daily_scan_{now.date().isoformat()}.log"
         local_python = PROJECT_DIR / ".venv" / "bin" / "python"
         scanner_python = local_python if local_python.exists() else Path(sys.executable)
-        cmd = [str(scanner_python), "focus_list.py", "--snapshot-date", snapshot.isoformat()]
+        cmd = [str(scanner_python), "theme_scan.py", "--snapshot-date", snapshot.isoformat()]
         print(f"Running {' '.join(cmd)} (force={force})", flush=True)
         with log_path.open("a", encoding="utf-8") as log:
             log.write(f"\n--- Scheduled run started {now.isoformat()} force={force} ---\n")
