@@ -3,24 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>LLD &lt;GO&gt; | Liquid Leadership</title>
+  <title>THM &lt;GO&gt; | Theme Scanner</title>
   <meta name="description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://toi-sh.github.io/liquid-leadership/">
+  <link rel="canonical" href="https://tomas-zamba.github.io/theme-scanner/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Liquid Leadership">
-  <meta property="og:title" content="LLD <GO> | Liquid Leadership">
+  <meta property="og:site_name" content="Theme Scanner">
+  <meta property="og:title" content="THM <GO> | Theme Scanner">
   <meta property="og:description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
-  <meta property="og:url" content="https://toi-sh.github.io/liquid-leadership/">
-  <meta property="og:image" content="https://toi-sh.github.io/liquid-leadership/assets/nel-social-preview.png">
-  <meta property="og:image:width" content="1731">
-  <meta property="og:image:height" content="909">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LLD <GO> | Liquid Leadership">
+  <meta property="og:url" content="https://tomas-zamba.github.io/theme-scanner/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="THM <GO> | Theme Scanner">
   <meta name="twitter:description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
-  <meta name="twitter:image" content="https://toi-sh.github.io/liquid-leadership/assets/nel-social-preview.png">
-  <link rel="icon" type="image/png" href="assets/nel-favicon.png">
-  <link rel="apple-touch-icon" href="assets/nel-favicon.png">
   <link rel="preload" href="assets/fonts/ibm-plex-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="tokens.css">
   <style>
@@ -748,8 +742,8 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
 <main>
   <header class="nav-edge topbar">
     <div class="bbg-brand">
-      <a class="wordmark" href="#thematic-title">LLD</a>
-      <span class="bbg-product">Liquid Leadership</span>
+      <a class="wordmark" href="#thematic-title">THM</a>
+      <span class="bbg-product">Theme Scanner</span>
     </div>
     <nav class="bbg-keys" aria-label="Terminal panels">
       <a href="#thematic-title"><kbd>F1</kbd> Themes</a>
@@ -788,7 +782,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   </section>
 </main>
 <footer class="foot-line">
-  <p>LLD · Liquid Leadership · not financial advice · kelex</p>
+  <p>THM · Theme Scanner · not financial advice · kelex</p>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
@@ -799,7 +793,7 @@ const QUOTES = ["There is nothing new in Wall Street. There can't be because spe
   const meta = document.getElementById('qotd-meta');
   const button = document.getElementById('qotd-next');
   if (!text || !Array.isArray(QUOTES) || !QUOTES.length) return;
-  const storageKey = 'lld-qotd';
+  const storageKey = 'thm-qotd';
   function nyDate() {
     return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   }
@@ -824,7 +818,7 @@ const QUOTES = ["There is nothing new in Wall Street. There can't be because spe
   }
   const today = nyDate();
   const saved = readSaved();
-  let index = hash('lld|' + today) % QUOTES.length;
+  let index = hash('thm|' + today) % QUOTES.length;
   if (saved && saved.date === today && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < QUOTES.length) index = saved.index;
   show(index);
   if (!button) return;
@@ -847,7 +841,7 @@ const downloadButton = document.getElementById('download-image');
 const downloadLiquidButton = document.getElementById('download-ll');
 const flowMeta = { '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
 const rankColors = ['var(--color-rank-1)', 'var(--color-rank-2)', 'var(--color-rank-3)', 'var(--color-rank-4)', 'var(--color-rank-5)'];
-const NOTE_KEY = 'nel-note:';
+const NOTE_KEY = 'thm-note:';
 
 function risingThemes(snapshot) { return snapshot?.rising_themes || []; }
 function risingIndustrySet(snapshot) { return new Set(snapshot?.rising_industries || []); }
@@ -1046,8 +1040,8 @@ async function downloadPageImage() {
   if (typeof html2canvas !== 'function') { window.alert('The image exporter could not load. Check your connection and try again.'); return; }
   downloadButton.disabled = true; downloadButton.dataset.state = 'loading'; downloadButton.textContent = 'Creating image…';
   try {
-    const canvas = await html2canvas(document.querySelector('main'), { backgroundColor: getComputedStyle(document.body).backgroundColor, scale:2, useCORS:true, windowWidth:document.documentElement.scrollWidth, windowHeight:document.documentElement.scrollHeight, onclone: clonedDocument => { const bar = clonedDocument.querySelector('.topbar'); bar.innerHTML = `<div class="bbg-brand"><a class="wordmark">LLD</a><span class="bbg-product">Liquid Leadership</span></div><span class="snapshot-date">${currentSnapshot().date}</span>`; } });
-    const link = document.createElement('a'); link.download = `industry-leadership-${currentSnapshot().date}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+    const canvas = await html2canvas(document.querySelector('main'), { backgroundColor: getComputedStyle(document.body).backgroundColor, scale:2, useCORS:true, windowWidth:document.documentElement.scrollWidth, windowHeight:document.documentElement.scrollHeight, onclone: clonedDocument => { const bar = clonedDocument.querySelector('.topbar'); bar.innerHTML = `<div class="bbg-brand"><a class="wordmark">THM</a><span class="bbg-product">Theme Scanner</span></div><span class="snapshot-date">${currentSnapshot().date}</span>`; } });
+    const link = document.createElement('a'); link.download = `industry-themes-${currentSnapshot().date}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   } finally { downloadButton.disabled = false; downloadButton.dataset.state = ''; downloadButton.textContent = 'Snap <GO>'; }
 }
 document.addEventListener('click', event => {
