@@ -67,7 +67,7 @@ Per-symbol notes are saved in the browser's local storage. Ticker symbols open T
 
 ## Automation
 
-**GitHub Actions** — `.github/workflows/daily-scan.yml` runs after the US close, commits the refreshed CSVs and dashboard, and needs no secrets beyond the default `GITHUB_TOKEN`. For Pages, enable it on the `main` branch with `/ (root)` as the source; the dashboard's canonical URL is set to `https://tomas-zamba.github.io/theme-scanner/`, so update the meta tags in `industry_flow_dashboard.py` if you publish somewhere else.
+**GitHub Actions** — `.github/workflows/daily-scan.yml` runs after the US close, commits the refreshed CSVs and dashboard, and needs no secrets beyond the default `GITHUB_TOKEN`. For Pages, enable it on the `main` branch with `/ (root)` as the source; the dashboard's canonical URL is set to `https://homasi28.github.io/theme-scanner/`, so update the meta tags in `industry_flow_dashboard.py` if you publish somewhere else.
 
 **macOS launchd** — `scripts/run_after_close.py` runs the scanner once after 4:10 PM New York time on regular market days. It uses New York time for close and holiday checks, stamps output with the **next** NYSE session date (Friday post-close stamps Monday), catches up if the Mac wakes later, handles daylight-saving changes, and logs to `logs/daily_scan_<date>.log`. `scripts/com.theme-scanner.daily-scan.plist` is a template — replace the placeholder paths before loading it.
 

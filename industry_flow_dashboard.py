@@ -344,12 +344,12 @@ def write_dashboard(output_dir: Path) -> Path:
   <title>THM &lt;GO&gt; | Theme Scanner</title>
   <meta name="description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://tomas-zamba.github.io/theme-scanner/">
+  <link rel="canonical" href="https://homasi28.github.io/theme-scanner/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Theme Scanner">
   <meta property="og:title" content="THM <GO> | Theme Scanner">
   <meta property="og:description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
-  <meta property="og:url" content="https://tomas-zamba.github.io/theme-scanner/">
+  <meta property="og:url" content="https://homasi28.github.io/theme-scanner/">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="THM <GO> | Theme Scanner">
   <meta name="twitter:description" content="Track which industries are gaining leadership among the market’s most liquid momentum stocks.">
