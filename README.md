@@ -34,9 +34,23 @@ An industry can top one view and be absent from the other, which is the point of
 
 ## Theme baskets
 
-Industries come from exchange taxonomy, which has no label for "AI Memory" or "Neo Cloud". `theme_baskets.json` holds 28 named themes, each an explicit ticker list. Baskets are counted and compared exactly like industries and can raise the same `RISING` / `KICKOFF` flags, but they are tracked separately so a hand-curated list can never distort the taxonomy counts.
+Industries come from exchange taxonomy, which has no label for "Quantum Computing" or "Space Tech". `theme_baskets.json` holds 40 named themes, each an explicit ticker list, imported from Finviz's thematic classification. Baskets are counted and compared exactly like industries and can raise the same `RISING` / `KICKOFF` flags, but they are tracked separately so a curated list can never distort the taxonomy counts.
 
-Edit that file to add, remove, or re-scope a basket — no code change needed. Note that ETF entries never match: the scan only looks at common stocks.
+A stock can sit in several themes at once, which is the point: today `INTC` lands in Artificial Intelligence, Semiconductors, Hardware, Quantum Computing, and more. Industries cannot express that.
+
+### Refreshing the baskets
+
+```bash
+python refresh_finviz_themes.py            # all 40 themes
+python refresh_finviz_themes.py --dry-run  # report counts, write nothing
+```
+
+Theme membership is editorial and changes slowly, so this is a **manual job worth running about quarterly**, not part of the daily scan. Two constraints make that the only sensible cadence:
+
+- The Finviz screener renders its rows client-side, so the importer drives a real browser (`pip install playwright && playwright install chromium`).
+- Finviz blocks datacenter IPs, so this **will not work from GitHub Actions**. Run it from your own machine.
+
+The script never destroys existing baskets on failure: if nothing scrapes, it exits and leaves the file alone. Edit `theme_baskets.json` by hand to add your own basket; the scanner reads whatever is in it, and the next import will overwrite it.
 
 ## Setup
 

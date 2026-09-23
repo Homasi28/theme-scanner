@@ -1,15 +1,38 @@
 date,frame,basket,leaders
-2026-09-18,1m,AI Healthcare,2
-2026-09-18,1m,Clawdbot,1
-2026-09-18,1m,Crypto,1
-2026-09-18,1m,Cyber Security,1
-2026-09-18,1m,Genomics,1
-2026-09-18,3m,Clawdbot,2
-2026-09-18,3m,AI Healthcare,1
-2026-09-18,3m,AI Software,1
-2026-09-18,3m,Cyber Security,1
-2026-09-18,3m,Fintech,1
-2026-09-18,3m,Genomics,1
-2026-09-18,6m,Quantum,2
-2026-09-18,6m,AI Healthcare,1
-2026-09-18,6m,AI Memory,1
+2026-09-18,1m,Software,3
+2026-09-18,1m,Artificial Intelligence,2
+2026-09-18,1m,Big Data,2
+2026-09-18,1m,Cloud Computing,2
+2026-09-18,1m,Semiconductors,2
+2026-09-18,1m,Telecommunications,2
+2026-09-18,1m,Agriculture & Food Tech,1
+2026-09-18,1m,Biometrics,1
+2026-09-18,1m,Consumer Goods,1
+2026-09-18,1m,Cybersecurity,1
+2026-09-18,1m,Digital Entertainment,1
+2026-09-18,1m,Energy - Renewable,1
+2026-09-18,1m,Fintech,1
+2026-09-18,1m,Hardware,1
+2026-09-18,1m,Healthcare & Biotech,1
+2026-09-18,1m,Internet of Things,1
+2026-09-18,1m,Social Media,1
+2026-09-18,1m,Virtual & Augmented Reality,1
+2026-09-18,3m,Cloud Computing,4
+2026-09-18,3m,Software,4
+2026-09-18,3m,Artificial Intelligence,2
+2026-09-18,3m,Biometrics,1
+2026-09-18,3m,Cybersecurity,1
+2026-09-18,3m,E-Commerce,1
+2026-09-18,3m,Healthcare & Biotech,1
+2026-09-18,3m,Internet of Things,1
+2026-09-18,6m,Cloud Computing,4
+2026-09-18,6m,Artificial Intelligence,3
+2026-09-18,6m,Hardware,3
+2026-09-18,6m,Big Data,2
+2026-09-18,6m,Healthcare & Biotech,2
+2026-09-18,6m,Energy - Renewable,1
+2026-09-18,6m,Fintech,1
+2026-09-18,6m,Internet of Things,1
+2026-09-18,6m,Semiconductors,1
+2026-09-18,6m,Software,1
+2026-09-18,6m,Telecommunications,1
