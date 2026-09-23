@@ -174,25 +174,36 @@ def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
 MEMBER_KEYS = {"name": "n", "industry": "i", "exchange": "e", "Perf.W": "1w", "Perf.1M": "1m", "Perf.3M": "3m", "Perf.6M": "6m"}
 
 
-def _performance_records(path: Path) -> dict[str, dict[str, list[dict]]]:
-    """industry_performance CSV -> {scope: {window: [rows ranked by median]}}."""
-    if not path.exists():
+def _performance_records(*paths: Path) -> dict[str, dict[str, list[dict]]]:
+    """Performance CSVs -> {scope: {window: [rows ranked best first]}}.
+
+    Takes both the TradingView-derived file and, when a local run managed to
+    fetch it, Finviz's own group table. They share a schema and differ only in
+    the `scope` column, so the dashboard can toggle between taxonomies.
+    """
+    frames = [pd.read_csv(path) for path in paths if path.exists()]
+    frames = [frame for frame in frames if not frame.empty and "scope" in frame.columns]
+    if not frames:
         return {}
-    frame = pd.read_csv(path)
-    if frame.empty or "scope" not in frame.columns:
-        return {}
+    combined = pd.concat(frames, ignore_index=True)
     out: dict[str, dict[str, list[dict]]] = {}
-    for (scope, window), group in frame.groupby(["scope", "window"]):
+    for (scope, window), group in combined.groupby(["scope", "window"]):
         ranked = group.sort_values("median_pct", ascending=False)
-        out.setdefault(str(scope), {})[str(window)] = [
-            {
+        rows = []
+        for row in ranked.itertuples():
+            record = {
                 "industry": str(row.industry),
-                "members": int(row.members),
                 "median": float(row.median_pct),
                 "mean": float(row.mean_pct),
             }
-            for row in ranked.itertuples()
-        ]
+            members = getattr(row, "members", None)
+            if members is not None and not pd.isna(members):
+                record["members"] = int(members)
+            slug = getattr(row, "slug", None)
+            if slug is not None and not pd.isna(slug) and str(slug):
+                record["slug"] = str(slug)
+            rows.append(record)
+        out.setdefault(str(scope), {})[str(window)] = rows
     return out
 
 
@@ -447,7 +458,10 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "groups": groups,
             "baskets": baskets,
             "liquid": _records_from_frame(frame),
-            "performance": _performance_records(output_dir / f"industry_performance_{stamp}.csv"),
+            "performance": _performance_records(
+                output_dir / f"industry_performance_{stamp}.csv",
+                output_dir / f"finviz_groups_{stamp}.csv",
+            ),
             "members": _member_records(output_dir / f"filtered_universe_{stamp}.csv"),
         })
     return annotate_rising_themes(snapshots)
@@ -1120,11 +1134,12 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     <div class="section-heading">
       <h1 id="thematic-title" class="dashboard-title">Thematic Leadership</h1>
       <div class="scope-toggle" role="group" aria-label="Universe scope">
+        <button id="scope-finviz" class="btn btn--ghost" type="button" aria-pressed="false">Finviz groups</button>
         <button id="scope-all" class="btn btn--ghost is-active" type="button" aria-pressed="true">All stocks</button>
         <button id="scope-liquid" class="btn btn--ghost" type="button" aria-pressed="false">Liquid only</button>
       </div>
     </div>
-    <p class="lede">Industries ranked by member performance, median across the group. Pick an industry to see the names inside it.</p>
+    <p class="lede" id="scope-note"></p>
     <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="leadership-sections" class="window-sections"></div>
     <div id="industry-detail" class="industry-detail" hidden aria-live="polite"></div>
@@ -1239,7 +1254,13 @@ function tickClock() {
   }) + ' NY';
 }
 function currentSnapshot() { return history[Number(dateSelect.value)] || null; }
-let perfScope = 'all';
+const SCOPES = {
+  finviz: { label: 'Finviz groups', note: "Finviz's own industry taxonomy, ranked by their published group performance. It keeps groups like Semiconductor Equipment & Materials intact, which TradingView splits apart. Select a group to open its constituents on Finviz." },
+  all: { label: 'All stocks', note: 'Every scanned stock grouped by TradingView industry, ranked by median member performance. Select an industry to see the eligible names inside it.' },
+  liquid: { label: 'Liquid only', note: 'Only names passing the liquidity and ADR filters, grouped by TradingView industry. Select an industry to see the names inside it.' },
+};
+// Prefer Finviz's taxonomy when a local run managed to fetch it.
+let perfScope = (history.at?.(-1)?.performance?.finviz) ? 'finviz' : 'all';
 let openIndustry = null;
 function perfRows(snapshot, frame) { return snapshot?.performance?.[perfScope]?.[frame] || []; }
 function formatSigned(value) { const n = Number(value); return Number.isFinite(n) ? `${n >= 0 ? '+' : ''}${n.toFixed(1)}%` : '—'; }
@@ -1253,7 +1274,9 @@ function renderPerformanceBars(current, frame, container) {
     const value = Number(row.median) || 0;
     const up = value >= 0;
     const selected = openIndustry && openIndustry.industry === row.industry && openIndustry.frame === frame;
-    const title = `${row.industry} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%`;
+    const title = row.members === undefined
+      ? `${row.industry} · ${value.toFixed(2)}% (Finviz)`
+      : `${row.industry} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%`;
     return `<div class="bar-row perf-row" role="button" tabindex="0" aria-selected="${selected ? 'true' : 'false'}" data-industry="${escapeHTML(row.industry)}" data-frame="${escapeHTML(frame)}" title="${escapeHTML(title)}"><div class="industry" style="color:${color}">${escapeHTML(row.industry)}</div><div class="track"><div class="bar current ${up ? '' : 'bar--down'}" style="width:${Math.abs(value) / max * 100}%;background:${color}"></div></div><div class="value ${up ? 'tick-up' : 'tick-down'}">${formatSigned(value)}</div></div>`;
   }).join('');
 }
@@ -1268,6 +1291,17 @@ function renderIndustryDetail() {
   if (!openIndustry) { panel.hidden = true; panel.innerHTML = ''; return; }
   const snapshot = currentSnapshot();
   const { industry, frame } = openIndustry;
+  if (perfScope === 'finviz') {
+    // Finviz groups use their own taxonomy, so our TradingView-tagged universe
+    // cannot be filtered by them; send the user to the real constituent list.
+    const row = perfRows(snapshot, frame).find(r => r.industry === industry);
+    const url = row?.slug
+      ? `https://finviz.com/screener.ashx?v=141&f=ind_${encodeURIComponent(row.slug)}&o=-perf1w`
+      : 'https://finviz.com/groups.ashx?g=industry&v=140&o=-perf1w';
+    panel.hidden = false;
+    panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${formatSigned(row?.median)} over ${escapeHTML(flowMeta[frame]?.label || frame)}</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div><p class="lede">This is a Finviz group, so its members come from their classification rather than ours. <a class="ticker-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Open the ${escapeHTML(industry)} constituents on Finviz →</a></p>`;
+    return;
+  }
   const members = (snapshot?.members || [])
     .filter(row => String(row.i || '').trim() === industry)
     .sort((a, b) => (Number(b[frame]) || -Infinity) - (Number(a[frame]) || -Infinity));
@@ -1281,13 +1315,17 @@ function renderIndustryDetail() {
 function setScope(scope) {
   perfScope = scope;
   openIndustry = null;
-  ['all', 'liquid'].forEach(key => {
+  Object.keys(SCOPES).forEach(key => {
     const button = document.getElementById(`scope-${key}`);
     if (!button) return;
+    const available = Boolean(currentSnapshot()?.performance?.[key]);
     const active = key === scope;
+    button.hidden = !available;
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
+  const note = document.getElementById('scope-note');
+  if (note) note.textContent = SCOPES[scope]?.note || '';
   render();
 }
 function renderBasketBars(current, previous, frame, container) {
@@ -1353,8 +1391,8 @@ document.addEventListener('keydown', event => {
   toggleIndustry(row.dataset.industry, row.dataset.frame);
 });
 document.addEventListener('click', event => {
-  const scopeButton = event.target.closest('#scope-all, #scope-liquid');
-  if (scopeButton) { setScope(scopeButton.id === 'scope-liquid' ? 'liquid' : 'all'); return; }
+  const scopeButton = event.target.closest('.scope-toggle .btn');
+  if (scopeButton) { setScope(scopeButton.id.replace('scope-', '')); return; }
   if (event.target.closest('#close-industry')) { openIndustry = null; Object.keys(flowMeta).forEach(key => renderPerformanceBars(currentSnapshot(), key, document.getElementById(`bars-${key}`))); renderIndustryDetail(); return; }
   const perfRow = event.target.closest('.perf-row');
   if (perfRow) { toggleIndustry(perfRow.dataset.industry, perfRow.dataset.frame); return; }
@@ -1384,7 +1422,7 @@ document.addEventListener('keydown', event => {
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 // The bars size themselves with CSS percentages, so a resize needs no redraw.
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', render); downloadButton.addEventListener('click', downloadPageImage); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); render(); }
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', () => setScope(currentSnapshot()?.performance?.[perfScope] ? perfScope : 'all')); downloadButton.addEventListener('click', downloadPageImage); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); setScope(perfScope); }
 </script>
 </body>
 </html>'''

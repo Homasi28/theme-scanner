@@ -127,6 +127,15 @@ def main(argv: list[str] | None = None) -> int:
         log_path = LOG_DIR / f"daily_scan_{now.date().isoformat()}.log"
         local_python = PROJECT_DIR / ".venv" / "bin" / "python"
         scanner_python = local_python if local_python.exists() else Path(sys.executable)
+        # Finviz group performance is best-effort: it needs a browser and a
+        # residential IP, so it works here but not from CI. The scan below
+        # falls back to the TradingView ranking whenever this comes up empty.
+        finviz = subprocess.run(
+            [str(scanner_python), "fetch_finviz_groups.py", "--snapshot-date", snapshot.isoformat()],
+            cwd=PROJECT_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=False,
+        )
+        print(f"Finviz groups: {'ok' if finviz.returncode == 0 else 'unavailable, using TradingView ranking'}", flush=True)
+
         cmd = [str(scanner_python), "theme_scan.py", "--snapshot-date", snapshot.isoformat()]
         print(f"Running {' '.join(cmd)} (force={force})", flush=True)
         with log_path.open("a", encoding="utf-8") as log:

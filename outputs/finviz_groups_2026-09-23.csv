@@ -1,0 +1,577 @@
+scope,window,industry,members,median_pct,mean_pct,slug
+finviz,1w,Semiconductor Equipment & Materials,,11.92,11.92,semiconductorequipmentmaterials
+finviz,1m,Semiconductor Equipment & Materials,,0.5,0.5,semiconductorequipmentmaterials
+finviz,3m,Semiconductor Equipment & Materials,,-13.45,-13.45,semiconductorequipmentmaterials
+finviz,6m,Semiconductor Equipment & Materials,,23.88,23.88,semiconductorequipmentmaterials
+finviz,1w,Computer Hardware,,9.79,9.79,computerhardware
+finviz,1m,Computer Hardware,,14.73,14.73,computerhardware
+finviz,3m,Computer Hardware,,1.33,1.33,computerhardware
+finviz,6m,Computer Hardware,,93.77,93.77,computerhardware
+finviz,1w,Semiconductors,,9.0,9.0,semiconductors
+finviz,1m,Semiconductors,,12.26,12.26,semiconductors
+finviz,3m,Semiconductors,,4.08,4.08,semiconductors
+finviz,6m,Semiconductors,,47.8,47.8,semiconductors
+finviz,1w,Electronics & Computer Distribution,,7.42,7.42,electronicscomputerdistribution
+finviz,1m,Electronics & Computer Distribution,,15.35,15.35,electronicscomputerdistribution
+finviz,3m,Electronics & Computer Distribution,,7.66,7.66,electronicscomputerdistribution
+finviz,6m,Electronics & Computer Distribution,,71.74,71.74,electronicscomputerdistribution
+finviz,1w,Electronic Components,,7.24,7.24,electroniccomponents
+finviz,1m,Electronic Components,,7.32,7.32,electroniccomponents
+finviz,3m,Electronic Components,,-11.68,-11.68,electroniccomponents
+finviz,6m,Electronic Components,,18.48,18.48,electroniccomponents
+finviz,1w,Copper,,5.8,5.8,copper
+finviz,1m,Copper,,-6.08,-6.08,copper
+finviz,3m,Copper,,18.37,18.37,copper
+finviz,6m,Copper,,30.32,30.32,copper
+finviz,1w,Apparel Retail,,5.77,5.77,apparelretail
+finviz,1m,Apparel Retail,,-6.73,-6.73,apparelretail
+finviz,3m,Apparel Retail,,-12.87,-12.87,apparelretail
+finviz,6m,Apparel Retail,,-9.9,-9.9,apparelretail
+finviz,1w,Scientific & Technical Instruments,,4.8,4.8,scientifictechnicalinstruments
+finviz,1m,Scientific & Technical Instruments,,2.97,2.97,scientifictechnicalinstruments
+finviz,3m,Scientific & Technical Instruments,,-6.27,-6.27,scientifictechnicalinstruments
+finviz,6m,Scientific & Technical Instruments,,9.44,9.44,scientifictechnicalinstruments
+finviz,1w,Electrical Equipment & Parts,,4.58,4.58,electricalequipmentparts
+finviz,1m,Electrical Equipment & Parts,,7.44,7.44,electricalequipmentparts
+finviz,3m,Electrical Equipment & Parts,,-17.88,-17.88,electricalequipmentparts
+finviz,6m,Electrical Equipment & Parts,,11.85,11.85,electricalequipmentparts
+finviz,1w,Specialty Industrial Machinery,,4.44,4.44,specialtyindustrialmachinery
+finviz,1m,Specialty Industrial Machinery,,-1.33,-1.33,specialtyindustrialmachinery
+finviz,3m,Specialty Industrial Machinery,,-5.21,-5.21,specialtyindustrialmachinery
+finviz,6m,Specialty Industrial Machinery,,3.31,3.31,specialtyindustrialmachinery
+finviz,1w,Airlines,,4.22,4.22,airlines
+finviz,1m,Airlines,,-1.78,-1.78,airlines
+finviz,3m,Airlines,,-14.26,-14.26,airlines
+finviz,6m,Airlines,,9.93,9.93,airlines
+finviz,1w,Auto Manufacturers,,4.17,4.17,automanufacturers
+finviz,1m,Auto Manufacturers,,5.22,5.22,automanufacturers
+finviz,3m,Auto Manufacturers,,2.71,2.71,automanufacturers
+finviz,6m,Auto Manufacturers,,-1.26,-1.26,automanufacturers
+finviz,1w,Silver,,3.96,3.96,silver
+finviz,1m,Silver,,-6.08,-6.08,silver
+finviz,3m,Silver,,27.44,27.44,silver
+finviz,6m,Silver,,14.3,14.3,silver
+finviz,1w,Industrial Distribution,,3.78,3.78,industrialdistribution
+finviz,1m,Industrial Distribution,,-1.76,-1.76,industrialdistribution
+finviz,3m,Industrial Distribution,,-3.23,-3.23,industrialdistribution
+finviz,6m,Industrial Distribution,,6.3,6.3,industrialdistribution
+finviz,1w,Diagnostics & Research,,3.54,3.54,diagnosticsresearch
+finviz,1m,Diagnostics & Research,,4.54,4.54,diagnosticsresearch
+finviz,3m,Diagnostics & Research,,25.89,25.89,diagnosticsresearch
+finviz,6m,Diagnostics & Research,,36.25,36.25,diagnosticsresearch
+finviz,1w,Software - Infrastructure,,3.33,3.33,softwareinfrastructure
+finviz,1m,Software - Infrastructure,,5.58,5.58,softwareinfrastructure
+finviz,3m,Software - Infrastructure,,31.17,31.17,softwareinfrastructure
+finviz,6m,Software - Infrastructure,,37.99,37.99,softwareinfrastructure
+finviz,1w,Farm & Heavy Construction Machinery,,3.12,3.12,farmheavyconstructionmachinery
+finviz,1m,Farm & Heavy Construction Machinery,,1.21,1.21,farmheavyconstructionmachinery
+finviz,3m,Farm & Heavy Construction Machinery,,-7.52,-7.52,farmheavyconstructionmachinery
+finviz,6m,Farm & Heavy Construction Machinery,,13.25,13.25,farmheavyconstructionmachinery
+finviz,1w,Footwear & Accessories,,2.73,2.73,footwearaccessories
+finviz,1m,Footwear & Accessories,,-9.29,-9.29,footwearaccessories
+finviz,3m,Footwear & Accessories,,-15.2,-15.2,footwearaccessories
+finviz,6m,Footwear & Accessories,,-23.17,-23.17,footwearaccessories
+finviz,1w,Conglomerates,,2.7,2.7,conglomerates
+finviz,1m,Conglomerates,,-3.46,-3.46,conglomerates
+finviz,3m,Conglomerates,,-5.66,-5.66,conglomerates
+finviz,6m,Conglomerates,,2.4,2.4,conglomerates
+finviz,1w,Building Products & Equipment,,2.58,2.58,buildingproductsequipment
+finviz,1m,Building Products & Equipment,,-4.55,-4.55,buildingproductsequipment
+finviz,3m,Building Products & Equipment,,-12.94,-12.94,buildingproductsequipment
+finviz,6m,Building Products & Equipment,,-0.61,-0.61,buildingproductsequipment
+finviz,1w,Lodging,,2.49,2.49,lodging
+finviz,1m,Lodging,,-5.29,-5.29,lodging
+finviz,3m,Lodging,,-9.17,-9.17,lodging
+finviz,6m,Lodging,,4.68,4.68,lodging
+finviz,1w,Financial Data & Stock Exchanges,,2.37,2.37,financialdatastockexchanges
+finviz,1m,Financial Data & Stock Exchanges,,-4.72,-4.72,financialdatastockexchanges
+finviz,3m,Financial Data & Stock Exchanges,,12.33,12.33,financialdatastockexchanges
+finviz,6m,Financial Data & Stock Exchanges,,2.9,2.9,financialdatastockexchanges
+finviz,1w,Discount Stores,,2.13,2.13,discountstores
+finviz,1m,Discount Stores,,-0.69,-0.69,discountstores
+finviz,3m,Discount Stores,,-5.65,-5.65,discountstores
+finviz,6m,Discount Stores,,-6.66,-6.66,discountstores
+finviz,1w,Tools & Accessories,,2.03,2.03,toolsaccessories
+finviz,1m,Tools & Accessories,,-4.39,-4.39,toolsaccessories
+finviz,3m,Tools & Accessories,,-7.82,-7.82,toolsaccessories
+finviz,6m,Tools & Accessories,,3.63,3.63,toolsaccessories
+finviz,1w,Real Estate - Diversified,,1.75,1.75,realestatediversified
+finviz,1m,Real Estate - Diversified,,-5.9,-5.9,realestatediversified
+finviz,3m,Real Estate - Diversified,,-3.43,-3.43,realestatediversified
+finviz,6m,Real Estate - Diversified,,2.28,2.28,realestatediversified
+finviz,1w,Internet Content & Information,,1.62,1.62,internetcontentinformation
+finviz,1m,Internet Content & Information,,5.15,5.15,internetcontentinformation
+finviz,3m,Internet Content & Information,,5.86,5.86,internetcontentinformation
+finviz,6m,Internet Content & Information,,17.83,17.83,internetcontentinformation
+finviz,1w,Packaging & Containers,,1.52,1.52,packagingcontainers
+finviz,1m,Packaging & Containers,,-8.25,-8.25,packagingcontainers
+finviz,3m,Packaging & Containers,,-1.73,-1.73,packagingcontainers
+finviz,6m,Packaging & Containers,,6.78,6.78,packagingcontainers
+finviz,1w,Medical Instruments & Supplies,,1.47,1.47,medicalinstrumentssupplies
+finviz,1m,Medical Instruments & Supplies,,-1.43,-1.43,medicalinstrumentssupplies
+finviz,3m,Medical Instruments & Supplies,,5.77,5.77,medicalinstrumentssupplies
+finviz,6m,Medical Instruments & Supplies,,-0.43,-0.43,medicalinstrumentssupplies
+finviz,1w,Airports & Air Services,,1.43,1.43,airportsairservices
+finviz,1m,Airports & Air Services,,-4.59,-4.59,airportsairservices
+finviz,3m,Airports & Air Services,,-18.99,-18.99,airportsairservices
+finviz,6m,Airports & Air Services,,-19.57,-19.57,airportsairservices
+finviz,1w,Specialty Retail,,1.39,1.39,specialtyretail
+finviz,1m,Specialty Retail,,-9.16,-9.16,specialtyretail
+finviz,3m,Specialty Retail,,-4.81,-4.81,specialtyretail
+finviz,6m,Specialty Retail,,-1.94,-1.94,specialtyretail
+finviz,1w,Residential Construction,,1.37,1.37,residentialconstruction
+finviz,1m,Residential Construction,,-7.51,-7.51,residentialconstruction
+finviz,3m,Residential Construction,,-13.43,-13.43,residentialconstruction
+finviz,6m,Residential Construction,,-1.57,-1.57,residentialconstruction
+finviz,1w,Textile Manufacturing,,1.35,1.35,textilemanufacturing
+finviz,1m,Textile Manufacturing,,-3.28,-3.28,textilemanufacturing
+finviz,3m,Textile Manufacturing,,-14.23,-14.23,textilemanufacturing
+finviz,6m,Textile Manufacturing,,18.42,18.42,textilemanufacturing
+finviz,1w,Trucking,,1.34,1.34,trucking
+finviz,1m,Trucking,,-7.79,-7.79,trucking
+finviz,3m,Trucking,,-14.96,-14.96,trucking
+finviz,6m,Trucking,,4.88,4.88,trucking
+finviz,1w,Consumer Electronics,,1.29,1.29,consumerelectronics
+finviz,1m,Consumer Electronics,,8.19,8.19,consumerelectronics
+finviz,3m,Consumer Electronics,,14.98,14.98,consumerelectronics
+finviz,6m,Consumer Electronics,,33.18,33.18,consumerelectronics
+finviz,1w,Paper & Paper Products,,1.28,1.28,paperpaperproducts
+finviz,1m,Paper & Paper Products,,1.26,1.26,paperpaperproducts
+finviz,3m,Paper & Paper Products,,10.99,10.99,paperpaperproducts
+finviz,6m,Paper & Paper Products,,-4.12,-4.12,paperpaperproducts
+finviz,1w,REIT - Hotel & Motel,,1.27,1.27,reithotelmotel
+finviz,1m,REIT - Hotel & Motel,,-5.55,-5.55,reithotelmotel
+finviz,3m,REIT - Hotel & Motel,,-6.0,-6.0,reithotelmotel
+finviz,6m,REIT - Hotel & Motel,,26.9,26.9,reithotelmotel
+finviz,1w,Communication Equipment,,1.25,1.25,communicationequipment
+finviz,1m,Communication Equipment,,0.49,0.49,communicationequipment
+finviz,3m,Communication Equipment,,-5.8,-5.8,communicationequipment
+finviz,6m,Communication Equipment,,19.21,19.21,communicationequipment
+finviz,1w,Pollution & Treatment Controls,,1.19,1.19,pollutiontreatmentcontrols
+finviz,1m,Pollution & Treatment Controls,,-3.54,-3.54,pollutiontreatmentcontrols
+finviz,3m,Pollution & Treatment Controls,,-0.49,-0.49,pollutiontreatmentcontrols
+finviz,6m,Pollution & Treatment Controls,,8.34,8.34,pollutiontreatmentcontrols
+finviz,1w,Rental & Leasing Services,,1.15,1.15,rentalleasingservices
+finviz,1m,Rental & Leasing Services,,-5.95,-5.95,rentalleasingservices
+finviz,3m,Rental & Leasing Services,,-6.43,-6.43,rentalleasingservices
+finviz,6m,Rental & Leasing Services,,18.36,18.36,rentalleasingservices
+finviz,1w,Internet Retail,,1.13,1.13,internetretail
+finviz,1m,Internet Retail,,-5.74,-5.74,internetretail
+finviz,3m,Internet Retail,,6.34,6.34,internetretail
+finviz,6m,Internet Retail,,14.31,14.31,internetretail
+finviz,1w,Lumber & Wood Production,,1.08,1.08,lumberwoodproduction
+finviz,1m,Lumber & Wood Production,,-3.55,-3.55,lumberwoodproduction
+finviz,3m,Lumber & Wood Production,,-6.74,-6.74,lumberwoodproduction
+finviz,6m,Lumber & Wood Production,,2.46,2.46,lumberwoodproduction
+finviz,1w,Drug Manufacturers - General,,1.06,1.06,drugmanufacturersgeneral
+finviz,1m,Drug Manufacturers - General,,-4.75,-4.75,drugmanufacturersgeneral
+finviz,3m,Drug Manufacturers - General,,6.17,6.17,drugmanufacturersgeneral
+finviz,6m,Drug Manufacturers - General,,14.15,14.15,drugmanufacturersgeneral
+finviz,1w,Department Stores,,1.05,1.05,departmentstores
+finviz,1m,Department Stores,,-2.21,-2.21,departmentstores
+finviz,3m,Department Stores,,-1.76,-1.76,departmentstores
+finviz,6m,Department Stores,,18.93,18.93,departmentstores
+finviz,1w,Business Equipment & Supplies,,0.99,0.99,businessequipmentsupplies
+finviz,1m,Business Equipment & Supplies,,-0.27,-0.27,businessequipmentsupplies
+finviz,3m,Business Equipment & Supplies,,5.06,5.06,businessequipmentsupplies
+finviz,6m,Business Equipment & Supplies,,18.47,18.47,businessequipmentsupplies
+finviz,1w,Solar,,0.92,0.92,solar
+finviz,1m,Solar,,-6.76,-6.76,solar
+finviz,3m,Solar,,-27.9,-27.9,solar
+finviz,6m,Solar,,-20.75,-20.75,solar
+finviz,1w,Utilities - Renewable,,0.92,0.92,utilitiesrenewable
+finviz,1m,Utilities - Renewable,,-6.89,-6.89,utilitiesrenewable
+finviz,3m,Utilities - Renewable,,-23.41,-23.41,utilitiesrenewable
+finviz,6m,Utilities - Renewable,,-15.05,-15.05,utilitiesrenewable
+finviz,1w,Specialty Chemicals,,0.88,0.88,specialtychemicals
+finviz,1m,Specialty Chemicals,,-4.81,-4.81,specialtychemicals
+finviz,3m,Specialty Chemicals,,-5.03,-5.03,specialtychemicals
+finviz,6m,Specialty Chemicals,,-0.39,-0.39,specialtychemicals
+finviz,1w,Capital Markets,,0.84,0.84,capitalmarkets
+finviz,1m,Capital Markets,,-4.87,-4.87,capitalmarkets
+finviz,3m,Capital Markets,,-2.77,-2.77,capitalmarkets
+finviz,6m,Capital Markets,,16.84,16.84,capitalmarkets
+finviz,1w,Engineering & Construction,,0.78,0.78,engineeringconstruction
+finviz,1m,Engineering & Construction,,-3.86,-3.86,engineeringconstruction
+finviz,3m,Engineering & Construction,,-17.39,-17.39,engineeringconstruction
+finviz,6m,Engineering & Construction,,-1.37,-1.37,engineeringconstruction
+finviz,1w,Pharmaceutical Retailers,,0.58,0.58,pharmaceuticalretailers
+finviz,1m,Pharmaceutical Retailers,,7.32,7.32,pharmaceuticalretailers
+finviz,3m,Pharmaceutical Retailers,,17.06,17.06,pharmaceuticalretailers
+finviz,6m,Pharmaceutical Retailers,,10.01,10.01,pharmaceuticalretailers
+finviz,1w,Health Information Services,,0.57,0.57,healthinformationservices
+finviz,1m,Health Information Services,,3.01,3.01,healthinformationservices
+finviz,3m,Health Information Services,,29.86,29.86,healthinformationservices
+finviz,6m,Health Information Services,,39.99,39.99,healthinformationservices
+finviz,1w,Gold,,0.56,0.56,gold
+finviz,1m,Gold,,-9.86,-9.86,gold
+finviz,3m,Gold,,25.32,25.32,gold
+finviz,6m,Gold,,11.58,11.58,gold
+finviz,1w,Uranium,,0.49,0.49,uranium
+finviz,1m,Uranium,,-13.04,-13.04,uranium
+finviz,3m,Uranium,,-12.42,-12.42,uranium
+finviz,6m,Uranium,,-17.81,-17.81,uranium
+finviz,1w,Utilities - Independent Power Producers,,0.38,0.38,utilitiesindependentpowerproducers
+finviz,1m,Utilities - Independent Power Producers,,-2.78,-2.78,utilitiesindependentpowerproducers
+finviz,3m,Utilities - Independent Power Producers,,-12.51,-12.51,utilitiesindependentpowerproducers
+finviz,6m,Utilities - Independent Power Producers,,-14.04,-14.04,utilitiesindependentpowerproducers
+finviz,1w,Software - Application,,0.32,0.32,softwareapplication
+finviz,1m,Software - Application,,-3.22,-3.22,softwareapplication
+finviz,3m,Software - Application,,24.04,24.04,softwareapplication
+finviz,6m,Software - Application,,19.88,19.88,softwareapplication
+finviz,1w,Other Industrial Metals & Mining,,0.31,0.31,otherindustrialmetalsmining
+finviz,1m,Other Industrial Metals & Mining,,-10.96,-10.96,otherindustrialmetalsmining
+finviz,3m,Other Industrial Metals & Mining,,0.03,0.03,otherindustrialmetalsmining
+finviz,6m,Other Industrial Metals & Mining,,11.51,11.51,otherindustrialmetalsmining
+finviz,1w,Auto Parts,,0.3,0.3,autoparts
+finviz,1m,Auto Parts,,-5.3,-5.3,autoparts
+finviz,3m,Auto Parts,,-7.44,-7.44,autoparts
+finviz,6m,Auto Parts,,-2.5,-2.5,autoparts
+finviz,1w,Biotechnology,,0.12,0.12,biotechnology
+finviz,1m,Biotechnology,,-5.32,-5.32,biotechnology
+finviz,3m,Biotechnology,,8.56,8.56,biotechnology
+finviz,6m,Biotechnology,,23.07,23.07,biotechnology
+finviz,1w,Apparel Manufacturing,,0.1,0.1,apparelmanufacturing
+finviz,1m,Apparel Manufacturing,,-11.51,-11.51,apparelmanufacturing
+finviz,3m,Apparel Manufacturing,,-14.88,-14.88,apparelmanufacturing
+finviz,6m,Apparel Manufacturing,,-7.97,-7.97,apparelmanufacturing
+finviz,1w,Household & Personal Products,,0.06,0.06,householdpersonalproducts
+finviz,1m,Household & Personal Products,,-3.42,-3.42,householdpersonalproducts
+finviz,3m,Household & Personal Products,,-1.51,-1.51,householdpersonalproducts
+finviz,6m,Household & Personal Products,,3.71,3.71,householdpersonalproducts
+finviz,1w,Drug Manufacturers - Specialty & Generic,,0.03,0.03,drugmanufacturersspecialtygeneric
+finviz,1m,Drug Manufacturers - Specialty & Generic,,-2.5,-2.5,drugmanufacturersspecialtygeneric
+finviz,3m,Drug Manufacturers - Specialty & Generic,,1.57,1.57,drugmanufacturersspecialtygeneric
+finviz,6m,Drug Manufacturers - Specialty & Generic,,0.9,0.9,drugmanufacturersspecialtygeneric
+finviz,1w,Education & Training Services,,0.02,0.02,educationtrainingservices
+finviz,1m,Education & Training Services,,-2.59,-2.59,educationtrainingservices
+finviz,3m,Education & Training Services,,2.53,2.53,educationtrainingservices
+finviz,6m,Education & Training Services,,-4.79,-4.79,educationtrainingservices
+finviz,1w,Other Precious Metals & Mining,,-0.02,-0.02,otherpreciousmetalsmining
+finviz,1m,Other Precious Metals & Mining,,-10.48,-10.48,otherpreciousmetalsmining
+finviz,3m,Other Precious Metals & Mining,,16.54,16.54,otherpreciousmetalsmining
+finviz,6m,Other Precious Metals & Mining,,-0.36,-0.36,otherpreciousmetalsmining
+finviz,1w,Real Estate - Development,,-0.02,-0.02,realestatedevelopment
+finviz,1m,Real Estate - Development,,-9.17,-9.17,realestatedevelopment
+finviz,3m,Real Estate - Development,,-11.52,-11.52,realestatedevelopment
+finviz,6m,Real Estate - Development,,3.14,3.14,realestatedevelopment
+finviz,1w,Broadcasting,,-0.08,-0.08,broadcasting
+finviz,1m,Broadcasting,,-8.27,-8.27,broadcasting
+finviz,3m,Broadcasting,,0.81,0.81,broadcasting
+finviz,6m,Broadcasting,,-14.74,-14.74,broadcasting
+finviz,1w,Financial Conglomerates,,-0.27,-0.27,financialconglomerates
+finviz,1m,Financial Conglomerates,,1.34,1.34,financialconglomerates
+finviz,3m,Financial Conglomerates,,5.64,5.64,financialconglomerates
+finviz,6m,Financial Conglomerates,,28.94,28.94,financialconglomerates
+finviz,1w,Asset Management,,-0.28,-0.28,assetmanagement
+finviz,1m,Asset Management,,-8.75,-8.75,assetmanagement
+finviz,3m,Asset Management,,4.91,4.91,assetmanagement
+finviz,6m,Asset Management,,11.59,11.59,assetmanagement
+finviz,1w,Shell Companies,,-0.32,-0.32,shellcompanies
+finviz,1m,Shell Companies,,-3.05,-3.05,shellcompanies
+finviz,3m,Shell Companies,,-8.75,-8.75,shellcompanies
+finviz,6m,Shell Companies,,19.99,19.99,shellcompanies
+finviz,1w,Railroads,,-0.33,-0.33,railroads
+finviz,1m,Railroads,,-8.42,-8.42,railroads
+finviz,3m,Railroads,,4.28,4.28,railroads
+finviz,6m,Railroads,,15.45,15.45,railroads
+finviz,1w,Electronic Gaming & Multimedia,,-0.35,-0.35,electronicgamingmultimedia
+finviz,1m,Electronic Gaming & Multimedia,,-1.45,-1.45,electronicgamingmultimedia
+finviz,3m,Electronic Gaming & Multimedia,,-3.67,-3.67,electronicgamingmultimedia
+finviz,6m,Electronic Gaming & Multimedia,,1.29,1.29,electronicgamingmultimedia
+finviz,1w,Beverages - Wineries & Distilleries,,-0.36,-0.36,beverageswineriesdistilleries
+finviz,1m,Beverages - Wineries & Distilleries,,-10.02,-10.02,beverageswineriesdistilleries
+finviz,3m,Beverages - Wineries & Distilleries,,1.37,1.37,beverageswineriesdistilleries
+finviz,6m,Beverages - Wineries & Distilleries,,16.93,16.93,beverageswineriesdistilleries
+finviz,1w,Insurance - Reinsurance,,-0.58,-0.58,insurancereinsurance
+finviz,1m,Insurance - Reinsurance,,-0.21,-0.21,insurancereinsurance
+finviz,3m,Insurance - Reinsurance,,10.02,10.02,insurancereinsurance
+finviz,6m,Insurance - Reinsurance,,15.79,15.79,insurancereinsurance
+finviz,1w,REIT - Specialty,,-0.74,-0.74,reitspecialty
+finviz,1m,REIT - Specialty,,-4.87,-4.87,reitspecialty
+finviz,3m,REIT - Specialty,,-7.63,-7.63,reitspecialty
+finviz,6m,REIT - Specialty,,2.08,2.08,reitspecialty
+finviz,1w,Tobacco,,-0.75,-0.75,tobacco
+finviz,1m,Tobacco,,-0.5,-0.5,tobacco
+finviz,3m,Tobacco,,0.13,0.13,tobacco
+finviz,6m,Tobacco,,9.01,9.01,tobacco
+finviz,1w,Oil & Gas Equipment & Services,,-0.85,-0.85,oilgasequipmentservices
+finviz,1m,Oil & Gas Equipment & Services,,-3.42,-3.42,oilgasequipmentservices
+finviz,3m,Oil & Gas Equipment & Services,,3.44,3.44,oilgasequipmentservices
+finviz,6m,Oil & Gas Equipment & Services,,-3.13,-3.13,oilgasequipmentservices
+finviz,1w,Aerospace & Defense,,-0.89,-0.89,aerospacedefense
+finviz,1m,Aerospace & Defense,,-1.25,-1.25,aerospacedefense
+finviz,3m,Aerospace & Defense,,-7.05,-7.05,aerospacedefense
+finviz,6m,Aerospace & Defense,,-5.68,-5.68,aerospacedefense
+finviz,1w,REIT - Industrial,,-0.9,-0.9,reitindustrial
+finviz,1m,REIT - Industrial,,-7.04,-7.04,reitindustrial
+finviz,3m,REIT - Industrial,,-5.4,-5.4,reitindustrial
+finviz,6m,REIT - Industrial,,5.04,5.04,reitindustrial
+finviz,1w,Food Distribution,,-0.97,-0.97,fooddistribution
+finviz,1m,Food Distribution,,-10.22,-10.22,fooddistribution
+finviz,3m,Food Distribution,,-5.06,-5.06,fooddistribution
+finviz,6m,Food Distribution,,1.38,1.38,fooddistribution
+finviz,1w,Medical Devices,,-1.03,-1.03,medicaldevices
+finviz,1m,Medical Devices,,-8.82,-8.82,medicaldevices
+finviz,3m,Medical Devices,,4.49,4.49,medicaldevices
+finviz,6m,Medical Devices,,-4.03,-4.03,medicaldevices
+finviz,1w,Beverages - Non-Alcoholic,,-1.09,-1.09,beveragesnonalcoholic
+finviz,1m,Beverages - Non-Alcoholic,,-6.77,-6.77,beveragesnonalcoholic
+finviz,3m,Beverages - Non-Alcoholic,,1.03,1.03,beveragesnonalcoholic
+finviz,6m,Beverages - Non-Alcoholic,,7.68,7.68,beveragesnonalcoholic
+finviz,1w,REIT - Retail,,-1.16,-1.16,reitretail
+finviz,1m,REIT - Retail,,-8.96,-8.96,reitretail
+finviz,3m,REIT - Retail,,-10.37,-10.37,reitretail
+finviz,6m,REIT - Retail,,1.21,1.21,reitretail
+finviz,1w,Recreational Vehicles,,-1.23,-1.23,recreationalvehicles
+finviz,1m,Recreational Vehicles,,-14.73,-14.73,recreationalvehicles
+finviz,3m,Recreational Vehicles,,-13.89,-13.89,recreationalvehicles
+finviz,6m,Recreational Vehicles,,-13.45,-13.45,recreationalvehicles
+finviz,1w,Insurance - Life,,-1.23,-1.23,insurancelife
+finviz,1m,Insurance - Life,,-1.94,-1.94,insurancelife
+finviz,3m,Insurance - Life,,5.5,5.5,insurancelife
+finviz,6m,Insurance - Life,,17.84,17.84,insurancelife
+finviz,1w,Oil & Gas Midstream,,-1.26,-1.26,oilgasmidstream
+finviz,1m,Oil & Gas Midstream,,-2.19,-2.19,oilgasmidstream
+finviz,3m,Oil & Gas Midstream,,0.6,0.6,oilgasmidstream
+finviz,6m,Oil & Gas Midstream,,-1.51,-1.51,oilgasmidstream
+finviz,1w,Medical Care Facilities,,-1.39,-1.39,medicalcarefacilities
+finviz,1m,Medical Care Facilities,,-1.11,-1.11,medicalcarefacilities
+finviz,3m,Medical Care Facilities,,10.56,10.56,medicalcarefacilities
+finviz,6m,Medical Care Facilities,,5.2,5.2,medicalcarefacilities
+finviz,1w,Confectioners,,-1.43,-1.43,confectioners
+finviz,1m,Confectioners,,-6.65,-6.65,confectioners
+finviz,3m,Confectioners,,-2.34,-2.34,confectioners
+finviz,6m,Confectioners,,-1.55,-1.55,confectioners
+finviz,1w,Oil & Gas Integrated,,-1.43,-1.43,oilgasintegrated
+finviz,1m,Oil & Gas Integrated,,0.72,0.72,oilgasintegrated
+finviz,3m,Oil & Gas Integrated,,20.04,20.04,oilgasintegrated
+finviz,6m,Oil & Gas Integrated,,1.74,1.74,oilgasintegrated
+finviz,1w,Building Materials,,-1.49,-1.49,buildingmaterials
+finviz,1m,Building Materials,,-11.4,-11.4,buildingmaterials
+finviz,3m,Building Materials,,-21.5,-21.5,buildingmaterials
+finviz,6m,Building Materials,,-14.45,-14.45,buildingmaterials
+finviz,1w,"Furnishings, Fixtures & Appliances",,-1.52,-1.52,furnishingsfixturesappliances
+finviz,1m,"Furnishings, Fixtures & Appliances",,-7.72,-7.72,furnishingsfixturesappliances
+finviz,3m,"Furnishings, Fixtures & Appliances",,-0.44,-0.44,furnishingsfixturesappliances
+finviz,6m,"Furnishings, Fixtures & Appliances",,12.79,12.79,furnishingsfixturesappliances
+finviz,1w,Home Improvement Retail,,-1.71,-1.71,homeimprovementretail
+finviz,1m,Home Improvement Retail,,-12.01,-12.01,homeimprovementretail
+finviz,3m,Home Improvement Retail,,-13.52,-13.52,homeimprovementretail
+finviz,6m,Home Improvement Retail,,-12.54,-12.54,homeimprovementretail
+finviz,1w,REIT - Mortgage,,-1.75,-1.75,reitmortgage
+finviz,1m,REIT - Mortgage,,-10.19,-10.19,reitmortgage
+finviz,3m,REIT - Mortgage,,-9.53,-9.53,reitmortgage
+finviz,6m,REIT - Mortgage,,-7.3,-7.3,reitmortgage
+finviz,1w,REIT - Healthcare Facilities,,-1.77,-1.77,reithealthcarefacilities
+finviz,1m,REIT - Healthcare Facilities,,-4.95,-4.95,reithealthcarefacilities
+finviz,3m,REIT - Healthcare Facilities,,1.32,1.32,reithealthcarefacilities
+finviz,6m,REIT - Healthcare Facilities,,11.73,11.73,reithealthcarefacilities
+finviz,1w,Security & Protection Services,,-1.78,-1.78,securityprotectionservices
+finviz,1m,Security & Protection Services,,-6.14,-6.14,securityprotectionservices
+finviz,3m,Security & Protection Services,,7.12,7.12,securityprotectionservices
+finviz,6m,Security & Protection Services,,10.31,10.31,securityprotectionservices
+finviz,1w,Metal Fabrication,,-1.83,-1.83,metalfabrication
+finviz,1m,Metal Fabrication,,-10.09,-10.09,metalfabrication
+finviz,3m,Metal Fabrication,,-16.56,-16.56,metalfabrication
+finviz,6m,Metal Fabrication,,4.13,4.13,metalfabrication
+finviz,1w,REIT - Office,,-2.01,-2.01,reitoffice
+finviz,1m,REIT - Office,,-9.12,-9.12,reitoffice
+finviz,3m,REIT - Office,,-3.61,-3.61,reitoffice
+finviz,6m,REIT - Office,,20.43,20.43,reitoffice
+finviz,1w,Medical Distribution,,-2.09,-2.09,medicaldistribution
+finviz,1m,Medical Distribution,,-1.96,-1.96,medicaldistribution
+finviz,3m,Medical Distribution,,7.76,7.76,medicaldistribution
+finviz,6m,Medical Distribution,,0.68,0.68,medicaldistribution
+finviz,1w,Information Technology Services,,-2.14,-2.14,informationtechnologyservices
+finviz,1m,Information Technology Services,,-3.38,-3.38,informationtechnologyservices
+finviz,3m,Information Technology Services,,2.31,2.31,informationtechnologyservices
+finviz,6m,Information Technology Services,,-6.31,-6.31,informationtechnologyservices
+finviz,1w,REIT - Residential,,-2.19,-2.19,reitresidential
+finviz,1m,REIT - Residential,,-9.98,-9.98,reitresidential
+finviz,3m,REIT - Residential,,-7.64,-7.64,reitresidential
+finviz,6m,REIT - Residential,,2.2,2.2,reitresidential
+finviz,1w,Thermal Coal,,-2.21,-2.21,thermalcoal
+finviz,1m,Thermal Coal,,-3.88,-3.88,thermalcoal
+finviz,3m,Thermal Coal,,9.65,9.65,thermalcoal
+finviz,6m,Thermal Coal,,-19.3,-19.3,thermalcoal
+finviz,1w,Banks - Regional,,-2.23,-2.23,banksregional
+finviz,1m,Banks - Regional,,-3.97,-3.97,banksregional
+finviz,3m,Banks - Regional,,-0.66,-0.66,banksregional
+finviz,6m,Banks - Regional,,10.58,10.58,banksregional
+finviz,1w,Waste Management,,-2.24,-2.24,wastemanagement
+finviz,1m,Waste Management,,-6.01,-6.01,wastemanagement
+finviz,3m,Waste Management,,-3.15,-3.15,wastemanagement
+finviz,6m,Waste Management,,-3.66,-3.66,wastemanagement
+finviz,1w,Leisure,,-2.24,-2.24,leisure
+finviz,1m,Leisure,,-12.9,-12.9,leisure
+finviz,3m,Leisure,,-14.6,-14.6,leisure
+finviz,6m,Leisure,,-7.66,-7.66,leisure
+finviz,1w,REIT - Diversified,,-2.27,-2.27,reitdiversified
+finviz,1m,REIT - Diversified,,-9.9,-9.9,reitdiversified
+finviz,3m,REIT - Diversified,,-10.36,-10.36,reitdiversified
+finviz,6m,REIT - Diversified,,-7.5,-7.5,reitdiversified
+finviz,1w,Insurance - Diversified,,-2.3,-2.3,insurancediversified
+finviz,1m,Insurance - Diversified,,0.21,0.21,insurancediversified
+finviz,3m,Insurance - Diversified,,2.35,2.35,insurancediversified
+finviz,6m,Insurance - Diversified,,6.12,6.12,insurancediversified
+finviz,1w,Banks - Diversified,,-2.32,-2.32,banksdiversified
+finviz,1m,Banks - Diversified,,-3.44,-3.44,banksdiversified
+finviz,3m,Banks - Diversified,,2.05,2.05,banksdiversified
+finviz,6m,Banks - Diversified,,21.74,21.74,banksdiversified
+finviz,1w,Oil & Gas Drilling,,-2.32,-2.32,oilgasdrilling
+finviz,1m,Oil & Gas Drilling,,-4.66,-4.66,oilgasdrilling
+finviz,3m,Oil & Gas Drilling,,9.57,9.57,oilgasdrilling
+finviz,6m,Oil & Gas Drilling,,-14.38,-14.38,oilgasdrilling
+finviz,1w,Staffing & Employment Services,,-2.44,-2.44,staffingemploymentservices
+finviz,1m,Staffing & Employment Services,,-10.06,-10.06,staffingemploymentservices
+finviz,3m,Staffing & Employment Services,,25.08,25.08,staffingemploymentservices
+finviz,6m,Staffing & Employment Services,,54.18,54.18,staffingemploymentservices
+finviz,1w,Real Estate Services,,-2.47,-2.47,realestateservices
+finviz,1m,Real Estate Services,,-12.02,-12.02,realestateservices
+finviz,3m,Real Estate Services,,-0.73,-0.73,realestateservices
+finviz,6m,Real Estate Services,,-3.97,-3.97,realestateservices
+finviz,1w,Credit Services,,-2.47,-2.47,creditservices
+finviz,1m,Credit Services,,-7.56,-7.56,creditservices
+finviz,3m,Credit Services,,4.45,4.45,creditservices
+finviz,6m,Credit Services,,12.41,12.41,creditservices
+finviz,1w,Restaurants,,-2.51,-2.51,restaurants
+finviz,1m,Restaurants,,-13.09,-13.09,restaurants
+finviz,3m,Restaurants,,-8.86,-8.86,restaurants
+finviz,6m,Restaurants,,-11.18,-11.18,restaurants
+finviz,1w,Utilities - Diversified,,-2.54,-2.54,utilitiesdiversified
+finviz,1m,Utilities - Diversified,,-5.09,-5.09,utilitiesdiversified
+finviz,3m,Utilities - Diversified,,-9.68,-9.68,utilitiesdiversified
+finviz,6m,Utilities - Diversified,,-10.33,-10.33,utilitiesdiversified
+finviz,1w,Chemicals,,-2.55,-2.55,chemicals
+finviz,1m,Chemicals,,-4.8,-4.8,chemicals
+finviz,3m,Chemicals,,-2.58,-2.58,chemicals
+finviz,6m,Chemicals,,-22.45,-22.45,chemicals
+finviz,1w,Integrated Freight & Logistics,,-2.56,-2.56,integratedfreightlogistics
+finviz,1m,Integrated Freight & Logistics,,-7.64,-7.64,integratedfreightlogistics
+finviz,3m,Integrated Freight & Logistics,,-9.74,-9.74,integratedfreightlogistics
+finviz,6m,Integrated Freight & Logistics,,-0.4,-0.4,integratedfreightlogistics
+finviz,1w,Steel,,-2.64,-2.64,steel
+finviz,1m,Steel,,1.09,1.09,steel
+finviz,3m,Steel,,6.51,6.51,steel
+finviz,6m,Steel,,35.49,35.49,steel
+finviz,1w,Coking Coal,,-2.89,-2.89,cokingcoal
+finviz,1m,Coking Coal,,-14.08,-14.08,cokingcoal
+finviz,3m,Coking Coal,,6.61,6.61,cokingcoal
+finviz,6m,Coking Coal,,-8.01,-8.01,cokingcoal
+finviz,1w,Insurance - Specialty,,-2.92,-2.92,insurancespecialty
+finviz,1m,Insurance - Specialty,,-6.62,-6.62,insurancespecialty
+finviz,3m,Insurance - Specialty,,-2.45,-2.45,insurancespecialty
+finviz,6m,Insurance - Specialty,,4.28,4.28,insurancespecialty
+finviz,1w,Utilities - Regulated Gas,,-2.96,-2.96,utilitiesregulatedgas
+finviz,1m,Utilities - Regulated Gas,,-5.77,-5.77,utilitiesregulatedgas
+finviz,3m,Utilities - Regulated Gas,,-9.79,-9.79,utilitiesregulatedgas
+finviz,6m,Utilities - Regulated Gas,,-10.67,-10.67,utilitiesregulatedgas
+finviz,1w,Specialty Business Services,,-3.01,-3.01,specialtybusinessservices
+finviz,1m,Specialty Business Services,,-7.79,-7.79,specialtybusinessservices
+finviz,3m,Specialty Business Services,,2.99,2.99,specialtybusinessservices
+finviz,6m,Specialty Business Services,,2.42,2.42,specialtybusinessservices
+finviz,1w,Utilities - Regulated Water,,-3.01,-3.01,utilitiesregulatedwater
+finviz,1m,Utilities - Regulated Water,,-1.11,-1.11,utilitiesregulatedwater
+finviz,3m,Utilities - Regulated Water,,0.42,0.42,utilitiesregulatedwater
+finviz,6m,Utilities - Regulated Water,,-2.06,-2.06,utilitiesregulatedwater
+finviz,1w,Agricultural Inputs,,-3.02,-3.02,agriculturalinputs
+finviz,1m,Agricultural Inputs,,-2.71,-2.71,agriculturalinputs
+finviz,3m,Agricultural Inputs,,8.88,8.88,agriculturalinputs
+finviz,6m,Agricultural Inputs,,-2.67,-2.67,agriculturalinputs
+finviz,1w,Healthcare Plans,,-3.02,-3.02,healthcareplans
+finviz,1m,Healthcare Plans,,-5.94,-5.94,healthcareplans
+finviz,3m,Healthcare Plans,,-7.12,-7.12,healthcareplans
+finviz,6m,Healthcare Plans,,33.59,33.59,healthcareplans
+finviz,1w,Resorts & Casinos,,-3.15,-3.15,resortscasinos
+finviz,1m,Resorts & Casinos,,-13.56,-13.56,resortscasinos
+finviz,3m,Resorts & Casinos,,-16.43,-16.43,resortscasinos
+finviz,6m,Resorts & Casinos,,-13.49,-13.49,resortscasinos
+finviz,1w,Beverages - Brewers,,-3.22,-3.22,beveragesbrewers
+finviz,1m,Beverages - Brewers,,-3.87,-3.87,beveragesbrewers
+finviz,3m,Beverages - Brewers,,-8.53,-8.53,beveragesbrewers
+finviz,6m,Beverages - Brewers,,6.29,6.29,beveragesbrewers
+finviz,1w,Utilities - Regulated Electric,,-3.23,-3.23,utilitiesregulatedelectric
+finviz,1m,Utilities - Regulated Electric,,-8.0,-8.0,utilitiesregulatedelectric
+finviz,3m,Utilities - Regulated Electric,,-12.66,-12.66,utilitiesregulatedelectric
+finviz,6m,Utilities - Regulated Electric,,-11.18,-11.18,utilitiesregulatedelectric
+finviz,1w,Packaged Foods,,-3.3,-3.3,packagedfoods
+finviz,1m,Packaged Foods,,-10.92,-10.92,packagedfoods
+finviz,3m,Packaged Foods,,-1.87,-1.87,packagedfoods
+finviz,6m,Packaged Foods,,-3.15,-3.15,packagedfoods
+finviz,1w,Farm Products,,-3.34,-3.34,farmproducts
+finviz,1m,Farm Products,,-0.6,-0.6,farmproducts
+finviz,3m,Farm Products,,2.47,2.47,farmproducts
+finviz,6m,Farm Products,,-1.84,-1.84,farmproducts
+finviz,1w,Entertainment,,-3.37,-3.37,entertainment
+finviz,1m,Entertainment,,-7.2,-7.2,entertainment
+finviz,3m,Entertainment,,2.69,2.69,entertainment
+finviz,6m,Entertainment,,-4.11,-4.11,entertainment
+finviz,1w,Oil & Gas E&P,,-3.39,-3.39,oilgasep
+finviz,1m,Oil & Gas E&P,,-5.46,-5.46,oilgasep
+finviz,3m,Oil & Gas E&P,,11.25,11.25,oilgasep
+finviz,6m,Oil & Gas E&P,,-7.01,-7.01,oilgasep
+finviz,1w,Aluminum,,-3.41,-3.41,aluminum
+finviz,1m,Aluminum,,-8.79,-8.79,aluminum
+finviz,3m,Aluminum,,-16.06,-16.06,aluminum
+finviz,6m,Aluminum,,-14.87,-14.87,aluminum
+finviz,1w,Auto & Truck Dealerships,,-3.55,-3.55,autotruckdealerships
+finviz,1m,Auto & Truck Dealerships,,-9.75,-9.75,autotruckdealerships
+finviz,3m,Auto & Truck Dealerships,,-4.62,-4.62,autotruckdealerships
+finviz,6m,Auto & Truck Dealerships,,7.34,7.34,autotruckdealerships
+finviz,1w,Advertising Agencies,,-3.85,-3.85,advertisingagencies
+finviz,1m,Advertising Agencies,,-0.39,-0.39,advertisingagencies
+finviz,3m,Advertising Agencies,,-23.69,-23.69,advertisingagencies
+finviz,6m,Advertising Agencies,,-19.64,-19.64,advertisingagencies
+finviz,1w,Marine Shipping,,-4.01,-4.01,marineshipping
+finviz,1m,Marine Shipping,,0.65,0.65,marineshipping
+finviz,3m,Marine Shipping,,13.53,13.53,marineshipping
+finviz,6m,Marine Shipping,,16.62,16.62,marineshipping
+finviz,1w,Personal Services,,-4.14,-4.14,personalservices
+finviz,1m,Personal Services,,-11.77,-11.77,personalservices
+finviz,3m,Personal Services,,-9.53,-9.53,personalservices
+finviz,6m,Personal Services,,-16.02,-16.02,personalservices
+finviz,1w,Telecom Services,,-4.45,-4.45,telecomservices
+finviz,1m,Telecom Services,,-6.31,-6.31,telecomservices
+finviz,3m,Telecom Services,,-1.19,-1.19,telecomservices
+finviz,6m,Telecom Services,,-13.73,-13.73,telecomservices
+finviz,1w,Consulting Services,,-4.64,-4.64,consultingservices
+finviz,1m,Consulting Services,,-11.36,-11.36,consultingservices
+finviz,3m,Consulting Services,,2.83,2.83,consultingservices
+finviz,6m,Consulting Services,,-7.9,-7.9,consultingservices
+finviz,1w,Luxury Goods,,-4.74,-4.74,luxurygoods
+finviz,1m,Luxury Goods,,-10.52,-10.52,luxurygoods
+finviz,3m,Luxury Goods,,-21.38,-21.38,luxurygoods
+finviz,6m,Luxury Goods,,-17.15,-17.15,luxurygoods
+finviz,1w,Insurance - Property & Casualty,,-5.0,-5.0,insurancepropertycasualty
+finviz,1m,Insurance - Property & Casualty,,-6.44,-6.44,insurancepropertycasualty
+finviz,3m,Insurance - Property & Casualty,,-1.57,-1.57,insurancepropertycasualty
+finviz,6m,Insurance - Property & Casualty,,5.32,5.32,insurancepropertycasualty
+finviz,1w,Oil & Gas Refining & Marketing,,-5.27,-5.27,oilgasrefiningmarketing
+finviz,1m,Oil & Gas Refining & Marketing,,7.31,7.31,oilgasrefiningmarketing
+finviz,3m,Oil & Gas Refining & Marketing,,52.69,52.69,oilgasrefiningmarketing
+finviz,6m,Oil & Gas Refining & Marketing,,48.1,48.1,oilgasrefiningmarketing
+finviz,1w,Insurance Brokers,,-5.28,-5.28,insurancebrokers
+finviz,1m,Insurance Brokers,,-15.85,-15.85,insurancebrokers
+finviz,3m,Insurance Brokers,,0.25,0.25,insurancebrokers
+finviz,6m,Insurance Brokers,,-1.75,-1.75,insurancebrokers
+finviz,1w,Grocery Stores,,-5.46,-5.46,grocerystores
+finviz,1m,Grocery Stores,,-6.23,-6.23,grocerystores
+finviz,3m,Grocery Stores,,-6.73,-6.73,grocerystores
+finviz,6m,Grocery Stores,,-17.64,-17.64,grocerystores
+finviz,1w,Mortgage Finance,,-5.6,-5.6,mortgagefinance
+finviz,1m,Mortgage Finance,,-13.4,-13.4,mortgagefinance
+finviz,3m,Mortgage Finance,,-18.67,-18.67,mortgagefinance
+finviz,6m,Mortgage Finance,,-16.53,-16.53,mortgagefinance
+finviz,1w,Publishing,,-7.18,-7.18,publishing
+finviz,1m,Publishing,,-6.83,-6.83,publishing
+finviz,3m,Publishing,,-5.21,-5.21,publishing
+finviz,6m,Publishing,,-5.61,-5.61,publishing
+finviz,1w,Travel Services,,-7.63,-7.63,travelservices
+finviz,1m,Travel Services,,-21.14,-21.14,travelservices
+finviz,3m,Travel Services,,-15.33,-15.33,travelservices
+finviz,6m,Travel Services,,-5.15,-5.15,travelservices
+finviz,1w,Gambling,,-10.57,-10.57,gambling
+finviz,1m,Gambling,,-15.7,-15.7,gambling
+finviz,3m,Gambling,,-12.61,-12.61,gambling
+finviz,6m,Gambling,,-11.13,-11.13,gambling

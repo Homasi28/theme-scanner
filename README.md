@@ -12,6 +12,16 @@ The desk measures leadership two different ways, because they answer different q
 
 **Magnitude — how did the industry do?** Every scanned stock is grouped by industry and the group's performance is summarised, the way a group screener does it. This ranks *all* industries, including ones holding no standout name, so a broad quiet grind higher is still visible. Median is the headline number: one +280% stock would otherwise carry a whole industry on the mean.
 
+This comes in three scopes, switchable on the dashboard:
+
+| Scope | Source | Why |
+| --- | --- | --- |
+| **Finviz groups** | Finviz's published group table | Their taxonomy keeps thematic groups whole |
+| **All stocks** | every scanned stock, by TradingView industry | Always available, no scraping |
+| **Liquid only** | just the names passing the filters | Removes microcap noise |
+
+Finviz is preferred when present because TradingView's taxonomy splits groups in ways that hide a move. Lam Research and Applied Materials sit in **Industrial Machinery** next to pumps and conveyors, so a semicap rally averages away to +1.8%; Finviz keeps those names together in "Semiconductor Equipment & Materials" and shows +11.9%. Selecting a Finviz group opens its constituents on Finviz, since those members come from their classification rather than ours.
+
 **Breadth — how many standout names does it hold?** The original signal. The universe is cut to momentum leaders, those leaders are counted by industry, and the counts are compared against the previous snapshot. Breadth is what produces the `RISING` / `KICKOFF` alerts.
 
 An industry can top one view and be absent from the other, which is the point of having both.
@@ -72,7 +82,8 @@ Useful flags: `--top-pct` changes the share taken from each performance ranking 
 
 In `outputs/`:
 
-- `industry_performance_<date>.csv` — every industry ranked by member performance, both scopes, all four windows
+- `finviz_groups_<date>.csv` — Finviz's 144 industry groups and their published performance, when a local run fetched it
+- `industry_performance_<date>.csv` — every TradingView industry ranked by member performance, both scopes, all four windows
 - `momentum_leaders_<date>.csv` — the leader list every theme count is built from
 - `filtered_universe_<date>.csv` — every name passing the liquidity, ADR%, and industry filters; also the source for the dashboard drill-down
 - `rising_themes_<date>.csv` — the flagged themes, with prior and current counts
@@ -99,6 +110,14 @@ Below the ranking, **Theme Baskets** shows the same breadth count for the named 
 Per-symbol notes are saved in the browser's local storage. Ticker symbols open TradingView daily charts in a new tab.
 
 ## Automation
+
+Finviz group performance is fetched separately, because it needs a browser and a residential IP:
+
+```bash
+python fetch_finviz_groups.py
+```
+
+`scripts/run_after_close.py` runs it automatically before each local scan, and treats failure as non-fatal — the dashboard simply falls back to the TradingView ranking. **A GitHub Actions run will not have it**, so the Finviz scope only appears on days the scan ran from your Mac.
 
 **GitHub Actions** — `.github/workflows/daily-scan.yml` runs after the US close, commits the refreshed CSVs and dashboard, and needs no secrets beyond the default `GITHUB_TOKEN`. For Pages, enable it on the `main` branch with `/ (root)` as the source; the dashboard's canonical URL is set to `https://homasi28.github.io/theme-scanner/`, so update the meta tags in `industry_flow_dashboard.py` if you publish somewhere else.
 
