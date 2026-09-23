@@ -169,6 +169,45 @@ def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
     return json.loads(frame.loc[:, columns].to_json(orient="records"))
 
 
+# Member rows use short keys because this list is the bulk of the embedded
+# payload: n=name, i=industry, e=exchange, then the four performance windows.
+MEMBER_KEYS = {"name": "n", "industry": "i", "exchange": "e", "Perf.W": "1w", "Perf.1M": "1m", "Perf.3M": "3m", "Perf.6M": "6m"}
+
+
+def _performance_records(path: Path) -> dict[str, dict[str, list[dict]]]:
+    """industry_performance CSV -> {scope: {window: [rows ranked by median]}}."""
+    if not path.exists():
+        return {}
+    frame = pd.read_csv(path)
+    if frame.empty or "scope" not in frame.columns:
+        return {}
+    out: dict[str, dict[str, list[dict]]] = {}
+    for (scope, window), group in frame.groupby(["scope", "window"]):
+        ranked = group.sort_values("median_pct", ascending=False)
+        out.setdefault(str(scope), {})[str(window)] = [
+            {
+                "industry": str(row.industry),
+                "members": int(row.members),
+                "median": float(row.median_pct),
+                "mean": float(row.mean_pct),
+            }
+            for row in ranked.itertuples()
+        ]
+    return out
+
+
+def _member_records(path: Path) -> list[dict]:
+    """Eligible-universe rows, slimmed down, for the industry drill-down."""
+    if not path.exists():
+        return []
+    frame = pd.read_csv(path)
+    if frame.empty or "name" not in frame.columns:
+        return []
+    columns = [column for column in MEMBER_KEYS if column in frame.columns]
+    slim = frame.loc[:, columns].rename(columns=MEMBER_KEYS)
+    return json.loads(slim.to_json(orient="records"))
+
+
 def _cluster_counts(groups: dict[str, int], members: frozenset[str]) -> int:
     return sum(int(groups.get(name, 0) or 0) for name in members)
 
@@ -408,6 +447,8 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "groups": groups,
             "baskets": baskets,
             "liquid": _records_from_frame(frame),
+            "performance": _performance_records(output_dir / f"industry_performance_{stamp}.csv"),
+            "members": _member_records(output_dir / f"filtered_universe_{stamp}.csv"),
         })
     return annotate_rising_themes(snapshots)
 
@@ -752,6 +793,28 @@ main {
   text-transform: uppercase;
   color: var(--color-muted);
 }
+.scope-toggle { display: flex; gap: var(--space-2xs); }
+.scope-toggle .btn.is-active {
+  border-color: var(--color-frame-1m);
+  color: var(--color-frame-1m);
+}
+.perf-row { cursor: pointer; }
+.perf-row:hover .industry, .perf-row:focus-visible .industry { text-decoration: underline; }
+.perf-row[aria-selected="true"] { background: color-mix(in oklch, var(--color-frame-1m) 10%, transparent); }
+.bar--down { opacity: 0.75; }
+.industry-detail {
+  margin-top: var(--space-sm);
+  border: var(--rule) solid var(--grey-100);
+  padding: var(--space-xs);
+}
+.industry-detail__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-2xs);
+}
+.industry-detail h3 { margin: 0; font-size: var(--text-sm); }
 .window-sections {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1182,9 +1245,17 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   </header>
   <p class="lede">Post-close desk · track industry themes · open charts <span id="bbg-session">US equity session</span></p>
   <section class="desk-block" aria-labelledby="thematic-title">
-    <div class="section-heading"><h1 id="thematic-title" class="dashboard-title">Thematic Leadership</h1></div>
+    <div class="section-heading">
+      <h1 id="thematic-title" class="dashboard-title">Thematic Leadership</h1>
+      <div class="scope-toggle" role="group" aria-label="Universe scope">
+        <button id="scope-all" class="btn btn--ghost is-active" type="button" aria-pressed="true">All stocks</button>
+        <button id="scope-liquid" class="btn btn--ghost" type="button" aria-pressed="false">Liquid only</button>
+      </div>
+    </div>
+    <p class="lede">Industries ranked by member performance, median across the group. Pick an industry to see the names inside it.</p>
     <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="leadership-sections" class="window-sections"></div>
+    <div id="industry-detail" class="industry-detail" hidden aria-live="polite"></div>
   </section>
   <section class="desk-block desk-block--graphite" aria-labelledby="baskets-title">
     <div class="section-heading">
@@ -1355,24 +1426,56 @@ function tickClock() {
   }) + ' NY';
 }
 function currentSnapshot() { return history[Number(dateSelect.value)] || null; }
-function renderBars(current, previous, frame, container) {
-  const now = counts(current, frame), then = counts(previous, frame);
-  const rising = new Set((risingThemes(current) || []).filter(row => row.frame === frame).map(row => row.industry));
-  // Cluster members still mark individual bars when the cluster itself is rising.
-  (risingThemes(current) || []).filter(row => row.frame === frame && row.kind === 'cluster').forEach(row => {
-    (row.members || []).forEach(name => rising.add(name));
-  });
-  const names = [...new Set([...Object.keys(now), ...Object.keys(then)])].sort((a,b) => (now[b]||0) - (now[a]||0) || (then[b]||0) - (then[a]||0)).slice(0, 5);
-  if (!names.length) { container.innerHTML = '<p class="empty">No leader data is available for this snapshot.</p>'; return []; }
-  const max = Math.max(1, ...names.flatMap(n => [now[n]||0, then[n]||0]));
-  container.innerHTML = names.map((name, index) => {
-    const color = rankColors[index];
-    const risingClass = rising.has(name) ? ' industry--rising' : '';
-    const delta = (now[name]||0) - (then[name]||0);
-    const title = rising.has(name) ? `${name} · rising ${delta >= 0 ? '+' : ''}${delta}` : name;
-    return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
+let perfScope = 'all';
+let openIndustry = null;
+function perfRows(snapshot, frame) { return snapshot?.performance?.[perfScope]?.[frame] || []; }
+function formatSigned(value) { const n = Number(value); return Number.isFinite(n) ? `${n >= 0 ? '+' : ''}${n.toFixed(1)}%` : '—'; }
+function renderPerformanceBars(current, frame, container) {
+  if (!container) return;
+  const rows = perfRows(current, frame).slice(0, 10);
+  if (!rows.length) { container.innerHTML = '<p class="empty">No industry performance for this snapshot. Re-run the scanner.</p>'; return; }
+  const max = Math.max(1, ...rows.map(row => Math.abs(Number(row.median) || 0)));
+  container.innerHTML = rows.map((row, index) => {
+    const color = rankColors[index % rankColors.length];
+    const value = Number(row.median) || 0;
+    const up = value >= 0;
+    const selected = openIndustry && openIndustry.industry === row.industry && openIndustry.frame === frame;
+    const title = `${row.industry} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%`;
+    return `<div class="bar-row perf-row" role="button" tabindex="0" aria-selected="${selected ? 'true' : 'false'}" data-industry="${escapeHTML(row.industry)}" data-frame="${escapeHTML(frame)}" title="${escapeHTML(title)}"><div class="industry" style="color:${color}">${escapeHTML(row.industry)}</div><div class="track"><div class="bar current ${up ? '' : 'bar--down'}" style="width:${Math.abs(value) / max * 100}%;background:${color}"></div></div><div class="value ${up ? 'tick-up' : 'tick-down'}">${formatSigned(value)}</div></div>`;
   }).join('');
-  return names;
+}
+function memberChartUrl(row) {
+  const name = String(row.n || '').trim();
+  const venue = String(row.e || 'NASDAQ').trim().toUpperCase() || 'NASDAQ';
+  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(venue + ':' + name)}&interval=D`;
+}
+function renderIndustryDetail() {
+  const panel = document.getElementById('industry-detail');
+  if (!panel) return;
+  if (!openIndustry) { panel.hidden = true; panel.innerHTML = ''; return; }
+  const snapshot = currentSnapshot();
+  const { industry, frame } = openIndustry;
+  const members = (snapshot?.members || [])
+    .filter(row => String(row.i || '').trim() === industry)
+    .sort((a, b) => (Number(b[frame]) || -Infinity) - (Number(a[frame]) || -Infinity));
+  const label = flowMeta[frame]?.label || frame;
+  const body = members.length
+    ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${members.map(row => `<tr><td class="col-ticker"><a class="ticker-link" href="${escapeHTML(memberChartUrl(row))}" target="_blank" rel="noopener noreferrer">${escapeHTML(row.n)}</a></td><td class="${Number(row['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['1w'])}</td><td class="${Number(row['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['1m'])}</td><td class="${Number(row['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['3m'])}</td><td class="${Number(row['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['6m'])}</td></tr>`).join('')}</tbody></table></div>`
+    : '<p class="empty">No eligible names in this industry for this snapshot. The ranking above can include stocks that fail the liquidity filters.</p>';
+  panel.hidden = false;
+  panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${members.length} eligible name${members.length === 1 ? '' : 's'} · sorted by ${escapeHTML(label)}</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div>${body}`;
+}
+function setScope(scope) {
+  perfScope = scope;
+  openIndustry = null;
+  ['all', 'liquid'].forEach(key => {
+    const button = document.getElementById(`scope-${key}`);
+    if (!button) return;
+    const active = key === scope;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+  render();
 }
 function renderBasketBars(current, previous, frame, container) {
   if (!container) return;
@@ -1391,21 +1494,38 @@ function renderBasketBars(current, previous, frame, container) {
     return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
   }).join('');
 }
-function renderTrend(frame, svg, names) {
+function perfLookup(snapshot, frame) {
+  const map = new Map();
+  (snapshot?.performance?.[perfScope]?.[frame] || []).forEach(row => map.set(row.industry, Number(row.median)));
+  return map;
+}
+function renderPerfTrend(frame, svg, names) {
+  if (!svg) return;
   const legend = document.getElementById(`trend-legend-${frame}`);
   if (legend) {
-    legend.innerHTML = (names || []).map((name, index) => `<span class="trend-legend__item"><span class="trend-legend__swatch" style="background:${rankColors[index]}"></span>${escapeHTML(name)}</span>`).join('');
+    legend.innerHTML = (names || []).map((name, index) => `<span class="trend-legend__item"><span class="trend-legend__swatch" style="background:${rankColors[index % rankColors.length]}"></span>${escapeHTML(name)}</span>`).join('');
   }
-  const active = history.filter(d => d.groups?.[frame]);
-  if (active.length < 2) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">Add future daily snapshots to see industry leadership trends.</text>'; return; }
-  const width = Math.max(620, svg.clientWidth || 900), height = 300, left = 42, right = 28, top = 18, bottom = 34;
-  const max = Math.max(1, ...active.flatMap(d => Object.values(counts(d, frame))));
+  const active = history.filter(d => d.performance?.[perfScope]?.[frame]);
+  if (active.length < 2) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">Add future daily snapshots to see industry performance trends.</text>'; return; }
+  const series = active.map(d => perfLookup(d, frame));
+  const values = names.flatMap(name => series.map(map => map.get(name)).filter(v => Number.isFinite(v)));
+  if (!values.length) { svg.innerHTML = '<text x="20" y="45" fill="var(--color-muted)">No history for these industries yet.</text>'; return; }
+  const width = Math.max(620, svg.clientWidth || 900), height = 300, left = 52, right = 28, top = 18, bottom = 34;
+  const rawMin = Math.min(0, ...values), rawMax = Math.max(0, ...values);
+  const pad = Math.max(1, (rawMax - rawMin) * 0.1);
+  const min = rawMin - pad, max = rawMax + pad;
   const x = i => left + i * ((width-left-right) / Math.max(1, active.length-1));
-  const y = value => top + (max-value) * ((height-top-bottom)/max);
-  let markup = `<line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="var(--color-rule)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--color-rule)"/>`;
-  for (let i=0;i<=max;i++) markup += `<text x="${left-8}" y="${y(i)+4}" text-anchor="end" font-size="12" fill="var(--color-ink-2)">${i}</text>`;
+  const y = value => top + (max-value) * ((height-top-bottom)/(max-min));
+  let markup = `<line x1="${left}" y1="${y(0)}" x2="${width-right}" y2="${y(0)}" stroke="var(--color-rule)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--color-rule)"/>`;
+  const ticks = 4;
+  for (let i=0;i<=ticks;i++) { const v = min + (max-min)*i/ticks; markup += `<text x="${left-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--color-ink-2)">${v.toFixed(0)}%</text>`; }
   active.forEach((d,i) => markup += `<text x="${x(i)}" y="${height-12}" text-anchor="middle" font-size="12" fill="var(--color-ink-2)">${d.date.slice(5)}</text>`);
-  names.forEach((name, index) => { const color = rankColors[index]; const points = active.map((d,i) => `${x(i)},${y(counts(d,frame)[name]||0)}`).join(' '); markup += `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5"/>`; active.forEach((d,i) => markup += `<circle cx="${x(i)}" cy="${y(counts(d,frame)[name]||0)}" r="3" fill="${color}"><title>${escapeHTML(name)}: ${counts(d,frame)[name]||0} on ${d.date}</title></circle>`); });
+  names.forEach((name, index) => {
+    const color = rankColors[index % rankColors.length];
+    const points = active.map((d,i) => { const v = series[i].get(name); return Number.isFinite(v) ? `${x(i)},${y(v)}` : null; }).filter(Boolean).join(' ');
+    if (points) markup += `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+    active.forEach((d,i) => { const v = series[i].get(name); if (!Number.isFinite(v)) return; markup += `<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${color}"><title>${escapeHTML(name)}: ${v.toFixed(2)}% on ${d.date}</title></circle>`; });
+  });
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`); svg.innerHTML = markup;
 }
 function windowTables(prefix, heading) {
@@ -1467,22 +1587,27 @@ function render() {
   const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
   liquidTitle.textContent = `Liquid Leaders (LL) - ${(current.liquid || []).length} Tickers`;
   renderRisingAlert(current);
-  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} leadership</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Leadership over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry leader counts across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
+  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} performance</h2><div id="bars-${frame}" class="bars"></div><h2 class="trend-label">Performance over time</h2><svg id="trend-${frame}" role="img" aria-label="${meta.label} industry performance across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
   liquidSections.innerHTML = windowTables('liquid', 'LL');
   if (basketSections) basketSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} baskets</h2><div id="baskets-${frame}" class="bars"></div></section>`).join('');
-  Object.keys(flowMeta).forEach(frame => { const rankedNames = renderBars(current, previous, frame, document.getElementById(`bars-${frame}`)); renderTrend(frame, document.getElementById(`trend-${frame}`), rankedNames); });
+  Object.keys(flowMeta).forEach(frame => {
+    renderPerformanceBars(current, frame, document.getElementById(`bars-${frame}`));
+    const top = perfRows(current, frame).slice(0, 5).map(row => row.industry);
+    renderPerfTrend(frame, document.getElementById(`trend-${frame}`), top);
+  });
   Object.keys(flowMeta).forEach(frame => renderBasketBars(current, previous, frame, document.getElementById(`baskets-${frame}`)));
   renderLiquid(current);
+  renderIndustryDetail();
 }
 function redrawChartsOnly() {
-  const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
+  const current = currentSnapshot();
   if (!current) return;
   Object.keys(flowMeta).forEach(frame => {
     const bars = document.getElementById(`bars-${frame}`);
     const svg = document.getElementById(`trend-${frame}`);
     if (!bars || !svg) return;
-    const rankedNames = renderBars(current, previous, frame, bars);
-    renderTrend(frame, svg, rankedNames);
+    renderPerformanceBars(current, frame, bars);
+    renderPerfTrend(frame, svg, perfRows(current, frame).slice(0, 5).map(row => row.industry));
   });
 }
 function downloadSymbols(key, filePrefix) {
@@ -1513,7 +1638,27 @@ async function downloadPageImage() {
     const link = document.createElement('a'); link.download = `industry-themes-${currentSnapshot().date}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   } finally { downloadButton.disabled = false; downloadButton.dataset.state = ''; downloadButton.textContent = 'Snap <GO>'; }
 }
+function toggleIndustry(industry, frame) {
+  openIndustry = (openIndustry && openIndustry.industry === industry && openIndustry.frame === frame)
+    ? null
+    : { industry, frame };
+  Object.keys(flowMeta).forEach(key => renderPerformanceBars(currentSnapshot(), key, document.getElementById(`bars-${key}`)));
+  renderIndustryDetail();
+  if (openIndustry) document.getElementById('industry-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const row = event.target.closest?.('.perf-row');
+  if (!row) return;
+  event.preventDefault();
+  toggleIndustry(row.dataset.industry, row.dataset.frame);
+});
 document.addEventListener('click', event => {
+  const scopeButton = event.target.closest('#scope-all, #scope-liquid');
+  if (scopeButton) { setScope(scopeButton.id === 'scope-liquid' ? 'liquid' : 'all'); return; }
+  if (event.target.closest('#close-industry')) { openIndustry = null; Object.keys(flowMeta).forEach(key => renderPerformanceBars(currentSnapshot(), key, document.getElementById(`bars-${key}`))); renderIndustryDetail(); return; }
+  const perfRow = event.target.closest('.perf-row');
+  if (perfRow) { toggleIndustry(perfRow.dataset.industry, perfRow.dataset.frame); return; }
   const nav = event.target.closest('.bbg-keys a[href^="#"], a.wordmark[href^="#"]');
   if (nav) {
     const href = nav.getAttribute('href');

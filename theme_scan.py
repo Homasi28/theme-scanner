@@ -65,6 +65,12 @@ PERF_WINDOWS = [
 ]
 REQUIRED_PERF = ["Perf.1M", "Perf.3M", "Perf.6M"]
 
+# Performance column -> dashboard window key, for the industry ranking.
+PERF_LABELS = {WEEKLY_COLUMN: "1w", "Perf.1M": "1m", "Perf.3M": "3m", "Perf.6M": "6m"}
+
+# An industry needs this many members before its average means anything.
+MIN_INDUSTRY_MEMBERS = 3
+
 
 def fetch_universe() -> pd.DataFrame:
     """Fetch a broad US stock universe; exact liquidity filtering happens locally.
@@ -236,6 +242,47 @@ def annotate_display(frame: pd.DataFrame, settings: Settings, snapshot_date: dat
     return result
 
 
+def industry_performance(scopes: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Rank industries by how their members actually performed.
+
+    This is the magnitude view: it asks "how did this industry do", across every
+    member, rather than "how many standout names does it hold". An industry can
+    lead here while holding no individual momentum leader at all.
+
+    Median is the headline number because a single +280% name would otherwise
+    carry a whole industry; the mean is kept alongside it for comparison.
+    """
+    rows = []
+    for scope, frame in scopes.items():
+        if frame is None or frame.empty or "industry" not in frame.columns:
+            continue
+        working = frame.copy()
+        _numeric(working, list(PERF_LABELS))
+        working["industry"] = working["industry"].fillna("Unclassified").astype(str).str.strip()
+        working = working.loc[working["industry"] != ""]
+        for column, window in PERF_LABELS.items():
+            if column not in working.columns:
+                continue
+            subset = working.loc[:, ["industry", column]].dropna()
+            if subset.empty:
+                continue
+            grouped = subset.groupby("industry")[column].agg(["count", "median", "mean"])
+            grouped = grouped.loc[grouped["count"] >= MIN_INDUSTRY_MEMBERS]
+            for industry, row in grouped.iterrows():
+                rows.append({
+                    "scope": scope,
+                    "window": window,
+                    "industry": industry,
+                    "members": int(row["count"]),
+                    "median_pct": round(float(row["median"]), 2),
+                    "mean_pct": round(float(row["mean"]), 2),
+                })
+    result = pd.DataFrame(rows, columns=["scope", "window", "industry", "members", "median_pct", "mean_pct"])
+    if result.empty:
+        return result
+    return result.sort_values(["scope", "window", "median_pct"], ascending=[True, True, False])
+
+
 def prepare_for_export(frame: pd.DataFrame) -> pd.DataFrame:
     """Order and round the columns so the daily snapshot stays scan-friendly."""
     preferred = [
@@ -262,6 +309,7 @@ def write_outputs(
     settings: Settings,
     output_dir: Path,
     snapshot_date: date | None = None,
+    performance: pd.DataFrame | None = None,
 ) -> list[Path]:
     """Write each review view as a plain CSV file."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -274,6 +322,8 @@ def write_outputs(
         "filtered_universe": prepare_for_export(universe),
         "settings": settings_frame,
     }
+    if performance is not None and not performance.empty:
+        outputs["industry_performance"] = performance
     paths = []
     for name, frame in outputs.items():
         path = output_dir / f"{name}_{stamp}.csv"
@@ -307,10 +357,12 @@ def main() -> None:
     universe, leaders = calculate_leaders(raw, settings)
     universe = annotate_display(universe, settings, snapshot)
     leaders = annotate_display(leaders, settings, snapshot)
-    paths = write_outputs(universe, leaders, settings, args.output_dir, snapshot)
+    performance = industry_performance({"all": raw, "liquid": universe})
+    paths = write_outputs(universe, leaders, settings, args.output_dir, snapshot, performance)
     paths.append(write_dashboard(args.output_dir))
+    ranked = performance.loc[performance["scope"] == "all", "industry"].nunique() if not performance.empty else 0
     print(
-        f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,}"
+        f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | industries ranked: {ranked:,}"
     )
     print("Saved:\n" + "\n".join(str(path) for path in paths))
 
