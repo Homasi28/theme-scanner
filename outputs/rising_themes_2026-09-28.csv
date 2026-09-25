@@ -1,0 +1,14 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-09-28,1m,cluster,Semis complex,RISING,5,7,2,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-09-28,1m,industry,Semiconductors,RISING,3,4,1,
+2026-09-28,1m,industry,Financial Conglomerates,RISING,2,3,1,
+2026-09-28,1w,industry,Financial Conglomerates,KICKOFF,0,2,2,
+2026-09-28,1w,cluster,Semis complex,RISING,7,8,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-09-28,1w,industry,Semiconductors,RISING,4,5,1,
+2026-09-28,3m,industry,Financial Conglomerates,RISING,3,4,1,
+2026-09-28,6m,basket,Big Data,RISING,2,3,1,
+2026-09-28,6m,industry,Financial Conglomerates,RISING,2,3,1,
+2026-09-28,6m,industry,Computer Processing Hardware,RISING,1,2,1,
+2026-09-28,1w,basket,Healthcare & Biotech,RISING,1,2,1,
+2026-09-28,3m,industry,Oil Refining/Marketing,RISING,1,2,1,
+2026-09-28,1w,industry,Restaurants,RISING,1,2,1,
