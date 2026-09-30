@@ -13,7 +13,7 @@ from typing import Iterable
 
 import pandas as pd
 
-from industry_flow_dashboard import write_dashboard
+from industry_flow_dashboard import THEME_BASKETS, write_dashboard
 
 
 @dataclass(frozen=True)
@@ -295,6 +295,59 @@ def industry_performance(scopes: dict[str, pd.DataFrame]) -> pd.DataFrame:
     return result.sort_values(["scope", "window", "median_pct"], ascending=[True, True, False])
 
 
+def basket_members(raw: pd.DataFrame, baskets: dict[str, frozenset[str]]) -> pd.DataFrame:
+    """Every basket member the scan actually found, with its performance.
+
+    Baskets are ticker lists, so this needs the whole scanned universe rather
+    than the filtered one: most basket names never pass the momentum filters
+    but still belong to the theme. ETF entries simply never match, since the
+    scan only looks at common stocks.
+    """
+    if raw.empty or "name" not in raw.columns or not baskets:
+        return pd.DataFrame(columns=["basket", "ticker", *PERF_LABELS.values()])
+    working = raw.copy()
+    _numeric(working, list(PERF_LABELS))
+    working["symbol"] = working["name"].astype(str).str.strip().str.upper()
+    by_symbol = working.drop_duplicates(subset="symbol").set_index("symbol")
+    rows = []
+    for basket, tickers in baskets.items():
+        found = by_symbol.index.intersection(list(tickers))
+        for symbol in found:
+            row = by_symbol.loc[symbol]
+            record = {"basket": basket, "ticker": symbol}
+            for column, window in PERF_LABELS.items():
+                value = row.get(column) if column in by_symbol.columns else None
+                record[window] = None if value is None or pd.isna(value) else round(float(value), 2)
+            rows.append(record)
+    return pd.DataFrame(rows, columns=["basket", "ticker", *PERF_LABELS.values()])
+
+
+def basket_performance(members: pd.DataFrame) -> pd.DataFrame:
+    """Summarise each basket the same way industries are summarised."""
+    if members.empty:
+        return pd.DataFrame(columns=["basket", "window", "members", "median_pct", "mean_pct"])
+    rows = []
+    for window in PERF_LABELS.values():
+        if window not in members.columns:
+            continue
+        subset = members.loc[:, ["basket", window]].dropna()
+        if subset.empty:
+            continue
+        grouped = subset.groupby("basket")[window].agg(["count", "median", "mean"])
+        for basket, row in grouped.iterrows():
+            rows.append({
+                "basket": basket,
+                "window": window,
+                "members": int(row["count"]),
+                "median_pct": round(float(row["median"]), 2),
+                "mean_pct": round(float(row["mean"]), 2),
+            })
+    result = pd.DataFrame(rows, columns=["basket", "window", "members", "median_pct", "mean_pct"])
+    if result.empty:
+        return result
+    return result.sort_values(["window", "median_pct"], ascending=[True, False])
+
+
 def prepare_for_export(frame: pd.DataFrame) -> pd.DataFrame:
     """Order and round the columns so the daily snapshot stays scan-friendly."""
     preferred = [
@@ -322,6 +375,8 @@ def write_outputs(
     output_dir: Path,
     snapshot_date: date | None = None,
     performance: pd.DataFrame | None = None,
+    baskets: pd.DataFrame | None = None,
+    basket_names: pd.DataFrame | None = None,
 ) -> list[Path]:
     """Write each review view as a plain CSV file."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -336,6 +391,10 @@ def write_outputs(
     }
     if performance is not None and not performance.empty:
         outputs["industry_performance"] = performance
+    if baskets is not None and not baskets.empty:
+        outputs["basket_performance"] = baskets
+    if basket_names is not None and not basket_names.empty:
+        outputs["basket_members"] = basket_names
     paths = []
     for name, frame in outputs.items():
         path = output_dir / f"{name}_{stamp}.csv"
@@ -370,11 +429,16 @@ def main() -> None:
     universe = annotate_display(universe, settings, snapshot)
     leaders = annotate_display(leaders, settings, snapshot)
     performance = industry_performance({"all": raw, "liquid": universe})
-    paths = write_outputs(universe, leaders, settings, args.output_dir, snapshot, performance)
+    names = basket_members(raw, THEME_BASKETS)
+    baskets = basket_performance(names)
+    paths = write_outputs(
+        universe, leaders, settings, args.output_dir, snapshot, performance, baskets, names
+    )
     paths.append(write_dashboard(args.output_dir))
     ranked = performance.loc[performance["scope"] == "all", "industry"].nunique() if not performance.empty else 0
     print(
-        f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | industries ranked: {ranked:,}"
+        f"Scanned: {len(raw):,} | eligible: {len(universe):,} | leaders: {len(leaders):,} | "
+        f"industries ranked: {ranked:,} | baskets ranked: {baskets['basket'].nunique() if not baskets.empty else 0}"
     )
     print("Saved:\n" + "\n".join(str(path) for path in paths))
 

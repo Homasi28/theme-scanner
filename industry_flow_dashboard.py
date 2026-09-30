@@ -174,71 +174,51 @@ def _records_from_frame(frame: pd.DataFrame) -> list[dict]:
 MEMBER_KEYS = {"name": "n", "industry": "i", "exchange": "e", "Perf.W": "1w", "Perf.1M": "1m", "Perf.3M": "3m", "Perf.6M": "6m"}
 
 
-def _performance_records(*paths: Path) -> dict[str, dict[str, list[dict]]]:
-    """Performance CSVs -> {scope: {window: [rows ranked best first]}}.
-
-    Takes both the TradingView-derived file and, when a local run managed to
-    fetch it, Finviz's own group table. They share a schema and differ only in
-    the `scope` column, so the dashboard can toggle between taxonomies.
-    """
-    frames = [pd.read_csv(path) for path in paths if path.exists()]
-    frames = [frame for frame in frames if not frame.empty and "scope" in frame.columns]
-    if not frames:
-        return {}
-    combined = pd.concat(frames, ignore_index=True)
-    out: dict[str, dict[str, list[dict]]] = {}
-    for (scope, window), group in combined.groupby(["scope", "window"]):
-        ranked = group.sort_values("median_pct", ascending=False)
-        rows = []
-        for row in ranked.itertuples():
-            record = {
-                "industry": str(row.industry),
-                "median": float(row.median_pct),
-                "mean": float(row.mean_pct),
-            }
-            members = getattr(row, "members", None)
-            if members is not None and not pd.isna(members):
-                record["members"] = int(members)
-            slug = getattr(row, "slug", None)
-            if slug is not None and not pd.isna(slug) and str(slug):
-                record["slug"] = str(slug)
-            rows.append(record)
-        out.setdefault(str(scope), {})[str(window)] = rows
-    return out
-
-
-def _finviz_member_records(path: Path) -> dict[str, list[dict]]:
-    """finviz_group_members CSV -> {industry: [names ranked by the week]}."""
+def _basket_performance_records(path: Path) -> dict[str, list[dict]]:
+    """basket_performance CSV -> {window: [baskets ranked best first]}."""
     if not path.exists():
         return {}
     frame = pd.read_csv(path)
-    if frame.empty or "industry" not in frame.columns:
+    if frame.empty or "basket" not in frame.columns:
+        return {}
+    out: dict[str, list[dict]] = {}
+    for window, group in frame.groupby("window"):
+        out[str(window)] = [
+            {
+                "basket": str(row.basket),
+                "members": int(row.members),
+                "median": float(row.median_pct),
+                "mean": float(row.mean_pct),
+            }
+            for row in group.sort_values("median_pct", ascending=False).itertuples()
+        ]
+    return out
+
+
+def _basket_member_records(path: Path) -> dict[str, list[dict]]:
+    """basket_members CSV -> {basket: [names ranked by the week]}.
+
+    Every member is kept, not just the ones the dashboard shows, so the page
+    can size a "top 10%" against the real basket rather than a truncated list.
+    """
+    if not path.exists():
+        return {}
+    frame = pd.read_csv(path)
+    if frame.empty or "basket" not in frame.columns:
         return {}
     windows = [column for column in ("1w", "1m", "3m", "6m") if column in frame.columns]
-    slim = frame.loc[:, ["industry", "rank", "ticker", *windows]].sort_values(["industry", "rank"])
     out: dict[str, list[dict]] = {}
-    for industry, group in slim.groupby("industry"):
+    for basket, group in frame.groupby("basket"):
+        ordered = group.sort_values("1w", ascending=False) if "1w" in windows else group
         records = []
-        for row in group.to_dict(orient="records"):
+        for row in ordered.to_dict(orient="records"):
             record = {"t": str(row["ticker"])}
             for window in windows:
                 value = row[window]
                 record[window] = None if pd.isna(value) else float(value)
             records.append(record)
-        out[str(industry)] = records
+        out[str(basket)] = records
     return out
-
-
-def _member_records(path: Path) -> list[dict]:
-    """Eligible-universe rows, slimmed down, for the industry drill-down."""
-    if not path.exists():
-        return []
-    frame = pd.read_csv(path)
-    if frame.empty or "name" not in frame.columns:
-        return []
-    columns = [column for column in MEMBER_KEYS if column in frame.columns]
-    slim = frame.loc[:, columns].rename(columns=MEMBER_KEYS)
-    return json.loads(slim.to_json(orient="records"))
 
 
 def _cluster_counts(groups: dict[str, int], members: frozenset[str]) -> int:
@@ -480,12 +460,8 @@ def collect_industry_history(output_dir: Path) -> list[dict]:
             "groups": groups,
             "baskets": baskets,
             "liquid": _records_from_frame(frame),
-            "performance": _performance_records(
-                output_dir / f"industry_performance_{stamp}.csv",
-                output_dir / f"finviz_groups_{stamp}.csv",
-            ),
-            "members": _member_records(output_dir / f"filtered_universe_{stamp}.csv"),
-            "finviz_members": _finviz_member_records(output_dir / f"finviz_group_members_{stamp}.csv"),
+            "basket_perf": _basket_performance_records(output_dir / f"basket_performance_{stamp}.csv"),
+            "basket_names": _basket_member_records(output_dir / f"basket_members_{stamp}.csv"),
         })
     return annotate_rising_themes(snapshots)
 
@@ -821,33 +797,43 @@ main {
   text-transform: uppercase;
   color: var(--color-muted);
 }
-.scope-toggle { display: flex; gap: var(--space-2xs); }
-.scope-toggle .btn.is-active {
-  border-color: var(--color-frame-1m);
-  color: var(--color-frame-1m);
-}
 .perf-row { cursor: pointer; }
 .perf-row:hover .industry, .perf-row:focus-visible .industry { text-decoration: underline; }
 .perf-row[aria-selected="true"] { background: color-mix(in oklch, var(--color-frame-1m) 10%, transparent); }
 .bar--down { opacity: 0.75; }
-.industry-detail {
+.detail-panel {
   margin-top: var(--space-sm);
   border: var(--rule) solid var(--grey-100);
   padding: var(--space-xs);
 }
-.industry-detail__head {
+.detail-panel__head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: var(--space-xs);
   margin-bottom: var(--space-2xs);
 }
-.industry-detail h3 { margin: 0; font-size: var(--text-sm); }
+.detail-panel h3 { margin: 0; font-size: var(--text-sm); }
 .window-sections {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-sm);
   align-items: start;
+}
+.trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  padding: 0 var(--space-xs) var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-graphite-muted);
+}
+.trend-legend__item { display: inline-flex; align-items: center; gap: var(--space-3xs); }
+.trend-legend__swatch {
+  width: 0.625rem;
+  height: 0.1875rem;
+  display: inline-block;
 }
 .panel,
 .panel h2,
@@ -1019,6 +1005,10 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
 @media (min-width: 90rem) {
   .window-sections { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+/* Two trend charts want room to breathe, not a quarter each. */
+@media (min-width: 60rem) {
+  .window-sections--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 72rem) {
   .bbg-product { display: none; }
 }
@@ -1133,16 +1123,16 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
   </style>
 </head>
 <body>
-<a class="skip-link" href="#thematic-title">Skip to desk</a>
+<a class="skip-link" href="#baskets-title">Skip to desk</a>
 <main>
   <header class="nav-edge topbar">
     <div class="bbg-brand">
-      <a class="wordmark" href="#thematic-title">THM</a>
+      <a class="wordmark" href="#baskets-title">THM</a>
       <span class="bbg-product">Theme Scanner</span>
     </div>
     <nav class="bbg-keys" aria-label="Terminal panels">
-      <a href="#thematic-title"><kbd>F1</kbd> Themes</a>
-      <a href="#baskets-title"><kbd>F2</kbd> Baskets</a>
+      <a href="#baskets-title"><kbd>F1</kbd> Themes</a>
+      <a href="#trend-title"><kbd>F2</kbd> Trend</a>
       <a href="#qotd"><kbd>F3</kbd> Quote</a>
     </nav>
     <div class="nav-edge__controls">
@@ -1153,27 +1143,22 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     </div>
   </header>
   <p class="lede">Post-close desk · track industry themes · open charts <span id="bbg-session">US equity session</span></p>
-  <section class="desk-block" aria-labelledby="thematic-title">
+  <section class="desk-block" aria-labelledby="baskets-title">
     <div class="section-heading">
-      <h1 id="thematic-title" class="dashboard-title">Thematic Leadership</h1>
-      <div class="scope-toggle" role="group" aria-label="Universe scope">
-        <button id="scope-finviz" class="btn btn--ghost" type="button" aria-pressed="false">Finviz groups</button>
-        <button id="scope-all" class="btn btn--ghost is-active" type="button" aria-pressed="true">All stocks</button>
-        <button id="scope-liquid" class="btn btn--ghost" type="button" aria-pressed="false">Liquid only</button>
-      </div>
-    </div>
-    <p class="lede" id="scope-note"></p>
-    <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
-    <div id="leadership-sections" class="window-sections"></div>
-    <div id="industry-detail" class="industry-detail" hidden aria-live="polite"></div>
-  </section>
-  <section class="desk-block desk-block--graphite" aria-labelledby="baskets-title">
-    <div class="section-heading">
-      <h2 id="baskets-title">Theme Baskets</h2>
+      <h1 id="baskets-title" class="dashboard-title">Theme Baskets</h1>
       <button id="download-baskets" class="btn btn--ghost" type="button">Export Baskets</button>
     </div>
-    <p class="lede">Named themes defined by a curated ticker list, counted the same way as industries. Edit <code>theme_baskets.json</code> to change one.</p>
+    <p class="lede">Named themes from Finviz's classification, ranked by median member performance. Pick a theme to see its strongest names. Edit <code>theme_baskets.json</code> to change one.</p>
+    <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="basket-sections" class="window-sections"></div>
+    <div id="basket-detail" class="detail-panel" hidden aria-live="polite"></div>
+  </section>
+  <section class="desk-block desk-block--graphite" aria-labelledby="trend-title">
+    <div class="section-heading">
+      <h2 id="trend-title">Theme Trend</h2>
+    </div>
+    <p class="lede">Median performance of the leading themes across saved snapshots.</p>
+    <div id="trend-sections" class="window-sections window-sections--pair"></div>
   </section>
   <section id="qotd" class="rules" aria-label="Quote of the day">
     <div class="qotd">
@@ -1238,9 +1223,9 @@ const QUOTES = __QUOTES__;
   });
 })();
 const dateSelect = document.getElementById('date');
-const leadershipSections = document.getElementById('leadership-sections');
 const risingThemeAlert = document.getElementById('rising-theme-alert');
 const basketSections = document.getElementById('basket-sections');
+const trendSections = document.getElementById('trend-sections');
 const downloadButton = document.getElementById('download-image');
 const downloadBasketsButton = document.getElementById('download-baskets');
 const flowMeta = { '1w': { label:'1 week', color:'var(--color-frame-1w)' }, '1m': { label:'1 month', color:'var(--color-frame-1m)' }, '3m': { label:'3 months', color:'var(--color-frame-3m)' }, '6m': { label:'6 months', color:'var(--color-frame-6m)' } };
@@ -1277,115 +1262,105 @@ function tickClock() {
   }) + ' NY';
 }
 function currentSnapshot() { return history[Number(dateSelect.value)] || null; }
-const SCOPES = {
-  finviz: { label: 'Finviz groups', note: "Finviz's own industry taxonomy, ranked by their published group performance. It keeps groups like Semiconductor Equipment & Materials intact, which TradingView splits apart. Select a group to open its constituents on Finviz." },
-  all: { label: 'All stocks', note: 'Every scanned stock grouped by TradingView industry, ranked by median member performance. Select an industry to see the eligible names inside it.' },
-  liquid: { label: 'Liquid only', note: 'Only names passing the liquidity and ADR filters, grouped by TradingView industry. Select an industry to see the names inside it.' },
-};
-// Prefer Finviz's taxonomy when a local run managed to fetch it.
-let perfScope = (history.at?.(-1)?.performance?.finviz) ? 'finviz' : 'all';
-let openIndustry = null;
-function perfRows(snapshot, frame) { return snapshot?.performance?.[perfScope]?.[frame] || []; }
+// Only the two shortest windows get a trend chart; the longer ones move too
+// slowly for a day-over-day line to say anything.
+const TREND_FRAMES = ['1w', '1m'];
+const TOP_SHARE = 0.10;   // "top 10% of the basket"
+const TOP_MINIMUM = 3;    // ...but never so few that the panel is useless
+let openBasket = null;
 function formatSigned(value) { const n = Number(value); return Number.isFinite(n) ? `${n >= 0 ? '+' : ''}${n.toFixed(1)}%` : '—'; }
-function renderPerformanceBars(current, frame, container) {
+function basketRows(snapshot, frame) { return snapshot?.basket_perf?.[frame] || []; }
+function basketNames(snapshot, basket) { return (snapshot?.basket_names || {})[basket] || []; }
+function topCount(total) { return Math.min(total, Math.max(TOP_MINIMUM, Math.ceil(total * TOP_SHARE))); }
+function renderBasketBars(current, frame, container) {
   if (!container) return;
-  const rows = perfRows(current, frame).slice(0, 10);
-  if (!rows.length) { container.innerHTML = '<p class="empty">No industry performance for this snapshot. Re-run the scanner.</p>'; return; }
+  const rows = basketRows(current, frame).slice(0, 10);
+  if (!rows.length) { container.innerHTML = '<p class="empty">No basket performance for this snapshot. Re-run the scanner.</p>'; return; }
+  const counts = basketCounts(current, frame);
+  const rising = new Set(risingThemes(current).filter(row => row.frame === frame && row.kind === 'basket').map(row => row.industry));
   const max = Math.max(1, ...rows.map(row => Math.abs(Number(row.median) || 0)));
   container.innerHTML = rows.map((row, index) => {
     const color = rankColors[index % rankColors.length];
     const value = Number(row.median) || 0;
     const up = value >= 0;
-    const selected = openIndustry && openIndustry.industry === row.industry && openIndustry.frame === frame;
-    const title = row.members === undefined
-      ? `${row.industry} · ${value.toFixed(2)}% (Finviz)`
-      : `${row.industry} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%`;
-    return `<div class="bar-row perf-row" role="button" tabindex="0" aria-selected="${selected ? 'true' : 'false'}" data-industry="${escapeHTML(row.industry)}" data-frame="${escapeHTML(frame)}" title="${escapeHTML(title)}"><div class="industry" style="color:${color}">${escapeHTML(row.industry)}</div><div class="track"><div class="bar current ${up ? '' : 'bar--down'}" style="width:${Math.abs(value) / max * 100}%;background:${color}"></div></div><div class="value ${up ? 'tick-up' : 'tick-down'}">${formatSigned(value)}</div></div>`;
+    const selected = openBasket && openBasket.basket === row.basket && openBasket.frame === frame;
+    const risingClass = rising.has(row.basket) ? ' industry--rising' : '';
+    const leaders = counts[row.basket] || 0;
+    const title = `${row.basket} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%${leaders ? ` · ${leaders} momentum leader${leaders === 1 ? '' : 's'}` : ''}`;
+    return `<div class="bar-row perf-row" role="button" tabindex="0" aria-selected="${selected ? 'true' : 'false'}" data-basket="${escapeHTML(row.basket)}" data-frame="${escapeHTML(frame)}" title="${escapeHTML(title)}"><div class="industry${risingClass}" style="color:${color}">${escapeHTML(row.basket)}</div><div class="track"><div class="bar current ${up ? '' : 'bar--down'}" style="width:${Math.abs(value) / max * 100}%;background:${color}"></div></div><div class="value ${up ? 'tick-up' : 'tick-down'}">${formatSigned(value)}</div></div>`;
   }).join('');
 }
-function memberChartUrl(row) {
-  const name = String(row.n || '').trim();
-  const venue = String(row.e || 'NASDAQ').trim().toUpperCase() || 'NASDAQ';
-  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(venue + ':' + name)}&interval=D`;
-}
-function renderIndustryDetail() {
-  const panel = document.getElementById('industry-detail');
+function renderBasketDetail() {
+  const panel = document.getElementById('basket-detail');
   if (!panel) return;
-  if (!openIndustry) { panel.hidden = true; panel.innerHTML = ''; return; }
+  if (!openBasket) { panel.hidden = true; panel.innerHTML = ''; return; }
   const snapshot = currentSnapshot();
-  const { industry, frame } = openIndustry;
-  if (perfScope === 'finviz') {
-    // Finviz groups carry their own membership and their own numbers, already
-    // ranked by the week when scraped.
-    const row = perfRows(snapshot, frame).find(r => r.industry === industry);
-    const names = (snapshot?.finviz_members || {})[industry] || [];
-    const body = names.length
-      ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${names.map(m => `<tr><td class="col-ticker"><a class="ticker-link" href="https://finviz.com/quote.ashx?t=${encodeURIComponent(m.t)}" target="_blank" rel="noopener noreferrer">${escapeHTML(m.t)}</a></td><td class="${Number(m['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1w'])}</td><td class="${Number(m['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1m'])}</td><td class="${Number(m['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['3m'])}</td><td class="${Number(m['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['6m'])}</td></tr>`).join('')}</tbody></table></div>`
-      : '<p class="empty">No member list for this group in this snapshot. Run fetch_finviz_groups.py.</p>';
-    panel.hidden = false;
-    panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${formatSigned(row?.median)} over ${escapeHTML(flowMeta[frame]?.label || frame)} · ${names.length} name${names.length === 1 ? '' : 's'}, best week first</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div>${body}`;
+  const { basket, frame } = openBasket;
+  const row = basketRows(snapshot, frame).find(r => r.basket === basket);
+  // Members arrive ranked by the week; the cut is a share of the whole basket.
+  const all = basketNames(snapshot, basket);
+  const keep = topCount(all.length);
+  const names = all.slice(0, keep);
+  const body = names.length
+    ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${names.map(m => `<tr><td class="col-ticker"><a class="ticker-link" href="https://finviz.com/quote.ashx?t=${encodeURIComponent(m.t)}" target="_blank" rel="noopener noreferrer">${escapeHTML(m.t)}</a></td><td class="${Number(m['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1w'])}</td><td class="${Number(m['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1m'])}</td><td class="${Number(m['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['3m'])}</td><td class="${Number(m['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['6m'])}</td></tr>`).join('')}</tbody></table></div>`
+    : '<p class="empty">No member performance for this theme in this snapshot. Re-run the scanner.</p>';
+  const heading = names.length
+    ? `${basket} · ${formatSigned(row?.median)} over ${flowMeta[frame]?.label || frame} · top ${keep} of ${all.length} by week`
+    : basket;
+  panel.hidden = false;
+  panel.innerHTML = `<div class="detail-panel__head"><h3>${escapeHTML(heading)}</h3><button id="close-basket" class="btn btn--ghost" type="button">Close</button></div>${body}`;
+}
+function renderBasketTrend(frame, svg) {
+  if (!svg) return;
+  const legend = document.getElementById(`trend-legend-${frame}`);
+  const active = history.filter(d => d.basket_perf?.[frame]?.length);
+  const leaders = basketRows(currentSnapshot(), frame).slice(0, 5).map(row => row.basket);
+  if (legend) legend.innerHTML = leaders.map((name, index) => `<span class="trend-legend__item"><span class="trend-legend__swatch" style="background:${rankColors[index % rankColors.length]}"></span>${escapeHTML(name)}</span>`).join('');
+  if (active.length < 2) {
+    svg.removeAttribute('viewBox');
+    svg.innerHTML = `<text x="16" y="42" fill="var(--color-muted)" font-size="13">${active.length ? 'One snapshot so far. The line starts once tomorrow&#39;s scan lands.' : 'No basket history yet.'}</text>`;
     return;
   }
-  const members = (snapshot?.members || [])
-    .filter(row => String(row.i || '').trim() === industry)
-    .sort((a, b) => (Number(b[frame]) || -Infinity) - (Number(a[frame]) || -Infinity));
-  const label = flowMeta[frame]?.label || frame;
-  const body = members.length
-    ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${members.map(row => `<tr><td class="col-ticker"><a class="ticker-link" href="${escapeHTML(memberChartUrl(row))}" target="_blank" rel="noopener noreferrer">${escapeHTML(row.n)}</a></td><td class="${Number(row['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['1w'])}</td><td class="${Number(row['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['1m'])}</td><td class="${Number(row['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['3m'])}</td><td class="${Number(row['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(row['6m'])}</td></tr>`).join('')}</tbody></table></div>`
-    : '<p class="empty">No eligible names in this industry for this snapshot. The ranking above can include stocks that fail the liquidity filters.</p>';
-  panel.hidden = false;
-  panel.innerHTML = `<div class="industry-detail__head"><h3>${escapeHTML(industry)} · ${members.length} eligible name${members.length === 1 ? '' : 's'} · sorted by ${escapeHTML(label)}</h3><button id="close-industry" class="btn btn--ghost" type="button">Close</button></div>${body}`;
-}
-function setScope(scope) {
-  perfScope = scope;
-  openIndustry = null;
-  Object.keys(SCOPES).forEach(key => {
-    const button = document.getElementById(`scope-${key}`);
-    if (!button) return;
-    const available = Boolean(currentSnapshot()?.performance?.[key]);
-    const active = key === scope;
-    button.hidden = !available;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  });
-  const note = document.getElementById('scope-note');
-  if (note) note.textContent = SCOPES[scope]?.note || '';
-  render();
-}
-function renderBasketBars(current, previous, frame, container) {
-  if (!container) return;
-  const now = basketCounts(current, frame), then = basketCounts(previous, frame);
-  const rising = new Set(risingThemes(current).filter(row => row.frame === frame && row.kind === 'basket').map(row => row.industry));
-  const names = [...new Set([...Object.keys(now), ...Object.keys(then)])]
-    .sort((a, b) => (now[b]||0) - (now[a]||0) || (then[b]||0) - (then[a]||0) || a.localeCompare(b))
-    .slice(0, 8);
-  if (!names.length) { container.innerHTML = '<p class="empty">No basket members lead this window.</p>'; return; }
-  const max = Math.max(1, ...names.flatMap(n => [now[n]||0, then[n]||0]));
-  container.innerHTML = names.map((name, index) => {
+  const series = active.map(d => new Map((d.basket_perf[frame] || []).map(row => [row.basket, Number(row.median)])));
+  const values = leaders.flatMap(name => series.map(map => map.get(name)).filter(v => Number.isFinite(v)));
+  if (!values.length) { svg.innerHTML = '<text x="16" y="42" fill="var(--color-muted)" font-size="13">No history for these themes yet.</text>'; return; }
+  const width = 900, height = 300, left = 52, right = 28, top = 18, bottom = 34;
+  const lo = Math.min(0, ...values), hi = Math.max(0, ...values);
+  const pad = Math.max(1, (hi - lo) * 0.12);
+  const min = lo - pad, max = hi + pad;
+  const x = i => left + i * ((width - left - right) / Math.max(1, active.length - 1));
+  const y = value => top + (max - value) * ((height - top - bottom) / (max - min));
+  let markup = `<line x1="${left}" y1="${y(0)}" x2="${width - right}" y2="${y(0)}" stroke="var(--color-rule)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height - bottom}" stroke="var(--color-rule)"/>`;
+  for (let i = 0; i <= 4; i++) { const v = min + (max - min) * i / 4; markup += `<text x="${left - 8}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="var(--color-ink-2)">${v.toFixed(0)}%</text>`; }
+  active.forEach((d, i) => markup += `<text x="${x(i)}" y="${height - 12}" text-anchor="middle" font-size="12" fill="var(--color-ink-2)">${d.date.slice(5)}</text>`);
+  leaders.forEach((name, index) => {
     const color = rankColors[index % rankColors.length];
-    const risingClass = rising.has(name) ? ' industry--rising' : '';
-    const delta = (now[name]||0) - (then[name]||0);
-    const title = rising.has(name) ? `${name} · rising ${delta >= 0 ? '+' : ''}${delta}` : name;
-    return `<div class="bar-row"><div class="industry${risingClass}" style="color:${color}" title="${escapeHTML(title)}">${escapeHTML(name)}</div><div class="track"><div class="bar current" style="width:${(now[name]||0)/max*100}%;background:${color}" title="Selected: ${now[name]||0}"></div><div class="bar previous" style="width:${(then[name]||0)/max*100}%" title="Prior: ${then[name]||0}"></div></div><div class="value">${now[name]||0}</div></div>`;
-  }).join('');
+    const points = active.map((d, i) => { const v = series[i].get(name); return Number.isFinite(v) ? `${x(i)},${y(v)}` : null; }).filter(Boolean).join(' ');
+    if (points) markup += `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+    active.forEach((d, i) => { const v = series[i].get(name); if (!Number.isFinite(v)) return; markup += `<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${color}"><title>${escapeHTML(name)}: ${v.toFixed(2)}% on ${d.date}</title></circle>`; });
+  });
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.innerHTML = markup;
 }
 function render() {
-  const current = currentSnapshot(), index = Number(dateSelect.value), previous = history[index-1];
+  const current = currentSnapshot();
   renderRisingAlert(current);
-  leadershipSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} performance</h2><div id="bars-${frame}" class="bars"></div></section>`).join('');
-  if (basketSections) basketSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label} baskets</h2><div id="baskets-${frame}" class="bars"></div></section>`).join('');
-  Object.keys(flowMeta).forEach(frame => renderPerformanceBars(current, frame, document.getElementById(`bars-${frame}`)));
-  Object.keys(flowMeta).forEach(frame => renderBasketBars(current, previous, frame, document.getElementById(`baskets-${frame}`)));
-  renderIndustryDetail();
+  if (basketSections) basketSections.innerHTML = Object.entries(flowMeta).map(([frame, meta]) => `<section class="panel" data-frame="${frame}"><h2>${meta.label}</h2><div id="baskets-${frame}" class="bars"></div></section>`).join('');
+  if (trendSections) trendSections.innerHTML = TREND_FRAMES.map(frame => `<section class="panel" data-frame="${frame}"><h2>${flowMeta[frame]?.label || frame}</h2><svg id="trend-${frame}" role="img" aria-label="${flowMeta[frame]?.label || frame} theme performance across available snapshots"></svg><div id="trend-legend-${frame}" class="trend-legend"></div></section>`).join('');
+  Object.keys(flowMeta).forEach(frame => renderBasketBars(current, frame, document.getElementById(`baskets-${frame}`)));
+  TREND_FRAMES.forEach(frame => renderBasketTrend(frame, document.getElementById(`trend-${frame}`)));
+  renderBasketDetail();
 }
 function downloadBasketCounts() {
   const snapshot = currentSnapshot();
   if (!snapshot) return;
-  const rows = [['frame', 'basket', 'leaders']];
+  const rows = [['frame', 'basket', 'members', 'median_pct', 'mean_pct', 'momentum_leaders']];
   Object.keys(flowMeta).forEach(frame => {
-    Object.entries(basketCounts(snapshot, frame))
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .forEach(([basket, count]) => rows.push([frame, basket, String(count)]));
+    const counts = basketCounts(snapshot, frame);
+    basketRows(snapshot, frame).forEach(row => rows.push([
+      frame, row.basket, String(row.members), row.median.toFixed(2),
+      Number(row.mean).toFixed(2), String(counts[row.basket] || 0),
+    ]));
   });
   const csv = rows.map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\n') + '\n';
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -1399,27 +1374,29 @@ async function downloadPageImage() {
     const link = document.createElement('a'); link.download = `industry-themes-${currentSnapshot().date}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   } finally { downloadButton.disabled = false; downloadButton.dataset.state = ''; downloadButton.textContent = 'Snap <GO>'; }
 }
-function toggleIndustry(industry, frame) {
-  openIndustry = (openIndustry && openIndustry.industry === industry && openIndustry.frame === frame)
+function repaintBaskets() {
+  const snapshot = currentSnapshot();
+  Object.keys(flowMeta).forEach(key => renderBasketBars(snapshot, key, document.getElementById(`baskets-${key}`)));
+}
+function toggleBasket(basket, frame) {
+  openBasket = (openBasket && openBasket.basket === basket && openBasket.frame === frame)
     ? null
-    : { industry, frame };
-  Object.keys(flowMeta).forEach(key => renderPerformanceBars(currentSnapshot(), key, document.getElementById(`bars-${key}`)));
-  renderIndustryDetail();
-  if (openIndustry) document.getElementById('industry-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    : { basket, frame };
+  repaintBaskets();
+  renderBasketDetail();
+  if (openBasket) document.getElementById('basket-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 document.addEventListener('keydown', event => {
   if (event.key !== 'Enter' && event.key !== ' ') return;
   const row = event.target.closest?.('.perf-row');
   if (!row) return;
   event.preventDefault();
-  toggleIndustry(row.dataset.industry, row.dataset.frame);
+  toggleBasket(row.dataset.basket, row.dataset.frame);
 });
 document.addEventListener('click', event => {
-  const scopeButton = event.target.closest('.scope-toggle .btn');
-  if (scopeButton) { setScope(scopeButton.id.replace('scope-', '')); return; }
-  if (event.target.closest('#close-industry')) { openIndustry = null; Object.keys(flowMeta).forEach(key => renderPerformanceBars(currentSnapshot(), key, document.getElementById(`bars-${key}`))); renderIndustryDetail(); return; }
+  if (event.target.closest('#close-basket')) { openBasket = null; repaintBaskets(); renderBasketDetail(); return; }
   const perfRow = event.target.closest('.perf-row');
-  if (perfRow) { toggleIndustry(perfRow.dataset.industry, perfRow.dataset.frame); return; }
+  if (perfRow) { toggleBasket(perfRow.dataset.basket, perfRow.dataset.frame); return; }
   const nav = event.target.closest('.bbg-keys a[href^="#"], a.wordmark[href^="#"]');
   if (nav) {
     const href = nav.getAttribute('href');
@@ -1439,14 +1416,14 @@ document.addEventListener('click', event => {
   window.open(href, '_blank', 'noopener,noreferrer');
 });
 document.addEventListener('keydown', event => {
-  const map = { F1: '#thematic-title', F2: '#baskets-title', F3: '#qotd' };
+  const map = { F1: '#baskets-title', F2: '#trend-title', F3: '#qotd' };
   const href = map[event.key];
   if (!href) return;
   event.preventDefault();
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 // The bars size themselves with CSS percentages, so a resize needs no redraw.
-if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', () => setScope(currentSnapshot()?.performance?.[perfScope] ? perfScope : 'all')); downloadButton.addEventListener('click', downloadPageImage); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); setScope(perfScope); }
+if (!history.length) { document.querySelector('main').innerHTML = '<p class="empty">Run the scanner once to create a momentum-leader snapshot.</p>'; } else { updateDates(); tickClock(); setInterval(tickClock, 1000); dateSelect.addEventListener('change', () => { openBasket = null; render(); }); downloadButton.addEventListener('click', downloadPageImage); if (downloadBasketsButton) downloadBasketsButton.addEventListener('click', downloadBasketCounts); render(); }
 </script>
 </body>
 </html>'''

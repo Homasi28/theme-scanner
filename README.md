@@ -10,17 +10,9 @@ Chart review is still required. A rising theme is a place to look, not a trade.
 
 The desk measures leadership two different ways, because they answer different questions.
 
-**Magnitude — how did the industry do?** Every scanned stock is grouped by industry and the group's performance is summarised, the way a group screener does it. This ranks *all* industries, including ones holding no standout name, so a broad quiet grind higher is still visible. Median is the headline number: one +280% stock would otherwise carry a whole industry on the mean.
+**Magnitude — how did the theme do?** Every member of a theme basket is looked up in the scan and the basket's performance is summarised. This ranks themes whether or not they hold a standout name, so a broad quiet grind higher is still visible. Median is the headline number: one +280% stock would otherwise carry a whole theme on the mean.
 
-This comes in three scopes, switchable on the dashboard:
-
-| Scope | Source | Why |
-| --- | --- | --- |
-| **Finviz groups** | Finviz's published group table | Their taxonomy keeps thematic groups whole |
-| **All stocks** | every scanned stock, by TradingView industry | Always available, no scraping |
-| **Liquid only** | just the names passing the filters | Removes microcap noise |
-
-Finviz is preferred when present because TradingView's taxonomy splits groups in ways that hide a move. Lam Research and Applied Materials sit in **Industrial Machinery** next to pumps and conveyors, so a semicap rally averages away to +1.8%; Finviz keeps those names together in "Semiconductor Equipment & Materials" and shows +11.9%. Selecting a Finviz group opens its constituents on Finviz, since those members come from their classification rather than ours.
+Selecting a theme lists its **top 10% of members by weekly performance**, with a floor of 3 names so small baskets still say something. The `Theme Trend` section charts the median over time for the leading themes, on the 1-week and 1-month windows only — the longer windows move too slowly for a day-over-day line to be informative.
 
 **Breadth — how many standout names does it hold?** The original signal. The universe is cut to momentum leaders, those leaders are counted by industry, and the counts are compared against the previous snapshot. Breadth is what produces the `RISING` / `KICKOFF` alerts.
 
@@ -82,8 +74,9 @@ Useful flags: `--top-pct` changes the share taken from each performance ranking 
 
 In `outputs/`:
 
-- `finviz_groups_<date>.csv` — Finviz's 144 industry groups and their published performance, when a local run fetched it
-- `industry_performance_<date>.csv` — every TradingView industry ranked by member performance, both scopes, all four windows
+- `basket_performance_<date>.csv` — each theme's member count, median, and mean, per window
+- `basket_members_<date>.csv` — every theme member found in the scan, with its performance
+- `industry_performance_<date>.csv` — every TradingView industry ranked by member performance, both scopes, all four windows (kept as data; the dashboard no longer shows it)
 - `momentum_leaders_<date>.csv` — the leader list every theme count is built from
 - `filtered_universe_<date>.csv` — every name passing the liquidity, ADR%, and industry filters; also the source for the dashboard drill-down
 - `rising_themes_<date>.csv` — the flagged themes, with prior and current counts
@@ -101,23 +94,17 @@ Keep the prior daily CSVs. Rising-theme detection is a day-over-day comparison, 
 
 Each run regenerates `industry_flow_dashboard.html` and an identical `index.html` for GitHub Pages. Open either in a browser. It has no build step and no runtime dependency beyond one CDN script for PNG export.
 
-- **F1 Themes** — industries ranked by performance across the 1-week, 1-month, 3-month, and 6-month windows, with a trend chart per window and a "Do not miss" banner when breadth is expanding. Toggle between **All stocks** and **Liquid only**, and select any industry to see the eligible names inside it.
-- **F2 LL** — the full leader table per window, with leading-theme names boxed and rising-theme names dashed
+- **F1 Themes** — theme baskets ranked by median member performance across the 1-week, 1-month, 3-month, and 6-month windows, with a "Do not miss" banner when breadth is expanding. Select a theme to see its top 10% of names by week.
+- **F2 Trend** — median performance over time for the leading themes, 1-week and 1-month
 - **F3 Quote** — a daily Livermore line from *Reminiscences of a Stock Operator* (1923, public domain)
 
-Below the ranking, **Theme Baskets** shows the same breadth count for the named ticker themes.
+The trend needs at least two snapshots carrying basket data, so it starts filling in the day after the first run.
 
 Per-symbol notes are saved in the browser's local storage. Ticker symbols open TradingView daily charts in a new tab.
 
 ## Automation
 
-Finviz group performance is fetched separately, because it needs a browser and a residential IP:
-
-```bash
-python fetch_finviz_groups.py
-```
-
-`scripts/run_after_close.py` runs it automatically before each local scan, and treats failure as non-fatal — the dashboard simply falls back to the TradingView ranking. **A GitHub Actions run will not have it**, so the Finviz scope only appears on days the scan ran from your Mac.
+`fetch_finviz_groups.py` still exists for pulling Finviz's 144 industry groups and their constituents, but nothing in the dashboard reads it now that the desk is themes-only. It is no longer part of the scheduled run; use it by hand if you want that data.
 
 **GitHub Actions** — `.github/workflows/daily-scan.yml` runs after the US close, commits the refreshed CSVs and dashboard, and needs no secrets beyond the default `GITHUB_TOKEN`. For Pages, enable it on the `main` branch with `/ (root)` as the source; the dashboard's canonical URL is set to `https://homasi28.github.io/theme-scanner/`, so update the meta tags in `industry_flow_dashboard.py` if you publish somewhere else.
 

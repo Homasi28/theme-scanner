@@ -3,7 +3,14 @@ from datetime import date
 
 import pandas as pd
 
-from theme_scan import Settings, annotate_display, calculate_leaders, tradingview_url
+from theme_scan import (
+    Settings,
+    annotate_display,
+    basket_members,
+    basket_performance,
+    calculate_leaders,
+    tradingview_url,
+)
 
 
 def _row(**overrides):
@@ -102,6 +109,44 @@ class CalculateLeadersTests(unittest.TestCase):
         universe, leaders = calculate_leaders(raw, Settings(top_pct=1))
         self.assertTrue(universe.empty)
         self.assertTrue(leaders.empty)
+
+
+class BasketTests(unittest.TestCase):
+    def _universe(self):
+        return pd.DataFrame([
+            _row(name="AAA", **{"Perf.W": 10, "Perf.1M": 20}),
+            _row(name="BBB", **{"Perf.W": -4, "Perf.1M": 5}),
+            _row(name="CCC", **{"Perf.W": 2, "Perf.1M": 1}),
+            _row(name="ILLIQ", average_volume_10d_calc=1, **{"Perf.W": 99, "Perf.1M": 99}),
+        ])
+
+    def test_members_come_from_the_whole_scan_not_the_filtered_universe(self):
+        """A basket name that fails the momentum filters still belongs to the theme."""
+        members = basket_members(self._universe(), {"Test": frozenset({"AAA", "ILLIQ"})})
+        self.assertEqual(set(members.ticker), {"AAA", "ILLIQ"})
+
+    def test_unlisted_and_etf_entries_are_simply_absent(self):
+        members = basket_members(self._universe(), {"Test": frozenset({"AAA", "SPY"})})
+        self.assertEqual(list(members.ticker), ["AAA"])
+
+    def test_a_ticker_can_belong_to_several_baskets(self):
+        members = basket_members(
+            self._universe(),
+            {"One": frozenset({"AAA", "BBB"}), "Two": frozenset({"AAA"})},
+        )
+        self.assertEqual(sorted(members.loc[members.ticker == "AAA", "basket"]), ["One", "Two"])
+
+    def test_performance_summarises_each_basket_per_window(self):
+        members = basket_members(self._universe(), {"Test": frozenset({"AAA", "BBB", "CCC"})})
+        perf = basket_performance(members).set_index("window")
+        self.assertEqual(perf.loc["1w", "members"], 3)
+        self.assertEqual(perf.loc["1w", "median_pct"], 2.0)   # -4, 2, 10
+        self.assertAlmostEqual(perf.loc["1w", "mean_pct"], 2.67, places=2)
+
+    def test_empty_inputs_are_safe(self):
+        self.assertTrue(basket_members(pd.DataFrame(), {"Test": frozenset({"AAA"})}).empty)
+        self.assertTrue(basket_members(self._universe(), {}).empty)
+        self.assertTrue(basket_performance(pd.DataFrame()).empty)
 
 
 class AnnotateDisplayTests(unittest.TestCase):
