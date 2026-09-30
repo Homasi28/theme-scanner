@@ -472,11 +472,15 @@ def write_dashboard(output_dir: Path) -> Path:
     write_rising_theme_csvs(output_dir, history)
     dashboard = Path("industry_flow_dashboard.html")
     pages_entrypoint = Path("index.html")
+    # Only offer snapshots the themes-only desk can actually draw. Snapshots
+    # predating the basket outputs still feed the CSVs above, but putting them
+    # in the date picker would just serve empty panels.
+    usable = [snapshot for snapshot in history if snapshot.get("basket_perf")] or history
     # `liquid` is the full leader list. The CSV exports above need it, the page
     # does not, and it is the single largest thing in the payload.
     browser_history = [
         {key: value for key, value in snapshot.items() if key != "liquid"}
-        for snapshot in history
+        for snapshot in usable
     ]
     payload = json.dumps(browser_history, separators=(",", ":"))
     quotes_payload = json.dumps(LIVERMORE_QUOTES, ensure_ascii=False, separators=(",", ":"))
