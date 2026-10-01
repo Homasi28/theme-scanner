@@ -436,7 +436,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-adr-pct", type=float, default=4.0, help="Minimum TradingView ADR%% (default: 4).")
     parser.add_argument("--top-pct", type=float, default=0.05, help="Top share from each 1-, 3-, and 6-month ranking before deduplication (default: 0.05).")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs"), help="CSV output directory.")
-    parser.add_argument("--snapshot-date", type=date.fromisoformat, help="Date to use in output filenames (YYYY-MM-DD).")
+    parser.add_argument(
+        "--snapshot-date",
+        type=date.fromisoformat,
+        help="Output stamp (YYYY-MM-DD). Defaults to today, but the scheduler "
+             "stamps the NEXT NYSE session, so a bare post-close run here will "
+             "land on a different date than the automated one.",
+    )
     return parser.parse_args()
 
 
