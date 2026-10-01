@@ -10,9 +10,11 @@ Chart review is still required. A rising theme is a place to look, not a trade.
 
 The desk measures leadership two different ways, because they answer different questions.
 
-**Magnitude — how did the theme do?** Every member of a theme basket is looked up in the scan and the basket's performance is summarised. This ranks themes whether or not they hold a standout name, so a broad quiet grind higher is still visible. Median is the headline number: one +280% stock would otherwise carry a whole theme on the mean.
+**Magnitude — where are the movers?** Every member of a theme is looked up in the scan, and each theme is ranked by the **median of its top 10%**: how hard its best names are actually moving. The floor is 3 names, so a 16-member theme still reports something.
 
-Selecting a theme lists its **top 10% of members by weekly performance**, with a floor of 3 names so small baskets still say something. The `Theme Trend` section charts the median over time for the leading themes, on the 1-week and 1-month windows only — the longer windows move too slowly for a day-over-day line to be informative.
+This is deliberately *not* a whole-basket median. Themes whose strength is concentrated would disappear under one. On 30 Sep, Healthcare & Biotech led every theme with a top-decile median of **+14.0%** and 10 names up more than 5% — while its whole-basket median was **−1.6%**, because 60 of its 76 members were flat or falling. A plain median ranked it 9th and hid the market's best movers. The whole-basket median is still computed and shown on hover.
+
+Selecting a theme lists exactly that top slice, ranked by whichever window you clicked. The `Theme Trend` section charts the same top-decile figure over time, on the 1-week and 1-month windows only — the longer windows move too slowly for a day-over-day line to be informative.
 
 **Breadth — how many standout names does it hold?** The original signal. The universe is cut to momentum leaders, those leaders are counted by industry, and the counts are compared against the previous snapshot. Breadth is what produces the `RISING` / `KICKOFF` alerts.
 
@@ -74,7 +76,7 @@ Useful flags: `--top-pct` changes the share taken from each performance ranking 
 
 In `outputs/`:
 
-- `basket_performance_<date>.csv` — each theme's member count, median, and mean, per window
+- `basket_performance_<date>.csv` — per theme and window: member count, top-decile size and median, count of names up over 5%, plus whole-basket median and mean
 - `basket_members_<date>.csv` — every theme member found in the scan, with its performance
 - `industry_performance_<date>.csv` — every TradingView industry ranked by member performance, both scopes, all four windows (kept as data; the dashboard no longer shows it)
 - `momentum_leaders_<date>.csv` — the leader list every theme count is built from
@@ -94,7 +96,7 @@ Keep the prior daily CSVs. Rising-theme detection is a day-over-day comparison, 
 
 Each run regenerates `industry_flow_dashboard.html` and an identical `index.html` for GitHub Pages. Open either in a browser. It has no build step and no runtime dependency beyond one CDN script for PNG export.
 
-- **F1 Themes** — theme baskets ranked by median member performance across the 1-week, 1-month, 3-month, and 6-month windows, with a "Do not miss" banner when breadth is expanding. Select a theme to see its top 10% of names by week.
+- **F1 Themes** — themes ranked by their top decile across the 1-week, 1-month, 3-month, and 6-month windows, with a "Do not miss" banner when breadth is expanding. Select a theme to see those names.
 - **F2 Trend** — median performance over time for the leading themes, 1-week and 1-month
 - **F3 Quote** — a daily Livermore line from *Reminiscences of a Stock Operator* (1923, public domain)
 

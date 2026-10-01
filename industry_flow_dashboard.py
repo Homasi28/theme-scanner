@@ -179,7 +179,10 @@ def _basket_performance_records(path: Path) -> dict[str, list[dict]]:
     if not path.exists():
         return {}
     frame = pd.read_csv(path)
-    if frame.empty or "basket" not in frame.columns:
+    required = {"basket", "window", "top_pct", "top_n", "movers"}
+    # Snapshots written before the movers metric existed lack these columns.
+    # Skipping them keeps a stale file from breaking the whole scan.
+    if frame.empty or not required.issubset(frame.columns):
         return {}
     out: dict[str, list[dict]] = {}
     for window, group in frame.groupby("window"):
@@ -187,10 +190,13 @@ def _basket_performance_records(path: Path) -> dict[str, list[dict]]:
             {
                 "basket": str(row.basket),
                 "members": int(row.members),
+                "topN": int(row.top_n),
+                "top": float(row.top_pct),
                 "median": float(row.median_pct),
                 "mean": float(row.mean_pct),
+                "movers": int(row.movers),
             }
-            for row in group.sort_values("median_pct", ascending=False).itertuples()
+            for row in group.sort_values("top_pct", ascending=False).itertuples()
         ]
     return out
 
@@ -1152,7 +1158,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
       <h1 id="baskets-title" class="dashboard-title">Theme Baskets</h1>
       <button id="download-baskets" class="btn btn--ghost" type="button">Export Baskets</button>
     </div>
-    <p class="lede">Named themes from Finviz's classification, ranked by median member performance. Pick a theme to see its strongest names. Edit <code>theme_baskets.json</code> to change one.</p>
+    <p class="lede">Finviz themes ranked by where the movers are: the median of each theme's top 10%. Pick a theme to see those names. Hover a bar for the whole-basket median. Edit <code>theme_baskets.json</code> to change one.</p>
     <div id="rising-theme-alert" class="rising-alert" hidden role="status" aria-live="polite"></div>
     <div id="basket-sections" class="window-sections"></div>
     <div id="basket-detail" class="detail-panel" hidden aria-live="polite"></div>
@@ -1161,7 +1167,7 @@ tbody tr:nth-child(even) { background: color-mix(in oklch, var(--color-paper-2) 
     <div class="section-heading">
       <h2 id="trend-title">Theme Trend</h2>
     </div>
-    <p class="lede">Median performance of the leading themes across saved snapshots.</p>
+    <p class="lede">How hard each leading theme's movers are moving, across saved snapshots.</p>
     <div id="trend-sections" class="window-sections window-sections--pair"></div>
   </section>
   <section id="qotd" class="rules" aria-label="Quote of the day">
@@ -1282,15 +1288,15 @@ function renderBasketBars(current, frame, container) {
   if (!rows.length) { container.innerHTML = '<p class="empty">No basket performance for this snapshot. Re-run the scanner.</p>'; return; }
   const counts = basketCounts(current, frame);
   const rising = new Set(risingThemes(current).filter(row => row.frame === frame && row.kind === 'basket').map(row => row.industry));
-  const max = Math.max(1, ...rows.map(row => Math.abs(Number(row.median) || 0)));
+  const max = Math.max(1, ...rows.map(row => Math.abs(Number(row.top) || 0)));
   container.innerHTML = rows.map((row, index) => {
     const color = rankColors[index % rankColors.length];
-    const value = Number(row.median) || 0;
+    const value = Number(row.top) || 0;
     const up = value >= 0;
     const selected = openBasket && openBasket.basket === row.basket && openBasket.frame === frame;
     const risingClass = rising.has(row.basket) ? ' industry--rising' : '';
     const leaders = counts[row.basket] || 0;
-    const title = `${row.basket} · ${row.members} members · median ${value.toFixed(2)}% · mean ${Number(row.mean).toFixed(2)}%${leaders ? ` · ${leaders} momentum leader${leaders === 1 ? '' : 's'}` : ''}`;
+    const title = `${row.basket} · top ${row.topN} of ${row.members} median ${value.toFixed(2)}% · ${row.movers} name${row.movers === 1 ? '' : 's'} up over 5% · whole-basket median ${Number(row.median).toFixed(2)}%${leaders ? ` · ${leaders} momentum leader${leaders === 1 ? '' : 's'}` : ''}`;
     return `<div class="bar-row perf-row" role="button" tabindex="0" aria-selected="${selected ? 'true' : 'false'}" data-basket="${escapeHTML(row.basket)}" data-frame="${escapeHTML(frame)}" title="${escapeHTML(title)}"><div class="industry${risingClass}" style="color:${color}">${escapeHTML(row.basket)}</div><div class="track"><div class="bar current ${up ? '' : 'bar--down'}" style="width:${Math.abs(value) / max * 100}%;background:${color}"></div></div><div class="value ${up ? 'tick-up' : 'tick-down'}">${formatSigned(value)}</div></div>`;
   }).join('');
 }
@@ -1301,15 +1307,17 @@ function renderBasketDetail() {
   const snapshot = currentSnapshot();
   const { basket, frame } = openBasket;
   const row = basketRows(snapshot, frame).find(r => r.basket === basket);
-  // Members arrive ranked by the week; the cut is a share of the whole basket.
-  const all = basketNames(snapshot, basket);
+  // Rank by whichever window was clicked, so the table and the bar agree.
+  const all = basketNames(snapshot, basket)
+    .slice()
+    .sort((a, b) => (Number(b[frame]) ?? -Infinity) - (Number(a[frame]) ?? -Infinity));
   const keep = topCount(all.length);
   const names = all.slice(0, keep);
   const body = names.length
     ? `<div class="table-wrap scrollable-table"><table><thead><tr><th>Symbol</th><th>1 week</th><th>1 month</th><th>3 months</th><th>6 months</th></tr></thead><tbody>${names.map(m => `<tr><td class="col-ticker"><a class="ticker-link" href="https://finviz.com/quote.ashx?t=${encodeURIComponent(m.t)}" target="_blank" rel="noopener noreferrer">${escapeHTML(m.t)}</a></td><td class="${Number(m['1w']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1w'])}</td><td class="${Number(m['1m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['1m'])}</td><td class="${Number(m['3m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['3m'])}</td><td class="${Number(m['6m']) >= 0 ? 'tick-up' : 'tick-down'}">${formatSigned(m['6m'])}</td></tr>`).join('')}</tbody></table></div>`
     : '<p class="empty">No member performance for this theme in this snapshot. Re-run the scanner.</p>';
   const heading = names.length
-    ? `${basket} · ${formatSigned(row?.median)} over ${flowMeta[frame]?.label || frame} · top ${keep} of ${all.length} by week`
+    ? `${basket} · top ${keep} of ${all.length} by ${flowMeta[frame]?.label || frame} · median ${formatSigned(row?.top)} · whole basket ${formatSigned(row?.median)}`
     : basket;
   panel.hidden = false;
   panel.innerHTML = `<div class="detail-panel__head"><h3>${escapeHTML(heading)}</h3><button id="close-basket" class="btn btn--ghost" type="button">Close</button></div>${body}`;
@@ -1325,7 +1333,7 @@ function renderBasketTrend(frame, svg) {
     svg.innerHTML = `<text x="16" y="42" fill="var(--color-muted)" font-size="13">${active.length ? 'One snapshot so far. The line starts once tomorrow&#39;s scan lands.' : 'No basket history yet.'}</text>`;
     return;
   }
-  const series = active.map(d => new Map((d.basket_perf[frame] || []).map(row => [row.basket, Number(row.median)])));
+  const series = active.map(d => new Map((d.basket_perf[frame] || []).map(row => [row.basket, Number(row.top)])));
   const values = leaders.flatMap(name => series.map(map => map.get(name)).filter(v => Number.isFinite(v)));
   if (!values.length) { svg.innerHTML = '<text x="16" y="42" fill="var(--color-muted)" font-size="13">No history for these themes yet.</text>'; return; }
   const width = 900, height = 300, left = 52, right = 28, top = 18, bottom = 34;
@@ -1358,12 +1366,13 @@ function render() {
 function downloadBasketCounts() {
   const snapshot = currentSnapshot();
   if (!snapshot) return;
-  const rows = [['frame', 'basket', 'members', 'median_pct', 'mean_pct', 'momentum_leaders']];
+  const rows = [['frame', 'basket', 'members', 'top_n', 'top_pct', 'movers_over_5pct', 'median_pct', 'mean_pct', 'momentum_leaders']];
   Object.keys(flowMeta).forEach(frame => {
     const counts = basketCounts(snapshot, frame);
     basketRows(snapshot, frame).forEach(row => rows.push([
-      frame, row.basket, String(row.members), row.median.toFixed(2),
-      Number(row.mean).toFixed(2), String(counts[row.basket] || 0),
+      frame, row.basket, String(row.members), String(row.topN), row.top.toFixed(2),
+      String(row.movers), row.median.toFixed(2), Number(row.mean).toFixed(2),
+      String(counts[row.basket] || 0),
     ]));
   });
   const csv = rows.map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\n') + '\n';

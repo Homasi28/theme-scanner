@@ -9,6 +9,7 @@ from theme_scan import (
     basket_members,
     basket_performance,
     calculate_leaders,
+    top_slice,
     tradingview_url,
 )
 
@@ -142,6 +143,27 @@ class BasketTests(unittest.TestCase):
         self.assertEqual(perf.loc["1w", "members"], 3)
         self.assertEqual(perf.loc["1w", "median_pct"], 2.0)   # -4, 2, 10
         self.assertAlmostEqual(perf.loc["1w", "mean_pct"], 2.67, places=2)
+
+    def test_top_pct_measures_the_movers_not_the_typical_member(self):
+        """A theme whose strength is concentrated should still rank well."""
+        universe = pd.DataFrame(
+            [_row(name=f"UP{i}", **{"Perf.W": 20}) for i in range(3)]
+            + [_row(name=f"DN{i}", **{"Perf.W": -5}) for i in range(27)]
+        )
+        tickers = frozenset({f"UP{i}" for i in range(3)} | {f"DN{i}" for i in range(27)})
+        perf = basket_performance(basket_members(universe, {"Concentrated": tickers}))
+        week = perf.loc[perf.window == "1w"].iloc[0]
+        self.assertEqual(week["members"], 30)
+        self.assertEqual(week["top_n"], 3)        # 10% of 30
+        self.assertEqual(week["top_pct"], 20.0)   # the movers
+        self.assertEqual(week["median_pct"], -5.0)  # the typical member
+        self.assertEqual(week["movers"], 3)       # names up over 5%
+
+    def test_top_slice_floors_small_baskets(self):
+        self.assertEqual(top_slice(30), 3)
+        self.assertEqual(top_slice(79), 8)
+        self.assertEqual(top_slice(16), 3)   # 10% would be 2
+        self.assertEqual(top_slice(2), 2)    # never more than the basket holds
 
     def test_empty_inputs_are_safe(self):
         self.assertTrue(basket_members(pd.DataFrame(), {"Test": frozenset({"AAA"})}).empty)

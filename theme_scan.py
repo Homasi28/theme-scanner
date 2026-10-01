@@ -77,6 +77,11 @@ PERF_LABELS = {WEEKLY_COLUMN: "1w", "Perf.1M": "1m", "Perf.3M": "3m", "Perf.6M":
 # An industry needs this many members before its average means anything.
 MIN_INDUSTRY_MEMBERS = 3
 
+# A basket's "movers" are its top decile, floored so small baskets still
+# report something. The dashboard drill-down shows exactly this slice.
+TOP_SHARE = 0.10
+TOP_MINIMUM = 3
+
 
 def fetch_universe() -> pd.DataFrame:
     """Fetch a broad US stock universe; exact liquidity filtering happens locally.
@@ -322,10 +327,25 @@ def basket_members(raw: pd.DataFrame, baskets: dict[str, frozenset[str]]) -> pd.
     return pd.DataFrame(rows, columns=["basket", "ticker", *PERF_LABELS.values()])
 
 
+COLUMNS = ["basket", "window", "members", "top_n", "top_pct", "median_pct", "mean_pct", "movers"]
+MOVER_THRESHOLD = 5.0  # percent, over the window
+
+
+def top_slice(count: int) -> int:
+    """How many names make up a basket's "top 10%", floored so it stays useful."""
+    return min(count, max(TOP_MINIMUM, ceil(count * TOP_SHARE)))
+
+
 def basket_performance(members: pd.DataFrame) -> pd.DataFrame:
-    """Summarise each basket the same way industries are summarised."""
+    """Summarise each basket, led by the strength of its best names.
+
+    `top_pct` is the headline: the median of the basket's top decile, i.e. how
+    hard its movers are actually moving. A plain median answers a different
+    question and buries themes whose strength is concentrated — Healthcare &
+    Biotech can hold the market's best movers while its typical member falls.
+    """
     if members.empty:
-        return pd.DataFrame(columns=["basket", "window", "members", "median_pct", "mean_pct"])
+        return pd.DataFrame(columns=COLUMNS)
     rows = []
     for window in PERF_LABELS.values():
         if window not in members.columns:
@@ -333,19 +353,23 @@ def basket_performance(members: pd.DataFrame) -> pd.DataFrame:
         subset = members.loc[:, ["basket", window]].dropna()
         if subset.empty:
             continue
-        grouped = subset.groupby("basket")[window].agg(["count", "median", "mean"])
-        for basket, row in grouped.iterrows():
+        for basket, group in subset.groupby("basket"):
+            values = group[window].sort_values(ascending=False)
+            keep = top_slice(len(values))
             rows.append({
                 "basket": basket,
                 "window": window,
-                "members": int(row["count"]),
-                "median_pct": round(float(row["median"]), 2),
-                "mean_pct": round(float(row["mean"]), 2),
+                "members": len(values),
+                "top_n": keep,
+                "top_pct": round(float(values.head(keep).median()), 2),
+                "median_pct": round(float(values.median()), 2),
+                "mean_pct": round(float(values.mean()), 2),
+                "movers": int((values > MOVER_THRESHOLD).sum()),
             })
-    result = pd.DataFrame(rows, columns=["basket", "window", "members", "median_pct", "mean_pct"])
+    result = pd.DataFrame(rows, columns=COLUMNS)
     if result.empty:
         return result
-    return result.sort_values(["window", "median_pct"], ascending=[True, False])
+    return result.sort_values(["window", "top_pct"], ascending=[True, False])
 
 
 def prepare_for_export(frame: pd.DataFrame) -> pd.DataFrame:
