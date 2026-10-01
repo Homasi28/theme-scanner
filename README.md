@@ -98,7 +98,7 @@ Each run regenerates `industry_flow_dashboard.html` and an identical `index.html
 
 - **F1 Themes** — themes ranked by their top decile across the 1-week, 1-month, 3-month, and 6-month windows, with a "Do not miss" banner when breadth is expanding. Select a theme to see those names.
 - **F2 Trend** — median performance over time for the leading themes, 1-week and 1-month
-- **F3 Quote** — a daily Livermore line from *Reminiscences of a Stock Operator* (1923, public domain)
+- **F3 Quote** — a daily line from the Stockbee Episodic Pivot Q&A (48 short excerpts, attributed to ZH)
 
 The trend needs at least two snapshots carrying basket data, so it starts filling in the day after the first run.
 
