@@ -1,0 +1,12 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-08,1m,industry,Semiconductors,RISING,4,5,1,
+2026-10-08,1w,industry,Packaged Software,RISING,3,6,3,
+2026-10-08,6m,cluster,Semis complex,RISING,7,8,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-10-08,3m,industry,Packaged Software,RISING,6,7,1,
+2026-10-08,1w,cluster,Semis complex,RISING,4,5,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-10-08,1w,industry,Semiconductors,RISING,3,4,1,
+2026-10-08,6m,basket,Software,RISING,2,3,1,
+2026-10-08,1w,basket,Virtual & Augmented Reality,RISING,2,3,1,
+2026-10-08,6m,industry,Computer Peripherals,RISING,1,2,1,
+2026-10-08,6m,basket,Cybersecurity,RISING,1,2,1,
+2026-10-08,1w,basket,Software,RISING,1,2,1,
