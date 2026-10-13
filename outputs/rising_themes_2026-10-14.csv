@@ -1,0 +1,16 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-14,1m,industry,Medical Specialties,RISING,2,3,1,
+2026-10-14,1m,basket,Cybersecurity,RISING,1,2,1,
+2026-10-14,1m,industry,Financial Conglomerates,RISING,1,2,1,
+2026-10-14,1m,basket,Healthcare & Biotech,RISING,1,2,1,
+2026-10-14,1w,industry,Restaurants,KICKOFF,0,3,3,
+2026-10-14,1w,basket,Artificial Intelligence,KICKOFF,1,3,2,
+2026-10-14,1w,industry,Oil Refining/Marketing,KICKOFF,0,2,2,
+2026-10-14,1w,industry,Packaged Software,RISING,6,7,1,
+2026-10-14,6m,cluster,Semis complex,RISING,5,6,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-10-14,6m,basket,Cloud Computing,RISING,4,5,1,
+2026-10-14,6m,industry,Computer Processing Hardware,RISING,1,2,1,
+2026-10-14,6m,basket,Hardware,RISING,1,2,1,
+2026-10-14,3m,industry,Pharmaceuticals: Major,RISING,1,2,1,
+2026-10-14,1w,basket,Social Media,RISING,1,2,1,
+2026-10-14,1w,basket,Virtual & Augmented Reality,RISING,1,2,1,
