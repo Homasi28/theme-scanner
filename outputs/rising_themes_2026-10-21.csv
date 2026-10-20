@@ -1,0 +1,8 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-21,1m,industry,Medical Specialties,RISING,2,3,1,
+2026-10-21,1w,industry,Packaged Software,KICKOFF,1,6,5,
+2026-10-21,1w,industry,Financial Conglomerates,KICKOFF,1,3,2,
+2026-10-21,6m,basket,Healthcare & Biotech,KICKOFF,1,3,2,
+2026-10-21,1w,basket,Cloud Computing,KICKOFF,0,2,2,
+2026-10-21,3m,industry,Packaged Software,RISING,9,10,1,
+2026-10-21,6m,industry,Medical Specialties,RISING,3,4,1,
