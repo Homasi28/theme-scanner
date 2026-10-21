@@ -1,0 +1,10 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-22,1m,industry,Packaged Software,RISING,4,5,1,
+2026-10-22,1m,industry,Pharmaceuticals: Major,RISING,2,3,1,
+2026-10-22,1w,industry,Miscellaneous Commercial Services,KICKOFF,1,3,2,
+2026-10-22,6m,industry,Packaged Software,RISING,8,11,3,
+2026-10-22,6m,basket,Cloud Computing,RISING,4,6,2,
+2026-10-22,6m,basket,Software,RISING,4,6,2,
+2026-10-22,6m,basket,Big Data,RISING,2,3,1,
+2026-10-22,6m,basket,Cybersecurity,RISING,2,3,1,
+2026-10-22,3m,industry,Pharmaceuticals: Major,RISING,1,2,1,
