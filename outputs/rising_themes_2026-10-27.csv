@@ -1,0 +1,23 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-27,1m,basket,Cybersecurity,KICKOFF,1,3,2,
+2026-10-27,1m,basket,E-Commerce,KICKOFF,0,2,2,
+2026-10-27,1m,basket,Software,RISING,2,4,2,
+2026-10-27,1w,industry,Medical Specialties,KICKOFF,0,2,2,
+2026-10-27,6m,basket,Software,RISING,9,11,2,
+2026-10-27,6m,basket,Cloud Computing,RISING,8,10,2,
+2026-10-27,6m,basket,Artificial Intelligence,RISING,5,7,2,
+2026-10-27,6m,basket,Big Data,RISING,3,5,2,
+2026-10-27,3m,basket,Cybersecurity,RISING,2,4,2,
+2026-10-27,6m,industry,Packaged Software,RISING,14,15,1,
+2026-10-27,6m,basket,Internet of Things,RISING,4,5,1,
+2026-10-27,3m,basket,Software,RISING,4,5,1,
+2026-10-27,1w,basket,Cybersecurity,RISING,2,3,1,
+2026-10-27,3m,industry,Financial Conglomerates,RISING,2,3,1,
+2026-10-27,3m,industry,Medical Specialties,RISING,2,3,1,
+2026-10-27,6m,cluster,Semis complex,RISING,2,3,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-10-27,3m,basket,Artificial Intelligence,RISING,1,2,1,
+2026-10-27,3m,industry,Computer Peripherals,RISING,1,2,1,
+2026-10-27,6m,industry,Computer Processing Hardware,RISING,1,2,1,
+2026-10-27,6m,basket,Hardware,RISING,1,2,1,
+2026-10-27,3m,basket,Healthcare & Biotech,RISING,1,2,1,
+2026-10-27,3m,cluster,Semis complex,RISING,1,2,1,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
