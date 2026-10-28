@@ -1,0 +1,161 @@
+basket,window,members,top_n,top_pct,median_pct,mean_pct,movers
+Cybersecurity,1m,20,3,49.04,9.18,13.84,13
+Biometrics,1m,26,3,40.28,5.37,5.71,14
+Software,1m,69,7,36.01,14.03,15.04,53
+Consumer Goods,1m,48,5,28.9,5.11,6.65,24
+Cloud Computing,1m,54,6,27.44,7.38,6.6,31
+E-Commerce,1m,52,6,25.38,6.43,5.58,28
+Healthcare & Biotech,1m,76,8,24.61,4.76,4.98,36
+Big Data,1m,37,4,22.8,5.05,4.42,19
+Social Media,1m,19,3,22.2,1.27,6.69,7
+Virtual & Augmented Reality,1m,23,3,22.2,-0.16,1.26,8
+Artificial Intelligence,1m,79,8,18.88,1.02,-0.31,30
+Industrial Automation,1m,41,5,18.75,3.54,2.5,17
+Internet of Things,1m,44,5,18.39,2.85,1.94,18
+Autonomous Systems,1m,43,5,18.35,-1.78,-3.02,12
+Smart Home,1m,29,3,18.05,-0.06,-2.08,8
+Fintech,1m,43,5,17.74,3.03,0.38,15
+Defense & Aerospace,1m,36,4,17.34,-2.57,-3.16,10
+Education Technology,1m,19,3,16.1,3.25,4.03,8
+Electric Vehicles,1m,46,5,15.77,-6.27,-5.7,10
+Telecommunications,1m,38,4,14.95,-1.69,-0.94,11
+Wearables,1m,21,3,14.38,4.77,2.72,10
+Robotics,1m,33,4,14.2,0.32,-4.1,10
+Commodities - Energy,1m,36,4,14.12,1.0,-1.93,16
+Hardware,1m,59,6,13.9,-3.08,-3.63,14
+Healthy Food & Nutrition,1m,23,3,13.87,1.56,2.15,8
+Crypto & Blockchain,1m,27,3,13.81,-0.74,-8.4,10
+Environmental Sustainability,1m,38,4,13.74,3.0,1.02,14
+Space Tech,1m,23,3,13.51,-8.45,-8.06,6
+Energy - Traditional,1m,53,6,13.45,4.52,1.53,26
+Transportation & Logistics,1m,63,7,13.29,-1.84,-1.92,16
+Real Estate & REITs,1m,57,6,12.39,-1.09,-0.41,10
+Agriculture & Food Tech,1m,32,4,11.45,-6.23,-10.09,5
+Aging Population & Longevity,1m,30,3,11.15,0.41,0.43,8
+Energy - Renewable,1m,63,7,10.32,-4.86,-6.23,14
+Semiconductors,1m,39,4,9.96,-8.62,-9.51,5
+Nanotechnology,1m,42,5,9.82,-2.71,-4.86,11
+Commodities - Agriculture,1m,24,3,9.13,-4.5,-6.47,2
+Commodities - Metals,1m,42,5,8.7,-8.97,-9.99,3
+Digital Entertainment,1m,35,4,8.12,-3.79,-3.76,5
+Quantum Computing,1m,16,3,5.05,-7.26,-11.66,2
+Cybersecurity,1w,20,3,23.97,11.25,9.48,12
+Electric Vehicles,1w,46,5,21.38,1.46,3.51,13
+Healthcare & Biotech,1w,76,8,16.91,2.59,3.52,28
+Space Tech,1w,23,3,15.88,4.45,5.13,11
+Internet of Things,1w,44,5,15.49,3.08,3.94,13
+Software,1w,69,7,15.49,2.01,3.06,22
+Cloud Computing,1w,54,6,15.33,2.55,3.6,20
+Biometrics,1w,26,3,15.1,3.43,5.05,10
+Artificial Intelligence,1w,79,8,15.02,1.31,1.95,22
+Telecommunications,1w,38,4,14.84,2.1,2.9,9
+Defense & Aerospace,1w,36,4,13.81,3.28,2.58,13
+Consumer Goods,1w,48,5,12.67,-0.53,0.05,8
+Autonomous Systems,1w,43,5,11.82,2.65,2.26,11
+Virtual & Augmented Reality,1w,23,3,11.43,0.87,1.35,5
+Fintech,1w,43,5,10.8,-1.39,-2.01,3
+Smart Home,1w,29,3,10.71,0.3,-0.17,6
+Wearables,1w,21,3,9.87,1.32,1.38,6
+Commodities - Energy,1w,36,4,9.72,2.34,1.47,7
+Industrial Automation,1w,41,5,9.39,2.14,1.79,8
+Semiconductors,1w,39,4,9.39,1.88,0.9,11
+Energy - Renewable,1w,63,7,9.26,0.21,-0.58,10
+Hardware,1w,59,6,9.13,2.25,1.76,10
+Robotics,1w,33,4,9.04,1.64,0.75,7
+Nanotechnology,1w,42,5,8.7,0.64,0.37,11
+Crypto & Blockchain,1w,27,3,8.58,-1.03,-0.64,2
+Environmental Sustainability,1w,38,4,8.38,0.92,0.18,3
+Transportation & Logistics,1w,63,7,8.22,0.89,0.75,14
+Aging Population & Longevity,1w,30,3,7.94,-0.41,-0.9,4
+Big Data,1w,37,4,7.88,1.33,1.46,8
+Digital Entertainment,1w,35,4,7.0,-1.28,-0.61,5
+Quantum Computing,1w,16,3,6.91,2.13,2.18,3
+Agriculture & Food Tech,1w,32,4,5.94,-2.1,-1.81,2
+Energy - Traditional,1w,53,6,5.73,1.47,0.48,3
+E-Commerce,1w,52,6,5.72,-1.98,-1.45,4
+Commodities - Metals,1w,42,5,5.33,-1.23,-0.85,4
+Commodities - Agriculture,1w,24,3,4.5,-2.63,-2.8,1
+Real Estate & REITs,1w,57,6,3.04,-0.35,-0.72,1
+Education Technology,1w,19,3,2.29,-2.29,-1.98,1
+Healthy Food & Nutrition,1w,23,3,2.23,-2.08,-1.75,0
+Social Media,1w,19,3,2.08,-4.2,-4.18,1
+Healthcare & Biotech,3m,76,8,90.03,10.25,17.91,48
+Cybersecurity,3m,20,3,74.87,25.49,33.14,16
+Software,3m,69,7,74.87,17.64,25.54,52
+Cloud Computing,3m,54,6,70.32,20.27,23.5,41
+Biometrics,3m,26,3,62.46,3.85,5.4,12
+Internet of Things,3m,44,5,62.46,12.13,14.41,31
+Big Data,3m,37,4,57.56,13.28,14.96,25
+Artificial Intelligence,3m,79,8,46.58,9.48,10.84,44
+Telecommunications,3m,38,4,41.66,6.58,6.98,20
+Virtual & Augmented Reality,3m,23,3,38.08,12.33,12.87,16
+Agriculture & Food Tech,3m,32,4,37.97,-7.62,-8.41,5
+Hardware,3m,59,6,36.16,10.43,7.61,30
+Robotics,3m,33,4,34.72,-0.94,-0.37,11
+Semiconductors,3m,39,4,34.62,1.74,3.36,18
+Energy - Traditional,3m,53,6,34.08,-0.14,2.75,22
+Crypto & Blockchain,3m,27,3,33.77,0.57,-3.03,12
+Autonomous Systems,3m,43,5,33.54,-5.8,0.9,15
+Electric Vehicles,3m,46,5,33.54,-8.72,-5.99,9
+Nanotechnology,3m,42,5,33.54,-0.74,8.3,17
+Consumer Goods,3m,48,5,33.17,-4.74,-5.43,14
+E-Commerce,3m,52,6,32.64,-2.46,0.34,19
+Defense & Aerospace,3m,36,4,32.34,-8.29,-4.36,9
+Commodities - Energy,3m,36,4,29.67,2.69,1.51,16
+Industrial Automation,3m,41,5,28.16,3.2,5.02,19
+Social Media,3m,19,3,27.62,9.11,7.35,12
+Space Tech,3m,23,3,26.13,-0.86,-1.88,9
+Energy - Renewable,3m,63,7,23.63,-8.12,-8.68,10
+Commodities - Agriculture,3m,24,3,22.88,-8.71,-9.27,2
+Commodities - Metals,3m,42,5,22.72,-0.71,-2.72,13
+Digital Entertainment,3m,35,4,21.82,-4.1,-6.9,12
+Education Technology,3m,19,3,21.64,-6.58,-6.89,4
+Quantum Computing,3m,16,3,21.26,9.29,2.59,9
+Smart Home,3m,29,3,21.26,-6.0,-5.8,8
+Transportation & Logistics,3m,63,7,19.69,-7.55,-7.79,12
+Aging Population & Longevity,3m,30,3,18.58,-2.42,-4.28,11
+Fintech,3m,43,5,17.84,-1.48,-3.9,10
+Wearables,3m,21,3,17.38,3.22,0.64,9
+Environmental Sustainability,3m,38,4,12.49,-3.58,-4.31,7
+Healthy Food & Nutrition,3m,23,3,9.11,-5.32,-7.54,7
+Real Estate & REITs,3m,57,6,8.23,-11.89,-10.97,4
+Cybersecurity,6m,20,3,190.79,80.44,75.78,17
+Healthcare & Biotech,6m,76,8,156.97,22.84,37.6,52
+Software,6m,69,7,154.0,32.89,45.9,51
+Cloud Computing,6m,54,6,152.76,45.16,52.65,41
+Big Data,6m,37,4,129.53,20.21,32.46,22
+Internet of Things,6m,44,5,128.95,17.25,29.47,29
+Artificial Intelligence,6m,79,8,125.67,6.82,21.66,42
+Hardware,6m,59,6,99.34,7.01,10.71,32
+Industrial Automation,6m,41,5,91.64,5.23,14.58,21
+Consumer Goods,6m,48,5,71.26,-5.85,-3.08,17
+Autonomous Systems,6m,43,5,64.39,-4.13,-1.97,17
+Nanotechnology,6m,42,5,64.39,6.25,12.97,22
+E-Commerce,6m,52,6,62.32,-2.97,1.73,18
+Semiconductors,6m,39,4,59.7,-5.1,-2.35,11
+Virtual & Augmented Reality,6m,23,3,54.82,0.21,9.1,9
+Energy - Traditional,6m,53,6,54.47,-4.58,-3.63,11
+Commodities - Energy,6m,36,4,54.16,-4.64,-7.59,10
+Telecommunications,6m,38,4,53.08,-0.83,1.7,14
+Quantum Computing,6m,16,3,51.16,-3.42,-0.17,6
+Digital Entertainment,6m,35,4,48.86,-1.95,-0.59,11
+Social Media,6m,19,3,46.57,-0.36,5.59,8
+Fintech,6m,43,5,41.77,4.14,1.05,20
+Biometrics,6m,26,3,37.39,0.02,3.13,11
+Aging Population & Longevity,6m,30,3,35.76,4.71,0.85,14
+Crypto & Blockchain,6m,27,3,32.89,0.24,-3.26,13
+Transportation & Logistics,6m,63,7,31.89,-6.14,-4.57,23
+Smart Home,6m,29,3,30.85,-14.87,-12.91,7
+Education Technology,6m,19,3,30.27,1.27,-1.15,8
+Robotics,6m,33,4,29.03,-2.98,-4.71,12
+Commodities - Agriculture,6m,24,3,27.46,-16.03,-14.17,3
+Wearables,6m,21,3,27.19,-0.36,0.31,9
+Defense & Aerospace,6m,36,4,24.52,-11.95,-13.64,9
+Real Estate & REITs,6m,57,6,21.77,-5.55,-2.58,14
+Commodities - Metals,6m,42,5,20.26,-18.77,-19.41,9
+Energy - Renewable,6m,63,7,19.81,-17.6,-18.37,8
+Space Tech,6m,23,3,17.47,-7.38,-17.49,5
+Environmental Sustainability,6m,38,4,14.87,0.47,-4.61,14
+Electric Vehicles,6m,46,5,14.11,-15.51,-19.31,8
+Agriculture & Food Tech,6m,32,4,9.18,-11.33,-16.36,5
+Healthy Food & Nutrition,6m,23,3,4.67,-13.1,-16.66,1

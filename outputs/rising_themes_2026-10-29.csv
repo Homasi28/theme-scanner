@@ -1,0 +1,12 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-29,1m,industry,Packaged Software,RISING,10,11,1,
+2026-10-29,1m,basket,E-Commerce,RISING,2,3,1,
+2026-10-29,1m,basket,Consumer Goods,RISING,1,2,1,
+2026-10-29,1m,industry,Internet Retail,RISING,1,2,1,
+2026-10-29,1w,industry,Packaged Software,RISING,6,8,2,
+2026-10-29,6m,basket,Software,RISING,9,10,1,
+2026-10-29,6m,basket,Cloud Computing,RISING,8,9,1,
+2026-10-29,1w,industry,Medical Specialties,RISING,2,3,1,
+2026-10-29,1w,basket,Healthcare & Biotech,RISING,1,2,1,
+2026-10-29,1w,industry,Miscellaneous Commercial Services,RISING,1,2,1,
+2026-10-29,1w,basket,Telecommunications,RISING,1,2,1,
