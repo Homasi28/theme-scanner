@@ -1,0 +1,10 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-10-30,1m,industry,Miscellaneous Commercial Services,RISING,1,2,1,
+2026-10-30,1w,industry,Aerospace & Defense,KICKOFF,0,3,3,
+2026-10-30,1w,cluster,Semis complex,KICKOFF,0,2,2,Computer Peripherals|Computer Processing Hardware|Electronic Equipment/Instruments|Electronic Production Equipment|Electronics/Appliances|Semiconductors
+2026-10-30,3m,industry,Financial Conglomerates,RISING,3,4,1,
+2026-10-30,6m,industry,Medical Specialties,RISING,3,4,1,
+2026-10-30,6m,basket,Healthcare & Biotech,RISING,2,3,1,
+2026-10-30,1w,basket,Artificial Intelligence,RISING,1,2,1,
+2026-10-30,1w,industry,Electrical Products,RISING,1,2,1,
+2026-10-30,1w,industry,Finance/Rental/Leasing,RISING,1,2,1,
