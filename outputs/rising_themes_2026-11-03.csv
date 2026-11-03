@@ -1,0 +1,11 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-11-03,1m,industry,Pharmaceuticals: Major,KICKOFF,0,2,2,
+2026-11-03,1m,industry,Restaurants,RISING,2,3,1,
+2026-11-03,1w,industry,Restaurants,KICKOFF,1,4,3,
+2026-11-03,6m,industry,Medical/Nursing Services,KICKOFF,0,3,3,
+2026-11-03,1w,industry,Finance/Rental/Leasing,KICKOFF,1,3,2,
+2026-11-03,3m,industry,Oil Refining/Marketing,KICKOFF,0,2,2,
+2026-11-03,1w,basket,Defense & Aerospace,RISING,1,2,1,
+2026-11-03,6m,industry,Information Technology Services,RISING,1,2,1,
+2026-11-03,1w,industry,Pharmaceuticals: Major,RISING,1,2,1,
+2026-11-03,1w,industry,Specialty Stores,RISING,1,2,1,
