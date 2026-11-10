@@ -1,0 +1,11 @@
+date,frame,kind,industry,signal,prior_count,current_count,delta,members
+2026-11-10,1m,industry,Pharmaceuticals: Major,RISING,5,8,3,
+2026-11-10,1m,industry,Aerospace & Defense,RISING,2,3,1,
+2026-11-10,3m,industry,Pharmaceuticals: Major,KICKOFF,0,5,5,
+2026-11-10,1w,industry,Pharmaceuticals: Major,RISING,2,4,2,
+2026-11-10,1w,industry,Packaged Software,RISING,4,5,1,
+2026-11-10,1w,basket,E-Commerce,RISING,2,3,1,
+2026-11-10,1w,basket,Social Media,RISING,2,3,1,
+2026-11-10,1w,basket,Artificial Intelligence,RISING,1,2,1,
+2026-11-10,6m,basket,Consumer Goods,RISING,1,2,1,
+2026-11-10,1w,industry,Industrial Machinery,RISING,1,2,1,
