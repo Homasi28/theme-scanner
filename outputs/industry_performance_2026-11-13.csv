@@ -1,0 +1,741 @@
+scope,window,industry,members,median_pct,mean_pct
+all,1m,Tools & Hardware,5,24.28,9.32
+all,1m,Industrial Conglomerates,3,15.55,14.31
+all,1m,Discount Stores,3,14.21,12.64
+all,1m,Financial Publishing/Services,8,14.01,13.93
+all,1m,Home Improvement Chains,5,13.91,11.58
+all,1m,Recreational Products,24,12.17,4.94
+all,1m,Services to the Health Industry,3,11.38,7.46
+all,1m,Pulp & Paper,5,10.56,7.62
+all,1m,Hotels/Resorts/Cruise lines,20,10.36,6.18
+all,1m,Textiles,5,10.32,-14.37
+all,1m,Building Products,24,8.83,2.11
+all,1m,Railroads,6,8.59,8.71
+all,1m,Apparel/Footwear,34,8.07,6.79
+all,1m,Beverages: Alcoholic,10,7.73,0.55
+all,1m,Chemicals: Major Diversified,12,7.7,4.8
+all,1m,Beverages: Non-Alcoholic,14,7.37,17.64
+all,1m,Hospital/Nursing Management,12,7.08,9.66
+all,1m,Food: Major Diversified,8,6.43,-2.42
+all,1m,Insurance Brokers/Services,18,6.35,-0.05
+all,1m,Electronics/Appliance Stores,4,6.13,2.24
+all,1m,Household/Personal Care,20,5.8,-1.04
+all,1m,Gas Distributors,24,5.72,5.44
+all,1m,Construction Materials,15,5.44,-0.11
+all,1m,Industrial Specialties,18,5.36,0.95
+all,1m,Department Stores,4,5.14,3.28
+all,1m,Broadcasting,15,4.88,-2.49
+all,1m,Specialty Stores,66,4.18,4.06
+all,1m,Specialty Insurance,12,4.1,0.05
+all,1m,Restaurants,48,3.97,3.29
+all,1m,Forest Products,5,3.94,2.76
+all,1m,Water Utilities,11,3.75,0.48
+all,1m,Other Transportation,13,3.62,2.14
+all,1m,Property/Casualty Insurance,48,3.56,3.37
+all,1m,Airlines,18,3.49,-4.53
+all,1m,Containers/Packaging,20,2.96,-1.67
+all,1m,Investment Managers,83,2.16,-1.29
+all,1m,Electric Utilities,73,2.09,2.18
+all,1m,Savings Banks,38,1.91,2.55
+all,1m,Regional Banks,257,1.75,1.23
+all,1m,Medical Distributors,9,1.63,-6.98
+all,1m,Movies/Entertainment,43,1.63,-3.28
+all,1m,Multi-Line Insurance,52,1.12,4.12
+all,1m,Managed Health Care,8,1.03,-0.69
+all,1m,Wireless Telecommunications,16,0.76,2.31
+all,1m,Aerospace & Defense,80,0.71,-1.51
+all,1m,Major Telecommunications,15,0.69,-3.49
+all,1m,Homebuilding,23,0.64,0.91
+all,1m,Medical/Nursing Services,57,0.57,-5.43
+all,1m,Food: Meat/Fish/Dairy,8,0.5,-3.16
+all,1m,Office Equipment/Supplies,4,0.32,3.89
+all,1m,Casinos/Gaming,14,0.25,-9.24
+all,1m,Financial Conglomerates,382,0.2,-2.61
+all,1m,Life/Health Insurance,27,-0.05,-0.68
+all,1m,Major Banks,132,-0.05,0.06
+all,1m,Apparel/Footwear Retail,30,-0.11,-0.19
+all,1m,Food: Specialty/Candy,39,-0.42,-4.82
+all,1m,Tobacco,3,-0.57,1.42
+all,1m,Steel,15,-0.62,-3.52
+all,1m,Investment Trusts/Mutual Funds,101,-0.91,-1.58
+all,1m,Miscellaneous Manufacturing,12,-0.99,5.35
+all,1m,Real Estate Investment Trusts,331,-1.01,-2.44
+all,1m,Trucks/Construction/Farm Machinery,31,-1.13,-0.42
+all,1m,Oil & Gas Pipelines,30,-1.34,-2.22
+all,1m,Cable/Satellite TV,7,-1.39,-6.12
+all,1m,Finance/Rental/Leasing,129,-1.51,-1.55
+all,1m,Publishing: Newspapers,7,-1.66,-5.0
+all,1m,Information Technology Services,88,-1.81,-2.83
+all,1m,Air Freight/Couriers,28,-1.82,-5.6
+all,1m,Home Furnishings,18,-2.17,0.45
+all,1m,Internet Retail,28,-2.37,-4.1
+all,1m,Food Retail,15,-2.41,-8.61
+all,1m,Specialty Telecommunications,8,-2.68,-6.94
+all,1m,Real Estate Development,52,-2.79,-4.52
+all,1m,Chemicals: Specialty,55,-2.83,-5.23
+all,1m,Food Distributors,11,-3.33,-10.99
+all,1m,Alternative Power Generation,12,-3.43,-7.67
+all,1m,Trucking,21,-4.35,-2.1
+all,1m,Personnel Services,24,-4.9,-6.24
+all,1m,Contract Drilling,11,-4.92,-4.96
+all,1m,Commercial Printing/Forms,11,-5.05,-12.15
+all,1m,Miscellaneous Commercial Services,151,-5.05,-8.23
+all,1m,Metal Fabrication,18,-5.12,1.09
+all,1m,Integrated Oil,42,-5.2,-8.99
+all,1m,Investment Banks/Brokers,56,-5.25,-9.67
+all,1m,Medical Specialties,205,-5.32,-7.14
+all,1m,Chemicals: Agricultural,16,-5.68,-4.1
+all,1m,Wholesale Distributors,71,-6.13,-7.95
+all,1m,Electronics/Appliances,20,-6.33,-6.63
+all,1m,Internet Software/Services,79,-6.46,-6.15
+all,1m,Packaged Software,342,-6.73,-8.68
+all,1m,Publishing: Books/Magazines,5,-7.12,-10.98
+all,1m,Other Consumer Services,34,-7.32,-6.26
+all,1m,Industrial Machinery,101,-7.69,-9.62
+all,1m,Agricultural Commodities/Milling,31,-7.76,-12.62
+all,1m,Motor Vehicles,29,-7.89,-16.71
+all,1m,Advertising/Marketing Services,31,-8.01,-6.4
+all,1m,Environmental Services,17,-8.08,-4.91
+all,1m,Biotechnology,284,-8.4,-8.93
+all,1m,Auto Parts: OEM,33,-8.62,-11.22
+all,1m,Oil & Gas Production,39,-8.93,-7.32
+all,1m,Pharmaceuticals: Major,311,-8.95,-11.22
+all,1m,Marine Shipping,69,-9.19,-10.24
+all,1m,Coal,10,-9.22,-11.08
+all,1m,Semiconductors,87,-9.75,-12.9
+all,1m,Oilfield Services/Equipment,33,-9.84,-8.39
+all,1m,Telecommunications Equipment,32,-9.97,-10.51
+all,1m,Electronics Distributors,10,-10.79,-9.17
+all,1m,Aluminum,5,-11.17,-11.81
+all,1m,Automotive Aftermarket,5,-11.23,-2.2
+all,1m,Electronic Equipment/Instruments,41,-13.17,-13.68
+all,1m,Computer Communications,11,-13.92,-11.89
+all,1m,Engineering & Construction,63,-14.1,-14.67
+all,1m,Precious Metals,71,-14.83,-13.89
+all,1m,Pharmaceuticals: Other,25,-15.09,-12.15
+all,1m,Electrical Products,71,-15.87,-11.68
+all,1m,Oil Refining/Marketing,12,-16.07,-22.33
+all,1m,Electronic Components,24,-16.64,-14.7
+all,1m,Electronic Production Equipment,29,-16.77,-15.8
+all,1m,Data Processing Services,62,-16.94,-13.93
+all,1m,Other Metals/Minerals,69,-18.89,-17.09
+all,1m,Consumer Sundries,4,-21.14,-21.32
+all,1m,Computer Peripherals,21,-23.55,-21.69
+all,1m,Computer Processing Hardware,16,-26.16,-21.3
+all,1m,Miscellaneous,3,-26.98,-26.49
+all,1w,Industrial Conglomerates,3,13.35,9.14
+all,1w,Electronic Components,24,7.19,18.24
+all,1w,Semiconductors,87,6.64,4.66
+all,1w,Electronic Production Equipment,29,5.01,4.71
+all,1w,Computer Peripherals,21,2.33,1.49
+all,1w,Coal,10,2.02,2.7
+all,1w,Aerospace & Defense,80,1.97,2.94
+all,1w,Industrial Machinery,101,1.26,2.73
+all,1w,Electronics/Appliance Stores,4,1.02,7.21
+all,1w,Major Telecommunications,15,0.61,0.12
+all,1w,Oil & Gas Pipelines,30,0.28,0.07
+all,1w,Environmental Services,17,0.27,-2.0
+all,1w,Metal Fabrication,18,0.23,3.52
+all,1w,Oil & Gas Production,39,0.14,1.08
+all,1w,Financial Conglomerates,377,0.1,-0.65
+all,1w,Aluminum,5,0.09,-3.24
+all,1w,Contract Drilling,11,0.0,0.78
+all,1w,Marine Shipping,69,-0.13,-0.93
+all,1w,Gas Distributors,24,-0.14,1.39
+all,1w,Publishing: Newspapers,7,-0.15,0.93
+all,1w,Specialty Telecommunications,8,-0.21,-1.33
+all,1w,Computer Processing Hardware,16,-0.28,-1.15
+all,1w,Railroads,6,-0.3,-0.2
+all,1w,Alternative Power Generation,12,-0.32,2.47
+all,1w,Integrated Oil,42,-0.48,-1.22
+all,1w,Electronics Distributors,10,-0.77,-3.89
+all,1w,Chemicals: Major Diversified,12,-0.79,1.09
+all,1w,Oilfield Services/Equipment,33,-0.79,-0.86
+all,1w,Food Distributors,11,-0.85,-5.71
+all,1w,Trucks/Construction/Farm Machinery,31,-0.89,-0.19
+all,1w,Electronic Equipment/Instruments,41,-1.05,-0.5
+all,1w,Cable/Satellite TV,7,-1.14,-5.44
+all,1w,Medical Distributors,9,-1.14,-0.19
+all,1w,Investment Trusts/Mutual Funds,101,-1.2,-1.17
+all,1w,Property/Casualty Insurance,48,-1.24,-2.3
+all,1w,Oil Refining/Marketing,12,-1.34,-4.46
+all,1w,Movies/Entertainment,43,-1.36,-4.04
+all,1w,Chemicals: Agricultural,16,-1.38,-1.04
+all,1w,Electrical Products,71,-1.39,-3.38
+all,1w,Recreational Products,24,-1.4,-2.44
+all,1w,Tools & Hardware,5,-1.54,-2.51
+all,1w,Electric Utilities,72,-1.57,0.44
+all,1w,Computer Communications,11,-1.59,-5.62
+all,1w,Wholesale Distributors,71,-1.59,-3.84
+all,1w,Multi-Line Insurance,52,-1.61,-1.76
+all,1w,Hotels/Resorts/Cruise lines,20,-1.63,-0.55
+all,1w,Engineering & Construction,63,-1.67,-3.07
+all,1w,Casinos/Gaming,14,-1.69,-7.49
+all,1w,Electronics/Appliances,20,-1.74,-1.33
+all,1w,Data Processing Services,62,-1.8,-0.09
+all,1w,Air Freight/Couriers,28,-1.83,0.9
+all,1w,Telecommunications Equipment,32,-1.85,-1.7
+all,1w,Auto Parts: OEM,33,-1.9,-1.84
+all,1w,Miscellaneous Commercial Services,151,-2.0,-4.07
+all,1w,Pulp & Paper,5,-2.03,3.28
+all,1w,Steel,15,-2.1,-1.33
+all,1w,Real Estate Investment Trusts,330,-2.14,-3.6
+all,1w,Beverages: Non-Alcoholic,14,-2.17,3.72
+all,1w,Services to the Health Industry,3,-2.17,-7.65
+all,1w,Wireless Telecommunications,16,-2.18,-0.56
+all,1w,Airlines,18,-2.28,-4.15
+all,1w,Other Transportation,13,-2.33,-5.47
+all,1w,Specialty Insurance,12,-2.36,-2.12
+all,1w,Savings Banks,38,-2.53,-2.0
+all,1w,Life/Health Insurance,27,-2.59,-2.43
+all,1w,Regional Banks,257,-2.79,-2.61
+all,1w,Office Equipment/Supplies,4,-2.85,-2.46
+all,1w,Water Utilities,11,-2.87,-4.31
+all,1w,Household/Personal Care,20,-2.88,-6.81
+all,1w,Information Technology Services,88,-2.88,-0.7
+all,1w,Medical/Nursing Services,57,-2.91,-7.28
+all,1w,Hospital/Nursing Management,12,-2.94,-1.14
+all,1w,Building Products,24,-2.96,-4.79
+all,1w,Investment Banks/Brokers,56,-2.97,-4.47
+all,1w,Investment Managers,83,-2.98,-3.68
+all,1w,Major Banks,132,-3.01,-2.61
+all,1w,Discount Stores,3,-3.02,-3.73
+all,1w,Trucking,21,-3.13,-2.53
+all,1w,Chemicals: Specialty,55,-3.2,-2.77
+all,1w,Commercial Printing/Forms,11,-3.33,-3.23
+all,1w,Miscellaneous Manufacturing,12,-3.33,-5.42
+all,1w,Personnel Services,24,-3.36,-3.65
+all,1w,Pharmaceuticals: Major,311,-3.42,-3.54
+all,1w,Packaged Software,342,-3.44,-4.04
+all,1w,Home Improvement Chains,5,-3.45,-5.84
+all,1w,Food Retail,15,-3.57,-3.49
+all,1w,Finance/Rental/Leasing,128,-3.59,-5.13
+all,1w,Food: Specialty/Candy,39,-3.6,-5.15
+all,1w,Financial Publishing/Services,8,-3.79,-2.04
+all,1w,Advertising/Marketing Services,31,-3.88,-1.7
+all,1w,Real Estate Development,52,-3.88,-7.25
+all,1w,Biotechnology,284,-3.94,-3.78
+all,1w,Department Stores,4,-3.97,-3.31
+all,1w,Medical Specialties,205,-4.09,-5.66
+all,1w,Internet Software/Services,79,-4.1,-4.12
+all,1w,Restaurants,48,-4.1,-4.94
+all,1w,Insurance Brokers/Services,18,-4.13,-5.07
+all,1w,Apparel/Footwear,34,-4.19,-3.25
+all,1w,Industrial Specialties,18,-4.48,-6.62
+all,1w,Specialty Stores,66,-4.79,-5.29
+all,1w,Food: Meat/Fish/Dairy,8,-4.83,-8.23
+all,1w,Agricultural Commodities/Milling,31,-4.97,-7.85
+all,1w,Containers/Packaging,20,-5.03,-9.16
+all,1w,Other Metals/Minerals,69,-5.04,-3.04
+all,1w,Food: Major Diversified,8,-5.09,-2.79
+all,1w,Other Consumer Services,34,-5.16,-5.93
+all,1w,Broadcasting,15,-5.25,-4.93
+all,1w,Pharmaceuticals: Other,25,-5.49,-4.58
+all,1w,Tobacco,3,-5.86,-9.51
+all,1w,Home Furnishings,18,-5.95,-6.65
+all,1w,Textiles,5,-5.96,-1.3
+all,1w,Beverages: Alcoholic,10,-6.1,-6.85
+all,1w,Precious Metals,71,-6.35,-7.09
+all,1w,Apparel/Footwear Retail,30,-6.75,-5.23
+all,1w,Publishing: Books/Magazines,5,-6.86,-7.72
+all,1w,Managed Health Care,8,-6.88,-4.52
+all,1w,Motor Vehicles,29,-7.1,-5.44
+all,1w,Internet Retail,28,-7.66,-6.04
+all,1w,Construction Materials,15,-8.01,-9.29
+all,1w,Automotive Aftermarket,5,-8.49,-9.17
+all,1w,Forest Products,5,-8.84,-8.39
+all,1w,Homebuilding,23,-9.89,-9.65
+all,1w,Miscellaneous,3,-12.12,-10.81
+all,1w,Consumer Sundries,4,-23.47,-25.23
+all,3m,Department Stores,4,11.83,11.42
+all,3m,Electronics/Appliance Stores,4,11.65,3.14
+all,3m,Tools & Hardware,5,10.67,-1.97
+all,3m,Services to the Health Industry,3,10.11,6.41
+all,3m,Industrial Conglomerates,3,9.43,9.77
+all,3m,Beverages: Non-Alcoholic,14,8.99,3.3
+all,3m,Discount Stores,3,8.68,6.85
+all,3m,Financial Publishing/Services,8,7.51,3.21
+all,3m,Property/Casualty Insurance,48,5.59,3.52
+all,3m,Hospital/Nursing Management,12,5.19,9.06
+all,3m,Managed Health Care,8,5.04,-0.08
+all,3m,Beverages: Alcoholic,10,4.5,-1.34
+all,3m,Tobacco,3,4.08,-3.83
+all,3m,Hotels/Resorts/Cruise lines,20,3.92,0.98
+all,3m,Oil Refining/Marketing,12,2.92,-7.77
+all,3m,Textiles,5,2.9,-16.03
+all,3m,Home Improvement Chains,5,2.19,0.61
+all,3m,Gas Distributors,24,1.56,17.71
+all,3m,Railroads,6,1.45,2.03
+all,3m,Office Equipment/Supplies,4,0.85,3.48
+all,3m,Financial Conglomerates,382,0.69,-1.76
+all,3m,Apparel/Footwear,34,0.37,6.16
+all,3m,Other Transportation,13,0.0,2.33
+all,3m,Household/Personal Care,20,-1.09,-7.42
+all,3m,Broadcasting,15,-1.18,-15.8
+all,3m,Marine Shipping,69,-1.82,-7.1
+all,3m,Building Products,24,-1.9,-11.02
+all,3m,Trucks/Construction/Farm Machinery,31,-2.11,-3.22
+all,3m,Savings Banks,38,-2.13,-0.7
+all,3m,Oil & Gas Pipelines,30,-2.16,-3.57
+all,3m,Food Retail,15,-2.72,-10.71
+all,3m,Medical/Nursing Services,57,-2.75,-10.96
+all,3m,Recreational Products,24,-3.1,-4.83
+all,3m,Apparel/Footwear Retail,30,-3.2,-9.47
+all,3m,Regional Banks,257,-3.37,-4.38
+all,3m,Integrated Oil,42,-3.95,-8.92
+all,3m,Air Freight/Couriers,28,-4.01,-2.72
+all,3m,Oil & Gas Production,39,-4.12,-5.22
+all,3m,Water Utilities,11,-4.12,-4.62
+all,3m,Insurance Brokers/Services,18,-4.22,-9.98
+all,3m,Food Distributors,11,-4.24,-22.78
+all,3m,Medical Distributors,9,-4.38,-7.55
+all,3m,Specialty Stores,66,-4.78,-6.73
+all,3m,Electric Utilities,73,-4.82,-6.47
+all,3m,Life/Health Insurance,27,-4.9,-4.71
+all,3m,Publishing: Books/Magazines,5,-5.47,-8.66
+all,3m,Multi-Line Insurance,52,-5.65,-4.24
+all,3m,Forest Products,5,-5.67,-12.08
+all,3m,Investment Trusts/Mutual Funds,101,-5.83,-5.81
+all,3m,Information Technology Services,88,-6.28,-7.8
+all,3m,Industrial Specialties,18,-6.45,-11.85
+all,3m,Chemicals: Major Diversified,12,-6.79,-2.36
+all,3m,Contract Drilling,11,-6.79,-7.09
+all,3m,Restaurants,48,-6.84,-7.06
+all,3m,Movies/Entertainment,43,-6.93,-15.23
+all,3m,Medical Specialties,205,-7.29,-10.61
+all,3m,Food: Major Diversified,8,-7.3,-15.54
+all,3m,Major Banks,132,-7.33,-6.48
+all,3m,Specialty Insurance,12,-7.49,-10.86
+all,3m,Investment Managers,83,-7.95,-11.55
+all,3m,Metal Fabrication,18,-8.16,7.3
+all,3m,Real Estate Investment Trusts,331,-8.44,-11.94
+all,3m,Food: Specialty/Candy,39,-8.47,-13.18
+all,3m,Major Telecommunications,15,-8.62,-12.11
+all,3m,Alternative Power Generation,12,-8.8,-19.94
+all,3m,Electronics Distributors,10,-9.29,-21.54
+all,3m,Publishing: Newspapers,7,-9.51,-9.87
+all,3m,Steel,15,-9.55,-10.45
+all,3m,Personnel Services,24,-9.72,-18.38
+all,3m,Finance/Rental/Leasing,129,-10.51,-10.25
+all,3m,Wireless Telecommunications,16,-10.51,-7.41
+all,3m,Electronics/Appliances,20,-10.97,-13.34
+all,3m,Internet Retail,28,-11.1,-14.52
+all,3m,Miscellaneous Commercial Services,151,-11.56,-13.3
+all,3m,Investment Banks/Brokers,56,-11.86,-16.3
+all,3m,Specialty Telecommunications,8,-11.86,-21.28
+all,3m,Packaged Software,342,-11.92,-15.52
+all,3m,Environmental Services,17,-11.95,-18.96
+all,3m,Airlines,18,-12.08,-17.67
+all,3m,Containers/Packaging,20,-12.12,-15.55
+all,3m,Real Estate Development,52,-12.14,-16.7
+all,3m,Chemicals: Specialty,55,-12.19,-14.01
+all,3m,Wholesale Distributors,71,-12.22,-14.82
+all,3m,Other Consumer Services,34,-12.39,-14.62
+all,3m,Miscellaneous Manufacturing,12,-13.1,-10.94
+all,3m,Homebuilding,23,-13.21,-15.16
+all,3m,Construction Materials,15,-13.59,-17.1
+all,3m,Food: Meat/Fish/Dairy,8,-13.93,-20.56
+all,3m,Coal,10,-14.4,-17.67
+all,3m,Internet Software/Services,79,-15.0,-11.78
+all,3m,Computer Communications,11,-15.38,-17.44
+all,3m,Industrial Machinery,101,-15.58,-21.82
+all,3m,Oilfield Services/Equipment,33,-15.63,-19.49
+all,3m,Chemicals: Agricultural,16,-15.91,-21.81
+all,3m,Cable/Satellite TV,7,-16.37,-24.4
+all,3m,Home Furnishings,18,-16.53,-14.94
+all,3m,Pulp & Paper,5,-16.63,-18.72
+all,3m,Telecommunications Equipment,32,-16.8,-19.99
+all,3m,Casinos/Gaming,14,-17.59,-26.88
+all,3m,Agricultural Commodities/Milling,31,-17.86,-23.26
+all,3m,Trucking,21,-18.3,-18.05
+all,3m,Precious Metals,71,-18.86,-19.12
+all,3m,Motor Vehicles,29,-19.04,-27.33
+all,3m,Aerospace & Defense,80,-19.63,-22.34
+all,3m,Automotive Aftermarket,5,-21.79,-13.77
+all,3m,Pharmaceuticals: Other,25,-21.86,-18.72
+all,3m,Pharmaceuticals: Major,311,-22.82,-20.78
+all,3m,Electronic Production Equipment,29,-23.22,-28.47
+all,3m,Commercial Printing/Forms,11,-23.37,-22.99
+all,3m,Biotechnology,284,-23.42,-21.39
+all,3m,Aluminum,5,-23.47,-26.43
+all,3m,Electronic Equipment/Instruments,41,-23.83,-25.61
+all,3m,Auto Parts: OEM,33,-24.04,-25.05
+all,3m,Semiconductors,87,-24.22,-24.56
+all,3m,Electronic Components,24,-26.28,-27.58
+all,3m,Data Processing Services,62,-27.96,-22.94
+all,3m,Engineering & Construction,63,-28.63,-27.95
+all,3m,Miscellaneous,3,-29.86,3.2
+all,3m,Computer Processing Hardware,16,-30.37,-35.53
+all,3m,Electrical Products,71,-30.46,-28.09
+all,3m,Consumer Sundries,4,-32.08,-34.51
+all,3m,Advertising/Marketing Services,31,-34.74,-27.93
+all,3m,Computer Peripherals,21,-38.11,-33.92
+all,3m,Other Metals/Minerals,69,-39.17,-35.44
+all,6m,Tools & Hardware,5,47.3,18.46
+all,6m,Office Equipment/Supplies,4,41.67,35.63
+all,6m,Services to the Health Industry,3,37.26,19.97
+all,6m,Oil Refining/Marketing,12,35.06,23.27
+all,6m,Discount Stores,3,27.76,33.52
+all,6m,Department Stores,4,26.22,41.61
+all,6m,Insurance Brokers/Services,18,24.03,9.49
+all,6m,Publishing: Books/Magazines,5,22.8,4.57
+all,6m,Financial Publishing/Services,8,19.55,21.02
+all,6m,Medical Distributors,9,18.39,-2.66
+all,6m,Property/Casualty Insurance,48,17.57,15.24
+all,6m,Hospital/Nursing Management,12,13.83,15.24
+all,6m,Savings Banks,38,13.37,14.28
+all,6m,Medical/Nursing Services,57,13.14,7.72
+all,6m,Hotels/Resorts/Cruise lines,20,12.54,10.53
+all,6m,Household/Personal Care,20,11.8,3.55
+all,6m,Personnel Services,24,11.72,3.55
+all,6m,Railroads,6,11.47,10.87
+all,6m,Electronics/Appliance Stores,4,11.4,11.23
+all,6m,Apparel/Footwear,34,11.03,20.44
+all,6m,Textiles,5,10.79,2.58
+all,6m,Managed Health Care,8,10.45,9.77
+all,6m,Restaurants,48,10.35,13.36
+all,6m,Environmental Services,17,10.24,-11.76
+all,6m,Building Products,24,9.17,-0.39
+all,6m,Water Utilities,11,9.06,6.95
+all,6m,Regional Banks,257,8.82,6.87
+all,6m,Containers/Packaging,20,7.82,-4.08
+all,6m,Home Improvement Chains,5,7.77,14.77
+all,6m,Other Transportation,13,6.2,6.71
+all,6m,Beverages: Non-Alcoholic,14,6.13,-6.23
+all,6m,Industrial Specialties,18,5.19,-4.12
+all,6m,Movies/Entertainment,43,4.38,-5.04
+all,6m,Metal Fabrication,18,3.49,20.33
+all,6m,Broadcasting,15,3.48,-13.14
+all,6m,Forest Products,5,3.1,1.82
+all,6m,Pulp & Paper,5,2.87,-8.55
+all,6m,Food: Major Diversified,8,2.18,-18.23
+all,6m,Tobacco,3,2.16,-9.9
+all,6m,Airlines,18,1.98,-11.12
+all,6m,Miscellaneous Manufacturing,12,1.96,4.12
+all,6m,Recreational Products,24,1.76,3.34
+all,6m,Industrial Conglomerates,3,1.75,-1.25
+all,6m,Financial Conglomerates,382,1.32,-3.93
+all,6m,Beverages: Alcoholic,10,1.07,-7.81
+all,6m,Apparel/Footwear Retail,30,0.8,4.9
+all,6m,Multi-Line Insurance,52,0.77,0.94
+all,6m,Medical Specialties,205,0.0,2.29
+all,6m,Specialty Stores,66,-0.68,-0.18
+all,6m,Oil & Gas Pipelines,30,-1.62,-2.13
+all,6m,Marine Shipping,69,-1.63,-2.99
+all,6m,Information Technology Services,88,-1.7,4.89
+all,6m,Homebuilding,23,-1.72,-1.71
+all,6m,Steel,15,-2.53,-0.84
+all,6m,Major Banks,132,-2.64,0.64
+all,6m,Electronics Distributors,10,-2.75,-16.41
+all,6m,Gas Distributors,24,-2.8,13.66
+all,6m,Commercial Printing/Forms,11,-3.3,-24.06
+all,6m,Food: Specialty/Candy,39,-3.61,-3.98
+all,6m,Investment Managers,83,-3.62,-6.42
+all,6m,Specialty Insurance,12,-3.7,-6.12
+all,6m,Trucks/Construction/Farm Machinery,31,-3.87,2.38
+all,6m,Publishing: Newspapers,7,-4.06,-5.8
+all,6m,Electronics/Appliances,20,-4.33,3.82
+all,6m,Air Freight/Couriers,28,-5.16,-12.7
+all,6m,Finance/Rental/Leasing,129,-6.55,-7.77
+all,6m,Investment Trusts/Mutual Funds,101,-6.74,-7.05
+all,6m,Home Furnishings,18,-6.81,-3.34
+all,6m,Internet Retail,28,-7.14,-8.97
+all,6m,Real Estate Development,52,-7.46,-13.62
+all,6m,Electric Utilities,73,-7.47,-9.05
+all,6m,Food Distributors,11,-7.61,-20.53
+all,6m,Food Retail,15,-7.91,-16.17
+all,6m,Packaged Software,342,-7.91,-2.72
+all,6m,Real Estate Investment Trusts,331,-8.27,7.56
+all,6m,Chemicals: Major Diversified,12,-8.42,-6.81
+all,6m,Major Telecommunications,15,-8.71,2.02
+all,6m,Investment Banks/Brokers,56,-8.72,-10.56
+all,6m,Integrated Oil,42,-8.76,-11.95
+all,6m,Life/Health Insurance,27,-8.79,-1.98
+all,6m,Wholesale Distributors,71,-8.85,-8.52
+all,6m,Alternative Power Generation,12,-9.91,-21.51
+all,6m,Cable/Satellite TV,7,-10.36,-19.55
+all,6m,Miscellaneous Commercial Services,151,-10.54,-5.72
+all,6m,Automotive Aftermarket,5,-10.62,-7.98
+all,6m,Oil & Gas Production,39,-10.86,-10.99
+all,6m,Trucking,21,-11.59,-7.36
+all,6m,Aerospace & Defense,80,-12.13,-16.27
+all,6m,Other Consumer Services,34,-12.48,-8.39
+all,6m,Food: Meat/Fish/Dairy,8,-12.77,-17.78
+all,6m,Casinos/Gaming,14,-12.86,-22.0
+all,6m,Wireless Telecommunications,16,-13.15,-10.34
+all,6m,Industrial Machinery,101,-13.25,-22.07
+all,6m,Internet Software/Services,79,-13.42,-11.13
+all,6m,Oilfield Services/Equipment,33,-17.36,-19.2
+all,6m,Construction Materials,15,-17.67,-15.46
+all,6m,Contract Drilling,11,-18.12,-15.52
+all,6m,Chemicals: Agricultural,16,-18.94,-29.33
+all,6m,Telecommunications Equipment,32,-19.08,-21.24
+all,6m,Chemicals: Specialty,55,-20.74,-20.77
+all,6m,Coal,10,-20.8,-21.95
+all,6m,Specialty Telecommunications,8,-21.49,-28.38
+all,6m,Precious Metals,71,-22.21,-22.03
+all,6m,Motor Vehicles,29,-22.35,-30.01
+all,6m,Electronic Equipment/Instruments,41,-22.37,-24.93
+all,6m,Agricultural Commodities/Milling,31,-22.49,-29.29
+all,6m,Biotechnology,284,-22.81,-11.45
+all,6m,Auto Parts: OEM,33,-22.92,-23.96
+all,6m,Pharmaceuticals: Major,311,-23.16,-19.23
+all,6m,Miscellaneous,3,-24.62,-20.19
+all,6m,Computer Processing Hardware,16,-25.27,-18.52
+all,6m,Consumer Sundries,4,-25.36,-28.45
+all,6m,Computer Peripherals,21,-27.74,-10.87
+all,6m,Electronic Production Equipment,29,-29.37,-31.1
+all,6m,Electronic Components,24,-31.19,-27.41
+all,6m,Semiconductors,87,-31.78,-30.61
+all,6m,Computer Communications,11,-33.06,-21.48
+all,6m,Advertising/Marketing Services,31,-35.24,-14.3
+all,6m,Aluminum,5,-35.87,-34.43
+all,6m,Pharmaceuticals: Other,25,-40.1,-26.46
+all,6m,Other Metals/Minerals,69,-41.18,-38.91
+all,6m,Data Processing Services,62,-41.55,-22.64
+all,6m,Engineering & Construction,63,-43.0,-35.42
+all,6m,Electrical Products,71,-44.92,-36.65
+liquid,1m,Building Products,4,15.07,10.72
+liquid,1m,Beverages: Non-Alcoholic,3,13.53,12.21
+liquid,1m,Apparel/Footwear Retail,6,13.45,14.65
+liquid,1m,Chemicals: Specialty,3,13.39,10.68
+liquid,1m,Real Estate Development,7,12.43,10.86
+liquid,1m,Medical/Nursing Services,12,10.25,6.27
+liquid,1m,Internet Retail,4,9.98,17.2
+liquid,1m,Chemicals: Major Diversified,3,9.46,3.9
+liquid,1m,Specialty Stores,8,8.35,9.59
+liquid,1m,Hospital/Nursing Management,4,7.08,2.17
+liquid,1m,Restaurants,10,6.85,7.01
+liquid,1m,Trucks/Construction/Farm Machinery,3,6.22,6.64
+liquid,1m,Movies/Entertainment,4,5.55,8.61
+liquid,1m,Casinos/Gaming,3,4.22,-6.73
+liquid,1m,Investment Managers,5,3.94,4.19
+liquid,1m,Airlines,4,3.49,3.51
+liquid,1m,Pharmaceuticals: Major,43,3.48,4.88
+liquid,1m,Other Consumer Services,6,2.46,0.04
+liquid,1m,Aerospace & Defense,25,2.25,3.93
+liquid,1m,Wholesale Distributors,4,1.93,3.87
+liquid,1m,Internet Software/Services,14,1.24,-1.04
+liquid,1m,Finance/Rental/Leasing,12,-0.31,0.64
+liquid,1m,Electronics/Appliances,3,-0.34,-0.71
+liquid,1m,Medical Specialties,30,-0.58,1.15
+liquid,1m,Food: Specialty/Candy,5,-2.12,-2.31
+liquid,1m,Trucking,5,-2.35,-0.5
+liquid,1m,Information Technology Services,23,-3.07,-1.17
+liquid,1m,Managed Health Care,4,-3.21,-3.07
+liquid,1m,Air Freight/Couriers,3,-4.1,-4.08
+liquid,1m,Apparel/Footwear,6,-4.27,1.35
+liquid,1m,Motor Vehicles,7,-4.41,-15.22
+liquid,1m,Electric Utilities,3,-5.79,-6.74
+liquid,1m,Miscellaneous Commercial Services,22,-6.02,-10.51
+liquid,1m,Packaged Software,91,-6.15,-6.8
+liquid,1m,Contract Drilling,7,-6.38,-10.24
+liquid,1m,Oil & Gas Production,7,-6.49,-1.33
+liquid,1m,Semiconductors,41,-9.4,-10.35
+liquid,1m,Electronics Distributors,4,-10.04,-0.23
+liquid,1m,Coal,3,-10.19,-15.94
+liquid,1m,Engineering & Construction,19,-12.24,-13.83
+liquid,1m,Integrated Oil,8,-12.76,-21.5
+liquid,1m,Marine Shipping,12,-13.05,-19.63
+liquid,1m,Specialty Telecommunications,3,-13.61,-12.63
+liquid,1m,Oilfield Services/Equipment,8,-14.72,-17.81
+liquid,1m,Oil Refining/Marketing,9,-14.78,-18.14
+liquid,1m,Precious Metals,12,-15.2,-14.05
+liquid,1m,Industrial Machinery,27,-15.5,-15.2
+liquid,1m,Auto Parts: OEM,3,-15.72,-13.14
+liquid,1m,Electrical Products,25,-15.87,-14.01
+liquid,1m,Other Metals/Minerals,13,-16.53,-16.99
+liquid,1m,Electronic Equipment/Instruments,10,-17.12,-14.2
+liquid,1m,Electronic Production Equipment,14,-17.71,-15.4
+liquid,1m,Telecommunications Equipment,6,-20.15,-16.84
+liquid,1m,Computer Peripherals,8,-21.33,-16.95
+liquid,1m,Financial Conglomerates,7,-21.89,-23.01
+liquid,1m,Investment Banks/Brokers,8,-22.71,-20.5
+liquid,1m,Computer Processing Hardware,10,-22.9,-21.26
+liquid,1m,Data Processing Services,17,-23.37,-15.67
+liquid,1m,Regional Banks,3,-25.36,-36.64
+liquid,1m,Major Banks,3,-25.72,-23.24
+liquid,1m,Electronic Components,8,-26.83,-29.95
+liquid,1w,Electric Utilities,3,16.94,17.24
+liquid,1w,Industrial Machinery,27,12.13,7.79
+liquid,1w,Semiconductors,41,9.79,8.83
+liquid,1w,Engineering & Construction,19,8.52,5.56
+liquid,1w,Electronic Components,8,8.23,8.2
+liquid,1w,Electronic Production Equipment,14,7.46,6.97
+liquid,1w,Aerospace & Defense,25,6.37,9.17
+liquid,1w,Coal,3,5.91,6.81
+liquid,1w,Computer Peripherals,8,4.32,7.71
+liquid,1w,Data Processing Services,17,3.64,4.67
+liquid,1w,Oilfield Services/Equipment,8,3.07,3.1
+liquid,1w,Electrical Products,25,2.31,-1.09
+liquid,1w,Electronics Distributors,4,2.2,2.08
+liquid,1w,Chemicals: Major Diversified,3,2.15,6.75
+liquid,1w,Chemicals: Specialty,3,2.11,1.8
+liquid,1w,Electronic Equipment/Instruments,10,1.85,2.62
+liquid,1w,Computer Processing Hardware,10,1.61,2.35
+liquid,1w,Wholesale Distributors,4,1.3,-0.4
+liquid,1w,Trucks/Construction/Farm Machinery,3,1.27,1.04
+liquid,1w,Telecommunications Equipment,6,0.98,-3.76
+liquid,1w,Movies/Entertainment,4,0.85,1.13
+liquid,1w,Oil Refining/Marketing,9,0.54,-1.69
+liquid,1w,Airlines,4,0.49,1.59
+liquid,1w,Other Metals/Minerals,13,0.48,0.02
+liquid,1w,Specialty Telecommunications,3,0.13,2.05
+liquid,1w,Contract Drilling,7,0.0,-0.09
+liquid,1w,Information Technology Services,23,-0.06,2.39
+liquid,1w,Investment Managers,5,-0.07,-0.32
+liquid,1w,Integrated Oil,8,-0.15,-8.31
+liquid,1w,Miscellaneous Commercial Services,22,-0.61,-2.51
+liquid,1w,Pharmaceuticals: Major,43,-0.8,-1.37
+liquid,1w,Oil & Gas Production,7,-0.82,1.98
+liquid,1w,Packaged Software,91,-1.24,-2.0
+liquid,1w,Casinos/Gaming,3,-1.26,-1.03
+liquid,1w,Auto Parts: OEM,3,-1.65,-0.08
+liquid,1w,Building Products,4,-1.71,-2.0
+liquid,1w,Marine Shipping,12,-1.72,-1.77
+liquid,1w,Beverages: Non-Alcoholic,3,-1.92,-1.35
+liquid,1w,Apparel/Footwear,6,-2.39,-3.68
+liquid,1w,Motor Vehicles,7,-2.43,-2.52
+liquid,1w,Air Freight/Couriers,3,-3.28,-4.18
+liquid,1w,Trucking,5,-3.73,-3.16
+liquid,1w,Apparel/Footwear Retail,6,-4.3,-4.98
+liquid,1w,Hospital/Nursing Management,4,-4.44,-8.1
+liquid,1w,Medical/Nursing Services,12,-5.1,-5.09
+liquid,1w,Other Consumer Services,6,-6.03,-5.57
+liquid,1w,Regional Banks,3,-6.07,-10.88
+liquid,1w,Medical Specialties,30,-6.08,-6.67
+liquid,1w,Precious Metals,12,-6.41,-7.15
+liquid,1w,Restaurants,10,-6.73,-5.06
+liquid,1w,Specialty Stores,8,-7.15,-5.7
+liquid,1w,Internet Software/Services,14,-7.56,-5.99
+liquid,1w,Investment Banks/Brokers,8,-7.77,-5.06
+liquid,1w,Managed Health Care,4,-8.17,-7.89
+liquid,1w,Food: Specialty/Candy,5,-8.24,-6.26
+liquid,1w,Finance/Rental/Leasing,12,-8.73,-6.69
+liquid,1w,Major Banks,3,-8.89,-6.32
+liquid,1w,Internet Retail,4,-8.95,-6.27
+liquid,1w,Electronics/Appliances,3,-9.73,-4.89
+liquid,1w,Real Estate Development,7,-10.07,-15.77
+liquid,1w,Financial Conglomerates,7,-14.15,-12.57
+liquid,3m,Apparel/Footwear Retail,6,22.11,14.01
+liquid,3m,Financial Conglomerates,7,20.46,34.14
+liquid,3m,Medical/Nursing Services,12,16.46,8.94
+liquid,3m,Chemicals: Specialty,3,14.7,9.49
+liquid,3m,Trucks/Construction/Farm Machinery,3,12.83,4.98
+liquid,3m,Oil Refining/Marketing,9,9.34,2.3
+liquid,3m,Beverages: Non-Alcoholic,3,8.8,4.13
+liquid,3m,Hospital/Nursing Management,4,8.34,0.38
+liquid,3m,Marine Shipping,12,5.34,0.09
+liquid,3m,Internet Retail,4,3.67,7.85
+liquid,3m,Managed Health Care,4,2.91,-8.06
+liquid,3m,Oil & Gas Production,7,2.24,3.13
+liquid,3m,Building Products,4,-0.75,-6.07
+liquid,3m,Specialty Telecommunications,3,-2.07,-15.6
+liquid,3m,Specialty Stores,8,-2.94,-5.66
+liquid,3m,Movies/Entertainment,4,-3.03,-3.14
+liquid,3m,Medical Specialties,30,-3.32,2.71
+liquid,3m,Packaged Software,91,-4.91,-7.61
+liquid,3m,Integrated Oil,8,-5.03,-16.87
+liquid,3m,Electronics Distributors,4,-5.62,-4.25
+liquid,3m,Information Technology Services,23,-5.76,-4.84
+liquid,3m,Miscellaneous Commercial Services,22,-7.07,-9.76
+liquid,3m,Contract Drilling,7,-7.64,-11.81
+liquid,3m,Other Consumer Services,6,-7.74,-11.37
+liquid,3m,Electric Utilities,3,-8.43,-8.77
+liquid,3m,Investment Managers,5,-8.46,-9.04
+liquid,3m,Apparel/Footwear,6,-8.63,-1.2
+liquid,3m,Restaurants,10,-8.65,4.7
+liquid,3m,Pharmaceuticals: Major,43,-10.55,-6.55
+liquid,3m,Real Estate Development,7,-11.17,-23.97
+liquid,3m,Food: Specialty/Candy,5,-11.25,-11.9
+liquid,3m,Wholesale Distributors,4,-11.69,-4.52
+liquid,3m,Electronics/Appliances,3,-11.71,-12.03
+liquid,3m,Coal,3,-11.9,-16.81
+liquid,3m,Chemicals: Major Diversified,3,-12.13,-6.66
+liquid,3m,Air Freight/Couriers,3,-12.55,-14.09
+liquid,3m,Trucking,5,-13.3,-17.93
+liquid,3m,Finance/Rental/Leasing,12,-14.35,-18.16
+liquid,3m,Internet Software/Services,14,-17.38,-14.91
+liquid,3m,Casinos/Gaming,3,-17.78,-25.65
+liquid,3m,Investment Banks/Brokers,8,-18.62,-20.1
+liquid,3m,Motor Vehicles,7,-19.04,-31.4
+liquid,3m,Electronic Equipment/Instruments,10,-19.09,-25.6
+liquid,3m,Precious Metals,12,-19.74,-19.16
+liquid,3m,Semiconductors,41,-20.28,-17.03
+liquid,3m,Airlines,4,-20.36,-16.35
+liquid,3m,Computer Peripherals,8,-20.92,-19.76
+liquid,3m,Major Banks,3,-22.29,-22.27
+liquid,3m,Auto Parts: OEM,3,-24.38,-27.19
+liquid,3m,Regional Banks,3,-24.84,-44.88
+liquid,3m,Electronic Production Equipment,14,-25.1,-27.69
+liquid,3m,Aerospace & Defense,25,-25.58,-23.09
+liquid,3m,Industrial Machinery,27,-26.66,-27.61
+liquid,3m,Electronic Components,8,-29.7,-35.75
+liquid,3m,Computer Processing Hardware,10,-30.37,-32.17
+liquid,3m,Electrical Products,25,-30.46,-30.99
+liquid,3m,Data Processing Services,17,-30.66,-26.04
+liquid,3m,Engineering & Construction,19,-31.65,-28.73
+liquid,3m,Telecommunications Equipment,6,-32.42,-34.27
+liquid,3m,Oilfield Services/Equipment,8,-32.61,-28.21
+liquid,3m,Other Metals/Minerals,13,-33.48,-30.45
+liquid,6m,Oil Refining/Marketing,9,51.63,44.56
+liquid,6m,Internet Retail,4,48.56,36.5
+liquid,6m,Medical Specialties,30,34.92,35.54
+liquid,6m,Medical/Nursing Services,12,34.29,46.2
+liquid,6m,Restaurants,10,33.04,35.57
+liquid,6m,Packaged Software,91,29.2,27.8
+liquid,6m,Apparel/Footwear Retail,6,27.88,45.64
+liquid,6m,Electronics/Appliances,3,24.3,10.82
+liquid,6m,Computer Peripherals,8,23.9,19.07
+liquid,6m,Hospital/Nursing Management,4,17.28,11.7
+liquid,6m,Marine Shipping,12,17.13,8.71
+liquid,6m,Managed Health Care,4,16.0,4.68
+liquid,6m,Other Consumer Services,6,14.08,15.73
+liquid,6m,Information Technology Services,23,13.88,19.31
+liquid,6m,Pharmaceuticals: Major,43,12.15,18.33
+liquid,6m,Beverages: Non-Alcoholic,3,9.93,14.86
+liquid,6m,Investment Managers,5,6.86,8.17
+liquid,6m,Miscellaneous Commercial Services,22,6.05,11.73
+liquid,6m,Building Products,4,4.74,8.64
+liquid,6m,Internet Software/Services,14,4.31,1.7
+liquid,6m,Specialty Stores,8,3.97,16.86
+liquid,6m,Airlines,4,1.98,0.58
+liquid,6m,Electronics Distributors,4,1.51,0.63
+liquid,6m,Apparel/Footwear,6,0.67,11.44
+liquid,6m,Coal,3,-0.09,-9.02
+liquid,6m,Oil & Gas Production,7,-0.13,-0.55
+liquid,6m,Real Estate Development,7,-1.37,-26.63
+liquid,6m,Wholesale Distributors,4,-2.67,12.51
+liquid,6m,Major Banks,3,-2.8,-6.44
+liquid,6m,Electric Utilities,3,-3.77,-8.38
+liquid,6m,Trucks/Construction/Farm Machinery,3,-3.87,0.49
+liquid,6m,Movies/Entertainment,4,-5.67,23.7
+liquid,6m,Finance/Rental/Leasing,12,-7.86,-11.95
+liquid,6m,Air Freight/Couriers,3,-8.47,-4.41
+liquid,6m,Chemicals: Specialty,3,-10.54,-14.53
+liquid,6m,Food: Specialty/Candy,5,-11.58,-2.95
+liquid,6m,Investment Banks/Brokers,8,-12.84,-19.08
+liquid,6m,Casinos/Gaming,3,-12.98,-18.98
+liquid,6m,Trucking,5,-13.19,-16.45
+liquid,6m,Financial Conglomerates,7,-13.3,-6.94
+liquid,6m,Integrated Oil,8,-16.38,-25.12
+liquid,6m,Contract Drilling,7,-20.5,-21.29
+liquid,6m,Chemicals: Major Diversified,3,-20.81,-17.92
+liquid,6m,Regional Banks,3,-20.83,-40.61
+liquid,6m,Precious Metals,12,-22.11,-22.08
+liquid,6m,Motor Vehicles,7,-22.35,-29.87
+liquid,6m,Electronic Equipment/Instruments,10,-22.55,-22.74
+liquid,6m,Computer Processing Hardware,10,-23.4,-11.12
+liquid,6m,Semiconductors,41,-23.96,-21.25
+liquid,6m,Aerospace & Defense,25,-25.55,-18.31
+liquid,6m,Specialty Telecommunications,3,-26.74,-29.91
+liquid,6m,Industrial Machinery,27,-27.99,-25.34
+liquid,6m,Electronic Production Equipment,14,-29.77,-33.19
+liquid,6m,Auto Parts: OEM,3,-30.96,-23.33
+liquid,6m,Telecommunications Equipment,6,-33.2,-31.47
+liquid,6m,Oilfield Services/Equipment,8,-33.24,-34.61
+liquid,6m,Other Metals/Minerals,13,-34.48,-29.0
+liquid,6m,Electronic Components,8,-37.67,-38.05
+liquid,6m,Engineering & Construction,19,-39.3,-32.5
+liquid,6m,Electrical Products,25,-42.35,-40.3
+liquid,6m,Data Processing Services,17,-43.97,-27.39
